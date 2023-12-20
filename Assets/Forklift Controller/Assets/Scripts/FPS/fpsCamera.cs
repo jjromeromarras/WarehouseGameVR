@@ -14,14 +14,8 @@ public class fpsCamera : MonoBehaviour {
 
     private void Awake()
     {
-        LockCursor();
+      
         limit = 0.0f;
-    }
-
-
-    private void LockCursor()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()
@@ -31,8 +25,14 @@ public class fpsCamera : MonoBehaviour {
 
     private void CameraRotation()
     {
+        
+        //Vector3 mouseInput = new Vector3(Input.GetAxis(mouseXInputName), Input.GetAxis(mouseYInputName));
+
+        //playerBody.transform.rotation = Quaternion.Euler(playerBody.transform.eulerAngles + new Vector3(0f,mouseX,0f));
+        //transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(mouseY,0f,0f));
+        
         float mouseX = Input.GetAxis(mouseXInputName) * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis(mouseYInputName) * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis(mouseYInputName) ;
 
         limit += mouseY;
 
@@ -48,8 +48,9 @@ public class fpsCamera : MonoBehaviour {
             mouseY = 0.0f;
             limitRotationToValue(90.0f);
         }
-
-        transform.Rotate(Vector3.left * mouseY);
+        
+        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(-mouseY,0f,0f));
+        // transform.Rotate(Vector3.left * mouseY);
         playerBody.Rotate(Vector3.up * mouseX);
     }
 

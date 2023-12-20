@@ -9,6 +9,8 @@ public class fpsBody : MonoBehaviour {
     public float Speed;
     public float runSpeedMultiplicated;
 
+    public Animator anim;
+
     public CharacterController charController;
 
     public void Start()
@@ -19,16 +21,20 @@ public class fpsBody : MonoBehaviour {
     private void Update()
     {
         PlayerMovement();
-
+   
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             Speed = Speed * runSpeedMultiplicated;
+             anim.SetBool("IsRunning", true);
         }
 
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             Speed = Speed / runSpeedMultiplicated;
+            anim.SetBool("IsRunning", false);
         }
+
+       
     }
 
     private void PlayerMovement()
@@ -40,6 +46,7 @@ public class fpsBody : MonoBehaviour {
         Vector3 rightMovement = transform.right * horizInput;
 
         charController.SimpleMove(forwardMovement + rightMovement);
+        anim.SetBool("IsWalker", forwardMovement.magnitude + rightMovement.magnitude>0);
     }
 
 }

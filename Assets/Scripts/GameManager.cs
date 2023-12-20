@@ -7,10 +7,13 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     public GameObject rfmenu;
 
+
     private bool showrfmenu;
     void Start()
-    {
-        showrfmenu = true;
+    {        
+        rfmenu.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        
     }
 
     // Update is called once per frame
