@@ -234,7 +234,7 @@ public class forklift : MonoBehaviour
                 }
             }
 
-            if (Input.GetKeyDown(changeCameraKey))
+           /* if (Input.GetKeyDown(changeCameraKey))
             {
                 if (cameraInteriorForklift.activeSelf)
                 {
@@ -246,7 +246,7 @@ public class forklift : MonoBehaviour
                     cameraInteriorForklift.SetActive(true);
                     cameraExteriorForklift.SetActive(false);
                 }
-            }
+            }*/
 
             //update texts
             gearText.text = "Gear: " + currentGear;

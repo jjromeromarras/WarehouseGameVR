@@ -118,8 +118,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level1: {fileID: 1795742561854776114}
   level2: {fileID: 6318457513234346482}
-  sscLevel1: 
-  sscLevel2: 
+  aisle: 0
+  logicalx: 0
+  sideChar: 
 --- !u!1 &1034085207617086038
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,7 +135,7 @@ GameObject:
   - component: {fileID: 8522043541164928000}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Ubicacion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -231,7 +232,7 @@ GameObject:
   - component: {fileID: 1888069791605523481}
   - component: {fileID: 6318457513234346482}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: Placa2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -403,7 +404,7 @@ GameObject:
   - component: {fileID: 7752708832372908330}
   - component: {fileID: 1795742561854776114}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: Placa1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -577,7 +578,7 @@ GameObject:
   - component: {fileID: 912984987675107605}
   m_Layer: 0
   m_Name: Plane (1)
-  m_TagString: Untagged
+  m_TagString: Ubicacion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

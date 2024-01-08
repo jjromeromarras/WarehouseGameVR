@@ -520,7 +520,7 @@ GameObject:
   - component: {fileID: 6808595756792603258}
   m_Layer: 0
   m_Name: Placa1
-  m_TagString: Untagged
+  m_TagString: PlacaContainer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -823,7 +823,7 @@ GameObject:
   - component: {fileID: 9020591356955891054}
   m_Layer: 0
   m_Name: Placa1 (1)
-  m_TagString: Untagged
+  m_TagString: PlacaContainer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
