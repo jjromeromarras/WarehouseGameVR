@@ -309,6 +309,7 @@ MonoBehaviour:
   cameraInteriorForklift: {fileID: 8656683283686413377}
   cameraExteriorForklift: {fileID: 6319335000638756650}
   FPS: {fileID: 0}
+  box: {fileID: 0}
   torque: 200
   brakeTorque: 100
   maxSteerAngle: 32
@@ -321,6 +322,7 @@ MonoBehaviour:
   downLoaderKey: 108
   isPnj: 0
   waypoints: []
+  loaderpos1: {fileID: 0}
 --- !u!54 &8548019789838093339
 Rigidbody:
   m_ObjectHideFlags: 0

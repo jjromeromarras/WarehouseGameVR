@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 using TMPro;
+using Assets.Scripts.Helper;
+using UnityEngine.AI;
+using System.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 public class forklift : MonoBehaviour
 {
@@ -29,6 +33,7 @@ public class forklift : MonoBehaviour
     public GameObject cameraInteriorForklift;
     public GameObject cameraExteriorForklift;
     public GameObject FPS;
+    public GameObject box;
 
     [Header("VALUES")]
     public float torque;
@@ -46,17 +51,29 @@ public class forklift : MonoBehaviour
 
     [Header("PNJ")]
     public bool isPnj;
-    public Transform[] waypoints;
-
+    public orderwalker[] waypoints;
+    public Transform loaderpos1;
+    
     [Range(-1, 1)]
     int currentGear = 0;
     bool canEnter = false;
     bool enter = false;
     float maxPositionY = 3.5f;
 
+    #region Private Fields
     private int indexWaypointActual = 0;
     private int margenError = 1;
     private bool pnjdetenido = false;
+    private ForkLiftState state;
+    
+    private float distanciaRecorrida = 0f;
+    private float velocidad = 5f; // Velocidad de avance
+    private GameObject palletloadpos = null;
+    private Vector3 positionorigpallet;
+    private Quaternion rotacionorigpallet;
+    private NavMeshAgent agente;
+
+    #endregion
     //when the player is close to the forklift
     private void OnTriggerEnter(Collider other)
     {
@@ -99,7 +116,11 @@ public class forklift : MonoBehaviour
                 rearR.brakeTorque = 0;
         }
     }
-
+    private void Awake()
+    {
+        state = ForkLiftState.eMove;
+        agente = GetComponent<NavMeshAgent>();
+    }
     private void Start()
     {
         //ignore that
@@ -249,66 +270,453 @@ public class forklift : MonoBehaviour
             }*/
 
             //update texts
-            gearText.text = "Gear: " + currentGear;
-            speedText.text = "Speed: " + currentSpeed.ToString("f2") + "Km/h";
+            // gearText.text = "Gear: " + currentGear;
+            // speedText.text = "Speed: " + currentSpeed.ToString("f2") + "Km/h";
         }
         else
         {
             // PNJ
-            movePNJ();
+            UpdatePNJ();
         }
     }
 
-    private void movePNJ()
+    private void MovePNJ()
     {
         if (waypoints.Length > 0 && indexWaypointActual < waypoints.Length && !pnjdetenido)
         {
-            // Calcula la distancia entre el camión y el waypoint actual
-            float distancia = Vector3.Distance(transform.position, waypoints[indexWaypointActual].position);
+            //if (!waypoints[indexWaypointActual].isloading && !waypoints[indexWaypointActual].isunloading)
+            //{
+            float distancia = Vector3.Distance(transform.position, waypoints[indexWaypointActual].waypoint.position);
 
             if (distancia > margenError)
             {
+
+                frontL.motorTorque = 0;
+                frontR.motorTorque = 0;
+                rearL.motorTorque = 0;
+                rearR.motorTorque = 0;
+                agente.enabled = true;
+                agente.destination = waypoints[indexWaypointActual].waypoint.position;
+
+
                 // Obtenemos la dirección hacia el waypoint actual
-                Vector3 direccion = waypoints[indexWaypointActual].position - transform.position;
+                //Vector3 direccion = waypoints[indexWaypointActual].waypoint.position - transform.position;
 
                 // Rotamos la carretilla hacía el punto
-                Quaternion rotacion = Quaternion.LookRotation(direccion);
-                transform.rotation = Quaternion.Lerp(transform.rotation, rotacion, Time.deltaTime * 3f);
+                //Quaternion rotacion = Quaternion.LookRotation(direccion);
+                //transform.rotation = Quaternion.Lerp(transform.rotation, rotacion, Time.deltaTime * 3f);
 
                 // Mueve el camión hacia el waypoint actual
                 // transform.position = Vector3.MoveTowards(transform.position, waypoints[indexWaypointActual].position, currentSpeed * Time.deltaTime);
 
-                if (currentSpeed < 2)
-                {
-                    //aply motor torque
-                    frontL.motorTorque = torque;
-                    frontR.motorTorque = torque;
-                    rearL.motorTorque = torque;
-                    rearR.motorTorque = torque;
-                }
-                else
-                {
-                    frontL.motorTorque = 0;
-                    frontR.motorTorque = 0;
-                    rearL.motorTorque = 0;
-                    rearR.motorTorque = 0;
-                }
+                //if (currentSpeed < 2)
+                //{
+                //    //aply motor torque
+                //    frontL.motorTorque = torque;
+                //    frontR.motorTorque = torque;
+                //    rearL.motorTorque = torque;
+                //    rearR.motorTorque = torque;
+                //}
+                //else
+                //{
+                //    frontL.motorTorque = 0;
+                //    frontR.motorTorque = 0;
+                //    rearL.motorTorque = 0;
+                //    rearR.motorTorque = 0;
+                //}
 
                 //update wheel poses
-                UpdateWheelPoses();
+                //UpdateWheelPoses();
                 // Si el camión ha alcanzado el waypoint actual, pasa al siguiente
             }
             else
             {
-                indexWaypointActual++;
-                // Verifica si hay más waypoints, si no, reinicia el recorrido
-                if (indexWaypointActual >= waypoints.Length)
+              
+                agente.enabled = false;
+                // Comprobamos si un movimiento de carga o descarga
+                if (waypoints[indexWaypointActual].isloading)
                 {
-                    indexWaypointActual = 0; // Reinicia al primer waypoint
-                    // Puedes agregar aquí lógica adicional si deseas que el camión se detenga o realice alguna acción específica al completar la ruta
+                    palletloadpos = waypoints[indexWaypointActual].pallettoload;
+                    rotacionorigpallet = palletloadpos.transform.rotation;
+                    positionorigpallet = palletloadpos.transform.position;
+                    state = ForkLiftState.eRotate;
+                    rb.velocity = Vector3.zero; rb.angularVelocity = Vector3.zero;
+                    // Obtenemos la dirección hacia el waypoint actual
+                    Vector3 direccion = positionorigpallet - transform.position;
+
+                    // Rotamos la carretilla hacía el punto
+                    Quaternion rotacion = Quaternion.LookRotation(direccion);
+                    
+                    //transform.rotation = Quaternion.Slerp(rotacionInicial, rotacionObjetivo, tiempoPasado / duracionRotacion);
+
+                     StartCoroutine(RotarHaciaCaja(rotacion));
                 }
+                else
+                {
+                    if (waypoints[indexWaypointActual].isunloading)
+                        state = ForkLiftState.eUnLoadingPrepareElevator;
+                    else
+                        CheckNextOrden();
+                }
+                
+            }
+            /*} 
+            else
+            {
+                agente.enabled = false;
+                frontL.motorTorque = 0;
+                frontR.motorTorque = 0;
+                rearL.motorTorque = 0;
+                rearR.motorTorque = 0;
+                frontL.brakeTorque = brakeTorque;
+                frontR.brakeTorque = brakeTorque;
+                rearL.brakeTorque = brakeTorque;
+                rearR.brakeTorque = brakeTorque;
+                UpdateWheelPoses();                
+                if (waypoints[indexWaypointActual].isloading)
+                {
+                    palletloadpos = waypoints[indexWaypointActual].pallettoload;
+                    rotacionorigpallet = palletloadpos.transform.rotation;
+                    positionorigpallet = palletloadpos.transform.position;
+                    state = ForkLiftState.eLoadingPrepareElevator;
+                } 
+                else
+                {
+                    state = ForkLiftState.eUnLoadingPrepareElevator;
+                }
+            }*/
+        }
+    }
+    IEnumerator RotarHaciaCaja(Quaternion rotacionObjetivo)
+    {
+        float duracionRotacion = 30f; // Ajusta según sea necesario
+        float tiempoPasado = 0f;
+        Quaternion rotacionInicial = transform.rotation;
+     
+
+        while (tiempoPasado < duracionRotacion)
+        {
+            // Usa Quaternion.RotateTowards para suavizar la rotación
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacionObjetivo, tiempoPasado / duracionRotacion);// Time.deltaTime * 3f);
+            //transform.rotation = Quaternion.Slerp(rotacionInicial, rotacionObjetivo, tiempoPasado / duracionRotacion);
+            //transform.rotation = Quaternion.Lerp(rotacionInicial, rotacionObjetivo, tiempoPasado / duracionRotacion);
+            //transform.rotation = Quaternion.Lerp(transform.rotation, rotacionObjetivo, Time.deltaTime * 3f);
+            // Controla la inclinación del objeto
+            Vector3 eulerAngles = transform.eulerAngles;
+            eulerAngles.x = 0f;
+            eulerAngles.z = 0f;
+            transform.eulerAngles = eulerAngles;
+
+            tiempoPasado += Time.deltaTime;
+        }
+
+        // Esperar un tiempo antes de continuar el movimiento
+        yield return new WaitForSeconds(1f); // Ajusta según sea necesario
+
+        // Reanudar el movimiento hacia la posición de la caja
+       state = ForkLiftState.eLoadingPrepareElevator;
+    }
+
+    private void LoadingPallet()
+    {
+        palletloadpos.GetComponent<Rigidbody>().isKinematic = true;
+        palletloadpos.SetActive(false);
+        box.SetActive(true);
+        currentGear = 0;
+        state = ForkLiftState.eLoadingSavePosition;
+        /*
+        // Carretilla avanza para cargar la paleta en la estantería
+        //this.rb.isKinematic = true;
+        //palletloadpos.GetComponent<Rigidbody>().isKinematic = true;
+        //palletloadpos.transform.SetParent(this.loaderpos1);
+        //palletloadpos.transform.position = loaderpos1.position;
+        //this.rb.isKinematic = false;
+
+        //frontL.brakeTorque = 0;
+        //frontR.brakeTorque = 0;
+        //rearL.brakeTorque = 0;
+        //rearR.brakeTorque = 0;
+        //state = ForkLiftState.eLoadingRetirePosition;
+        
+        frontL.motorTorque = currentGear * velocidad;
+        frontR.motorTorque = currentGear * velocidad;
+        rearL.motorTorque = currentGear * velocidad;
+        rearR.motorTorque = currentGear * velocidad;
+        
+        // Calcula la distancia recorrida
+        distanciaRecorrida += velocidad * Time.deltaTime;
+
+        // Si la distancia recorrida es mayor o igual a la distancia máxima, detén el objeto
+        if (distanciaRecorrida >= 38)
+        {
+            frontL.motorTorque = 0;
+            frontR.motorTorque = 0;
+            rearL.motorTorque = 0;
+            rearR.motorTorque = 0;
+            frontL.brakeTorque = brakeTorque;
+            frontR.brakeTorque = brakeTorque;
+            rearL.brakeTorque = brakeTorque;
+            rearR.brakeTorque = brakeTorque;
+            UpdateWheelPoses();
+            
+
+            if (currentGear > 0)
+            {
+                // nos toca elevar las palas
+                palletloadpos.transform.SetParent(loader.transform);
+                palletloadpos.GetComponent<Rigidbody>().isKinematic = true;
+                currentGear = 0;
+                state = ForkLiftState.eLoadingElevatorPallet;
+            } else
+            {
+                // estoy dando marcha atras
+                currentGear = 0;
+                state = ForkLiftState.eLoadingSavePosition;
             }
         }
+        else
+        {
+            UpdateWheelPoses();
+        }
+        */
+    }
+
+    private  void LoadingSavePosition()
+    {
+        // La carretilla baja las palas con la carga a posición segura para moverse
+        frontL.motorTorque = 0;
+        frontR.motorTorque = 0;
+        rearL.motorTorque = 0;
+        rearR.motorTorque = 0;
+        frontL.brakeTorque = brakeTorque;
+        frontR.brakeTorque = brakeTorque;
+        rearL.brakeTorque = brakeTorque;
+        rearR.brakeTorque = brakeTorque;
+        UpdateWheelPoses();
+        if (loader.position.y > 1)
+        {
+            loader.Translate(new Vector3(0f, -1f, 0f) * Time.deltaTime);
+        }
+        else
+        {
+            frontL.brakeTorque = 0;
+            frontR.brakeTorque = 0;
+            rearL.brakeTorque = 0;
+            rearR.brakeTorque = 0;
+            state = ForkLiftState.eMove;
+            indexWaypointActual++;
+            // Verifica si hay más waypoints, si no, reinicia el recorrido
+            if (indexWaypointActual >= waypoints.Length)
+            {
+                indexWaypointActual = 0; // Reinicia al primer waypoint
+                                         // Puedes agregar aquí lógica adicional si deseas que el camión se detenga o realice alguna acción específica al completar la ruta
+            }
+        }
+    }
+
+    private void LoadingPrepareElevator ()
+    {
+        // carretilla posiciona la palas a la altura de la paleta
+        frontL.motorTorque = 0;
+        frontR.motorTorque = 0;
+        rearL.motorTorque = 0;
+        rearR.motorTorque = 0;
+        frontL.brakeTorque = brakeTorque;
+        frontR.brakeTorque = brakeTorque;
+        rearL.brakeTorque = brakeTorque;
+        rearR.brakeTorque = brakeTorque;
+        UpdateWheelPoses();
+        if (loader.position.y < (waypoints[indexWaypointActual].pallettoload.transform.position.y-0.05f) && loader.position.y < maxPositionY)
+        {
+            loader.Translate(new Vector3(0f, 1f, 0f) * Time.deltaTime);
+        }
+        else
+        {
+            frontL.brakeTorque = 0;
+            frontR.brakeTorque = 0;
+            rearL.brakeTorque = 0;
+            rearR.brakeTorque = 0;
+            state = ForkLiftState.eLoadingPallet;
+        }
+    }
+
+    private void LoadingElevatorPallet ()
+    {
+        // carretilla eleva la carga de la estanteria
+        if (loader.position.y < maxPositionY)
+        {
+            loader.Translate(new Vector3(0f, 1f, 0f) * Time.deltaTime);
+        }
+        else
+        {
+            frontL.brakeTorque = 0;
+            frontR.brakeTorque = 0;
+            rearL.brakeTorque = 0;
+            rearR.brakeTorque = 0;
+            state = ForkLiftState.eLoadingRetirePosition;
+        }
+    }
+
+
+    private void UnLoadingPrepareElevator()
+    {
+        // La carretilla baja la carga al suelo
+        rb.velocity = Vector3.zero;
+        StopForkList();
+        UpdateWheelPoses();
+        if (loader.position.y > 0f)
+        {
+            loader.Translate(new Vector3(0f, -1f, 0f) * Time.deltaTime);
+        }
+        else
+        {
+            frontL.brakeTorque = 0;
+            frontR.brakeTorque = 0;
+            rearL.brakeTorque = 0;
+            rearR.brakeTorque = 0;
+            distanciaRecorrida = 0;
+            //state = ForkLiftState.eUnLoadingRetirePosition;
+            if (palletloadpos != null)
+            {
+                palletloadpos.transform.SetParent(waypoints[indexWaypointActual].waypoint);                
+                palletloadpos.GetComponent<Rigidbody>().isKinematic = true;
+                palletloadpos.SetActive(true);
+            }
+            box.SetActive(false);
+            state = ForkLiftState.eMove;
+            indexWaypointActual++;
+            // Verifica si hay más waypoints, si no, reinicia el recorrido
+            if (indexWaypointActual >= waypoints.Length)
+            {
+                indexWaypointActual = 0; // Reinicia al primer waypoint
+                                         // Puedes agregar aquí lógica adicional si deseas que el camión se detenga o realice alguna acción específica al completar la ruta
+            }
+
+        }
+    }
+
+
+    private void UnLoadingRetirePosition()
+    {
+        // Carretilla avanza para cargar la paleta en la estantería
+
+        frontL.motorTorque = currentGear * velocidad;
+        frontR.motorTorque = currentGear * velocidad;
+        rearL.motorTorque = currentGear * velocidad;
+        rearR.motorTorque = currentGear * velocidad;
+
+        // Calcula la distancia recorrida
+        distanciaRecorrida += velocidad * Time.deltaTime;
+
+        // Si la distancia recorrida es mayor o igual a la distancia máxima, detén el objeto
+        if (distanciaRecorrida >= 50)
+        {
+            StopForkList();
+            UpdateWheelPoses();
+            StartCoroutine(DevolverCaja());
+            CheckNextOrden();        
+        }
+        else
+        {
+            UpdateWheelPoses();
+        }
+    }
+    
+    private void CheckNextOrden()
+    {
+        if (!waypoints[indexWaypointActual].isfinish)
+        {
+            frontL.brakeTorque = 0;
+            frontR.brakeTorque = 0;
+            rearL.brakeTorque = 0;
+            rearR.brakeTorque = 0;
+            state = ForkLiftState.eMove;
+            indexWaypointActual++;
+            // Verifica si hay más waypoints, si no, reinicia el recorrido
+            if (indexWaypointActual >= waypoints.Length)
+            {
+                indexWaypointActual = 0; // Reinicia al primer waypoint
+            }
+        }
+        else
+        {
+            state = ForkLiftState.eNothing;
+        }
+
+    }
+
+    private void StopForkList()
+    {
+        frontL.motorTorque = 0;
+        frontR.motorTorque = 0;
+        rearL.motorTorque = 0;
+        rearR.motorTorque = 0;
+        frontL.brakeTorque = brakeTorque;
+        frontR.brakeTorque = brakeTorque;
+        rearL.brakeTorque = brakeTorque;
+        rearR.brakeTorque = brakeTorque;      
+    }
+
+    private void UpdatePNJ()
+    {
+        switch (state)
+        {
+            case ForkLiftState.eMove:
+                {
+                    // La carretilla se mueve a la siguiente posición
+                    distanciaRecorrida = 0;
+                    MovePNJ(); 
+                    break;
+                }
+            case ForkLiftState.eLoadingPrepareElevator:
+                {
+                    // Elevamos las palas a la posición de la paleta a cargar
+                    distanciaRecorrida = 0;
+                    LoadingPrepareElevator();
+                    break;
+                }
+            case ForkLiftState.eLoadingPallet:
+                {                    
+                    // Avanzamos hacia la paleta a cargar
+                    currentGear = 1;
+                    LoadingPallet();
+                    break;
+                }
+            case ForkLiftState.eLoadingElevatorPallet:
+                {
+                    // Con la paleta cargada, la elevamos para poder retirarla de la estanteria/suelo
+                    distanciaRecorrida = 0;
+                    LoadingElevatorPallet();
+                    break;
+                }
+            case ForkLiftState.eLoadingRetirePosition:
+                {
+                    // Retiramos hacía atrás para poder sacar la paleta de su posición
+                    currentGear = -1;
+                    LoadingPallet();
+                    break;
+                }
+            case ForkLiftState.eLoadingSavePosition:
+                {
+                    // Bajamos/subimos la palas a posición segura para poder movernos con la paleta encima
+                    LoadingSavePosition();                    
+                    break;
+                }
+            case ForkLiftState.eUnLoadingPrepareElevator:
+                {
+                    // Bajamos las palas a la posición de descarga
+                    UnLoadingPrepareElevator();
+                    break;
+                }
+            case ForkLiftState.eUnLoadingRetirePosition:
+                {
+                    // Nos retiramos hacia atrás para dejar la paleta
+                    currentGear = -1;                 
+                    UnLoadingRetirePosition();
+                    break;
+                }
+        }
+        
     }
 
     private void UpdateWheelPoses()
@@ -329,5 +737,17 @@ public class forklift : MonoBehaviour
         _collider.GetWorldPose(out _pos, out _quat);
 
         _transform.rotation = _quat.normalized;
+    }
+
+    IEnumerator DevolverCaja()
+    {
+        yield return new WaitForSeconds(2f); // Ajusta el tiempo según sea necesario
+
+        // Devuelve la caja a su posición y orientación originales
+        palletloadpos.transform.SetParent(null);
+        palletloadpos.GetComponent<Rigidbody>().isKinematic = false;
+        palletloadpos.transform.position = positionorigpallet;
+        palletloadpos.transform.rotation = rotacionorigpallet;
+        palletloadpos = null;
     }
 }
