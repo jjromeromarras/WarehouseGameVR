@@ -89,12 +89,42 @@ public class fpsBody : MonoBehaviour {
                 Ray currentRay = Camera.allCameras[0].ScreenPointToRay(crossHair.transform.position);
                 if (Physics.Raycast(currentRay, out rayHit))
                 {
-                    if (rayHit.collider.tag == "Ubicacion" && rayHit.distance <= 3)
+                    if (rayHit.collider.tag == "Ubicacion" && rayHit.distance <= 4)
                     {
-                        TextMeshPro ubicacion = rayHit.transform.GetChild(0).gameObject.GetComponents<TextMeshPro>()[0];
-                        Debug.Log("Colision con ubicación: " + ubicacion.text);
+                        TextMeshPro ubicacion = null;
+                        try
+                        {
+                            ubicacion = rayHit.transform.GetChild(0).gameObject.GetComponents<TextMeshPro>()[0];
+                        }
+                        catch
+                        {
+                            ubicacion = rayHit.transform.parent.parent.GetChild(0).gameObject.GetComponents<TextMeshPro>()[0];
+                        }
+                        finally
+                        {
+                            if (ubicacion == null)
+                            {
+                                ubicacion = rayHit.transform.parent.GetComponent<TextMeshPro>();
+                            }
+                            Debug.Log("Colision con ubicación: " + ubicacion.text);
+
+                        }
+                    }
+                    else
+                    {
+                        if (rayHit.collider.tag == "PlacaContainer" && rayHit.distance <= 4)
+                        {
+                            var container = rayHit.transform.GetChild(1).GetComponentInChildren<TextMeshPro>();
+
+                            if (container != null)
+                            {
+                                Debug.Log("Colision con contenedor: " + container.text);
+                            }
+
+                        }
                     }
                 }
+               
             }
         }
     }
