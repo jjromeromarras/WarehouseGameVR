@@ -24,6 +24,14 @@ namespace Assets.Scripts.Helper
        eUnLoadingSavePosition = 12,
        eNothing = 13,
        eRotate = 14
+    }    
 
+    public enum PNJRFState
+    {
+        eNothing = 0,
+        eMove = 1,
+        eRotateToPallet=2,
+        eDoPicking=3,
+        eWaiting=4
     }
 }

@@ -160,21 +160,12 @@ public class forklift : MonoBehaviour
             if (Input.GetAxis("Vertical") != 0)
             {
                 if (Input.GetAxis("Vertical") > 0)
-                {
-                    //aply brake torque
-                    //frontL.brakeTorque = brakeTorque;
-                    //frontR.brakeTorque = brakeTorque;
-                    //rearL.brakeTorque = brakeTorque;
-                    //rearR.brakeTorque = brakeTorque;
+                {                  
                     currentGear = 1;
                 }
                 else
                 {
-                    currentGear = -1;
-                    //frontL.brakeTorque = 0;
-                    //frontR.brakeTorque = 0;
-                    //rearL.brakeTorque = 0;
-                    //rearR.brakeTorque = 0;
+                    currentGear = -1;                   
                 }
                 frontL.brakeTorque = 0;
                 frontR.brakeTorque = 0;
@@ -253,25 +244,7 @@ public class forklift : MonoBehaviour
                 {
                     currentGear--;
                 }
-            }
-
-           /* if (Input.GetKeyDown(changeCameraKey))
-            {
-                if (cameraInteriorForklift.activeSelf)
-                {
-                    cameraInteriorForklift.SetActive(false);
-                    cameraExteriorForklift.SetActive(true);
-                }
-                else
-                {
-                    cameraInteriorForklift.SetActive(true);
-                    cameraExteriorForklift.SetActive(false);
-                }
-            }*/
-
-            //update texts
-            // gearText.text = "Gear: " + currentGear;
-            // speedText.text = "Speed: " + currentSpeed.ToString("f2") + "Km/h";
+            }          
         }
         else
         {
@@ -283,9 +256,7 @@ public class forklift : MonoBehaviour
     private void MovePNJ()
     {
         if (waypoints.Length > 0 && indexWaypointActual < waypoints.Length && !pnjdetenido)
-        {
-            //if (!waypoints[indexWaypointActual].isloading && !waypoints[indexWaypointActual].isunloading)
-            //{
+        {           
             float distancia = Vector3.Distance(transform.position, waypoints[indexWaypointActual].waypoint.position);
 
             if (distancia > margenError)
@@ -298,36 +269,6 @@ public class forklift : MonoBehaviour
                 agente.enabled = true;
                 agente.destination = waypoints[indexWaypointActual].waypoint.position;
 
-
-                // Obtenemos la dirección hacia el waypoint actual
-                //Vector3 direccion = waypoints[indexWaypointActual].waypoint.position - transform.position;
-
-                // Rotamos la carretilla hacía el punto
-                //Quaternion rotacion = Quaternion.LookRotation(direccion);
-                //transform.rotation = Quaternion.Lerp(transform.rotation, rotacion, Time.deltaTime * 3f);
-
-                // Mueve el camión hacia el waypoint actual
-                // transform.position = Vector3.MoveTowards(transform.position, waypoints[indexWaypointActual].position, currentSpeed * Time.deltaTime);
-
-                //if (currentSpeed < 2)
-                //{
-                //    //aply motor torque
-                //    frontL.motorTorque = torque;
-                //    frontR.motorTorque = torque;
-                //    rearL.motorTorque = torque;
-                //    rearR.motorTorque = torque;
-                //}
-                //else
-                //{
-                //    frontL.motorTorque = 0;
-                //    frontR.motorTorque = 0;
-                //    rearL.motorTorque = 0;
-                //    rearR.motorTorque = 0;
-                //}
-
-                //update wheel poses
-                //UpdateWheelPoses();
-                // Si el camión ha alcanzado el waypoint actual, pasa al siguiente
             }
             else
             {
@@ -346,10 +287,8 @@ public class forklift : MonoBehaviour
 
                     // Rotamos la carretilla hacía el punto
                     Quaternion rotacion = Quaternion.LookRotation(direccion);
-                    
-                    //transform.rotation = Quaternion.Slerp(rotacionInicial, rotacionObjetivo, tiempoPasado / duracionRotacion);
-
-                     StartCoroutine(RotarHaciaCaja(rotacion));
+                             
+                    StartCoroutine(RotarHaciaCaja(rotacion));
                 }
                 else
                 {
@@ -359,48 +298,17 @@ public class forklift : MonoBehaviour
                         CheckNextOrden();
                 }
                 
-            }
-            /*} 
-            else
-            {
-                agente.enabled = false;
-                frontL.motorTorque = 0;
-                frontR.motorTorque = 0;
-                rearL.motorTorque = 0;
-                rearR.motorTorque = 0;
-                frontL.brakeTorque = brakeTorque;
-                frontR.brakeTorque = brakeTorque;
-                rearL.brakeTorque = brakeTorque;
-                rearR.brakeTorque = brakeTorque;
-                UpdateWheelPoses();                
-                if (waypoints[indexWaypointActual].isloading)
-                {
-                    palletloadpos = waypoints[indexWaypointActual].pallettoload;
-                    rotacionorigpallet = palletloadpos.transform.rotation;
-                    positionorigpallet = palletloadpos.transform.position;
-                    state = ForkLiftState.eLoadingPrepareElevator;
-                } 
-                else
-                {
-                    state = ForkLiftState.eUnLoadingPrepareElevator;
-                }
-            }*/
+            }            
         }
     }
     IEnumerator RotarHaciaCaja(Quaternion rotacionObjetivo)
     {
         float duracionRotacion = 30f; // Ajusta según sea necesario
-        float tiempoPasado = 0f;
-        Quaternion rotacionInicial = transform.rotation;
-     
-
+        float tiempoPasado = 0f;           
         while (tiempoPasado < duracionRotacion)
         {
             // Usa Quaternion.RotateTowards para suavizar la rotación
             transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacionObjetivo, tiempoPasado / duracionRotacion);// Time.deltaTime * 3f);
-            //transform.rotation = Quaternion.Slerp(rotacionInicial, rotacionObjetivo, tiempoPasado / duracionRotacion);
-            //transform.rotation = Quaternion.Lerp(rotacionInicial, rotacionObjetivo, tiempoPasado / duracionRotacion);
-            //transform.rotation = Quaternion.Lerp(transform.rotation, rotacionObjetivo, Time.deltaTime * 3f);
             // Controla la inclinación del objeto
             Vector3 eulerAngles = transform.eulerAngles;
             eulerAngles.x = 0f;
@@ -423,62 +331,7 @@ public class forklift : MonoBehaviour
         palletloadpos.SetActive(false);
         box.SetActive(true);
         currentGear = 0;
-        state = ForkLiftState.eLoadingSavePosition;
-        /*
-        // Carretilla avanza para cargar la paleta en la estantería
-        //this.rb.isKinematic = true;
-        //palletloadpos.GetComponent<Rigidbody>().isKinematic = true;
-        //palletloadpos.transform.SetParent(this.loaderpos1);
-        //palletloadpos.transform.position = loaderpos1.position;
-        //this.rb.isKinematic = false;
-
-        //frontL.brakeTorque = 0;
-        //frontR.brakeTorque = 0;
-        //rearL.brakeTorque = 0;
-        //rearR.brakeTorque = 0;
-        //state = ForkLiftState.eLoadingRetirePosition;
-        
-        frontL.motorTorque = currentGear * velocidad;
-        frontR.motorTorque = currentGear * velocidad;
-        rearL.motorTorque = currentGear * velocidad;
-        rearR.motorTorque = currentGear * velocidad;
-        
-        // Calcula la distancia recorrida
-        distanciaRecorrida += velocidad * Time.deltaTime;
-
-        // Si la distancia recorrida es mayor o igual a la distancia máxima, detén el objeto
-        if (distanciaRecorrida >= 38)
-        {
-            frontL.motorTorque = 0;
-            frontR.motorTorque = 0;
-            rearL.motorTorque = 0;
-            rearR.motorTorque = 0;
-            frontL.brakeTorque = brakeTorque;
-            frontR.brakeTorque = brakeTorque;
-            rearL.brakeTorque = brakeTorque;
-            rearR.brakeTorque = brakeTorque;
-            UpdateWheelPoses();
-            
-
-            if (currentGear > 0)
-            {
-                // nos toca elevar las palas
-                palletloadpos.transform.SetParent(loader.transform);
-                palletloadpos.GetComponent<Rigidbody>().isKinematic = true;
-                currentGear = 0;
-                state = ForkLiftState.eLoadingElevatorPallet;
-            } else
-            {
-                // estoy dando marcha atras
-                currentGear = 0;
-                state = ForkLiftState.eLoadingSavePosition;
-            }
-        }
-        else
-        {
-            UpdateWheelPoses();
-        }
-        */
+        state = ForkLiftState.eLoadingSavePosition;        
     }
 
     private  void LoadingSavePosition()
