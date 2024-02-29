@@ -16,7 +16,7 @@ public class pnjwalker : MonoBehaviour
     private int margenError = 2;
     private bool pnjdetenido = false;
     private NavMeshAgent agente;
-    private ForkLiftState state;
+    private PNJRFState state;
     void Start()
     {
           anim.SetBool("IsWalk", false);
@@ -28,19 +28,24 @@ public class pnjwalker : MonoBehaviour
     {
         switch (state)
         {
-            case ForkLiftState.eMove:
+            case PNJRFState.eMove:
                 {
                     movePNJ();
                     break;
                 }
-            case ForkLiftState.eNothing: {
+            case PNJRFState.eNothing: {
                     anim.SetBool("IsWalk", false);
                     anim.SetBool("IsPicking", false);                                        
                     break;
                 }
-            case ForkLiftState.eLoadingPallet:
+            case PNJRFState.eDoPicking:
                 {
                     DoPicking();
+                    break;
+                }
+            case PNJRFState.eRotateToPallet:
+                {
+
                     break;
                 }
         }
@@ -48,7 +53,7 @@ public class pnjwalker : MonoBehaviour
     }
     private void Awake()
     {
-        state = ForkLiftState.eMove;
+        state = PNJRFState.eMove;
         agente = GetComponent<NavMeshAgent>();
     }
 
@@ -90,13 +95,27 @@ public class pnjwalker : MonoBehaviour
                 agente.enabled = false;
                 if (orderwalkers[indexWaypointActual].ispicking)
                 {
-                    state = ForkLiftState.eLoadingPallet;
+                    var shelf = orderwalkers[indexWaypointActual].waypoint.parent;
+                    if (shelf != null)
+                    {
+                        var positionorigpallet = shelf.transform.position;
+
+                        // Obtenemos la dirección hacia el waypoint actual
+                        Vector3 direccion = positionorigpallet - transform.position;
+
+                        // Rotamos la carretilla hacía el punto
+                        Quaternion rotacion = Quaternion.LookRotation(direccion);
+
+                        StartCoroutine(RotarHaciaCaja(rotacion));
+                        state = PNJRFState.eRotateToPallet;
+                    } else
+                        state = PNJRFState.eDoPicking;
                 } 
                 else
                 {
                     if (!orderwalkers[indexWaypointActual].isfinish)
                     {
-                        state = ForkLiftState.eMove;
+                        state = PNJRFState.eMove;
                         indexWaypointActual++;
                         // Verifica si hay más waypoints, si no, reinicia el recorrido
                         if (indexWaypointActual >= orderwalkers.Length)
@@ -107,76 +126,10 @@ public class pnjwalker : MonoBehaviour
                     }
                     else
                     {
-                        state = ForkLiftState.eNothing;
+                        state = PNJRFState.eNothing;
                     }
                 }
-            }
-            /*
-            if (!orderwalkers[indexWaypointActual].ispicking)
-            {
-                anim.SetBool("IsWalk", true);
-                anim.SetBool("IsPicking", false);
-                anim.Play("walking", 0);
-
-                // Calcula la distancia entre el camión y el waypoint actual
-                float distancia = Vector3.Distance(transform.position, orderwalkers[indexWaypointActual].waypoint.position);
-
-                if (distancia > margenError)
-                {
-                    // Obtenemos la dirección hacia el waypoint actual
-                    Vector3 direccion = orderwalkers[indexWaypointActual].waypoint.position - transform.position;
-
-                    // Rotamos la carretilla hacía el punto
-                    Quaternion rotacion = Quaternion.LookRotation(direccion);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, rotacion, Time.deltaTime * 3f);
-
-                    // Mueve el camión hacia el waypoint actual
-                    transform.position = Vector3.MoveTowards(transform.position, orderwalkers[indexWaypointActual].waypoint.position, Time.deltaTime * 1.5f);
-
-                }
-                else
-                {
-                    if(orderwalkers[indexWaypointActual].isfinish)
-                    {
-                        indexWaypointActual = orderwalkers.Length + 1;
-                    }
-                    else 
-                        indexWaypointActual++;
-                    // Verifica si hay más waypoints, si no, reinicia el recorrido
-                    if (indexWaypointActual >= orderwalkers.Length && !orderwalkers[indexWaypointActual].isfinish)
-                    {
-                        indexWaypointActual = 0; // Reinicia al primer waypoint
-                                                 // Puedes agregar aquí lógica adicional si deseas que el camión se detenga o realice alguna acción específica al completar la ruta
-                    }
-                    else
-                    {
-                        anim.SetBool("IsWalk", false);
-                        anim.SetBool("IsPicking", false);
-                    }
-                }
-            }
-            else // picking
-            {
-                anim.SetBool("IsWalk", false);
-                anim.SetBool("IsPicking", true);
-                StartCoroutine(WaitPicking(10));
-                
-                if (!orderwalkers[indexWaypointActual].isfinish)
-                {
-                    indexWaypointActual++;
-                    // Verifica si hay más waypoints, si no, reinicia el recorrido
-                    if (indexWaypointActual >= orderwalkers.Length)
-                    {
-                        indexWaypointActual = 0; // Reinicia al primer waypoint
-                                                 // Puedes agregar aquí lógica adicional si deseas que el camión se detenga o realice alguna acción específica al completar la ruta
-                    }
-                }
-                else
-                {                    
-                    anim.SetBool("IsWalk", true);
-                    anim.SetBool("IsPicking", false);
-                }
-            }*/
+            }           
          }
     }
 
@@ -184,7 +137,7 @@ public class pnjwalker : MonoBehaviour
     {
         anim.SetBool("IsWalk", false);
         anim.SetBool("IsPicking", true);
-        state = ForkLiftState.eLoadingSavePosition;
+        state = PNJRFState.eWaiting;
         StartCoroutine(WaitPicking(10));
     }
     public IEnumerator WaitPicking(float seconds)
@@ -194,7 +147,7 @@ public class pnjwalker : MonoBehaviour
         anim.SetBool("IsPicking", false);
         if (!orderwalkers[indexWaypointActual].isfinish)
         {
-            state = ForkLiftState.eMove;
+            state = PNJRFState.eMove;
             indexWaypointActual++;
             // Verifica si hay más waypoints, si no, reinicia el recorrido
             if (indexWaypointActual >= orderwalkers.Length)
@@ -205,7 +158,32 @@ public class pnjwalker : MonoBehaviour
         }
         else
         {
-            state = ForkLiftState.eNothing;
+            state = PNJRFState.eNothing;
         }
+    }
+
+    IEnumerator RotarHaciaCaja(Quaternion rotacionObjetivo)
+    {
+        float duracionRotacion = 40f; // Ajusta según sea necesario
+        float tiempoPasado = 0f;
+      
+        while (tiempoPasado < duracionRotacion)
+        {
+            // Usa Quaternion.RotateTowards para suavizar la rotación
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacionObjetivo, tiempoPasado / duracionRotacion);// Time.deltaTime * 3f);
+            // Controla la inclinación del objeto
+            Vector3 eulerAngles = transform.eulerAngles;
+            eulerAngles.x = 0f;
+            eulerAngles.z = 0f;
+            transform.eulerAngles = eulerAngles;
+
+            tiempoPasado += Time.deltaTime;
+        }
+
+        // Esperar un tiempo antes de continuar el movimiento
+        yield return new WaitForSeconds(1f); // Ajusta según sea necesario
+
+        // Reanudar el movimiento hacia la posición de la caja
+        state = PNJRFState.eDoPicking;
     }
 }
