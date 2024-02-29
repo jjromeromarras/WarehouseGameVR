@@ -184,6 +184,7 @@ public class pnjwalker : MonoBehaviour
     {
         anim.SetBool("IsWalk", false);
         anim.SetBool("IsPicking", true);
+        state = ForkLiftState.eLoadingSavePosition;
         StartCoroutine(WaitPicking(10));
     }
     public IEnumerator WaitPicking(float seconds)
