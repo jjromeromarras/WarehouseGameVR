@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     private bool showrfmenu;
     void Start()
     {        
-        rfmenu.SetActive(false);
+        rfmenu.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
         
     }
