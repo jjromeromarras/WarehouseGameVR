@@ -55,6 +55,7 @@ public class pnjwalker : MonoBehaviour
     {
         state = PNJRFState.eMove;
         agente = GetComponent<NavMeshAgent>();
+        agente.enabled = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -86,8 +87,11 @@ public class pnjwalker : MonoBehaviour
                 anim.SetBool("IsWalk", true);
                 anim.SetBool("IsPicking", false);
                 anim.Play("walking", 0);
-                agente.enabled = true;
-                agente.destination = orderwalkers[indexWaypointActual].waypoint.position;
+                if (!agente.enabled)
+                {
+                    agente.enabled = true;
+                    agente.destination = orderwalkers[indexWaypointActual].waypoint.position;
+                }
             }
             else
             {
@@ -185,5 +189,16 @@ public class pnjwalker : MonoBehaviour
 
         // Reanudar el movimiento hacia la posición de la caja
         state = PNJRFState.eDoPicking;
+    }
+
+    public void StopPNJ()
+    {
+        state = PNJRFState.eNothing;
+        agente.enabled = false;
+    }
+
+    public void ResumePNJ()
+    {
+        state = PNJRFState.eMove;
     }
 }
