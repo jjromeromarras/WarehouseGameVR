@@ -34,4 +34,44 @@ namespace Assets.Scripts.Helper
         eDoPicking=3,
         eWaiting=4
     }
+
+    public enum GameState
+    {
+        Traveller,
+        Picking,
+        Inventory,
+        Dialog
+    }
+
+    public enum Stock
+    {
+        piña,
+        melocoton,
+        platano,
+        fresa,
+        peras,
+        manzanas,
+        uvas
+
+    }
+    public enum OrderType
+    {
+        Shipping,
+        Picking
+    }
+
+    public enum TaskStatus
+    {
+        LocationScanner,
+        ContainerScanner,
+        QuantityPicking,
+    }
+
+    public enum OrderStatus
+    {
+        CreateContainerClient,
+        ShowHelp,
+        TaskWorking,
+        DockScanner
+    }
 }

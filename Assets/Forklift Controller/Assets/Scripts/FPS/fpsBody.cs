@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 public class fpsBody : MonoBehaviour {
 
     public static fpsBody instance;
@@ -14,6 +15,9 @@ public class fpsBody : MonoBehaviour {
     public GameObject crossHair;
     public float resetTime;
     public Color scannColor;
+
+    public event Action<string> onScannerContainer;
+    public event Action<string> onScannerLocation;
 
     private float timer;
     private Color currentColorCrossHair;
@@ -76,6 +80,7 @@ public class fpsBody : MonoBehaviour {
     private void ScannerAtPoint(Color color){
         if (crossHair != null)
         {
+
             Image[] images = crossHair.GetComponentsInChildren<Image>();
             for (int i = 0; i < images.Length; i++)
             {
@@ -118,6 +123,7 @@ public class fpsBody : MonoBehaviour {
 
                             if (container != null)
                             {
+                                this.onScannerContainer(container.text);
                                 Debug.Log("Colision con contenedor: " + container.text);
                             }
 
