@@ -12,6 +12,7 @@ public class pallet : MonoBehaviour
     public TextMeshPro SSC2;
 
     public Transform centerOfMass;
+    public GameObject selectedCube;
 
     [Header("VALUES")]
     public string ssc;
@@ -49,6 +50,14 @@ public class pallet : MonoBehaviour
         if (caninteractue == true && Input.GetKeyDown(KeyCode.Space))
         {
             centerOfMass.rotation = Quaternion.Euler(0,90,0);
+        }
+    }
+
+    public void SetSelected(bool selected)
+    {
+        if (selectedCube != null)
+        {
+            selectedCube.SetActive(selected);
         }
     }
 }

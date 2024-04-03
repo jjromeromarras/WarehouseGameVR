@@ -89,9 +89,13 @@ public class infotextcontroller : MonoBehaviour
         }
     }
 
-    public IEnumerator SetMessageKey(string key, float timeToWaitAfecterText)
+    public IEnumerator SetMessageKey(string key, float timeToWaitAfecterText, object[] arguments = null)
     {
         var localizedstring = GenerateLocalizedStringInEditor(key);
+        if (arguments != null)
+        {
+            localizedstring.Arguments = arguments;
+        }
         localize.StringReference = localizedstring;
         yield return SetMessage(textinfo.text, timeToWaitAfecterText);
     }
