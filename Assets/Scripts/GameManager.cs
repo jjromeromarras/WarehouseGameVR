@@ -25,18 +25,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private forklift[] forklifts;
     [SerializeField] private GameObject warehousemanual;
     [SerializeField] private GameObject warehouseautomatico;
-
+    [SerializeField] public int currentGame;
+    [SerializeField] public panelusercontroller paneluser;
     [SerializeField] private Level[] levels;
 
     private bool showrfmenu;
-    private GameState _state; 
-    public int currentGame;
+    private GameState _state;
+    private Player player;
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
         _state = GameState.Traveller;
         currentGame = 0;
-       
+        player = new Player();
 
     }
     void Start()
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        paneluser.SetScore(new object[] { player.Score });
         if (_state == GameState.Traveller)
         {
             if (Input.GetKeyDown(KeyCode.T))
@@ -87,11 +89,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ScannerContainer(string container)
+    private void ScannerContainer(string container, string tag)
     {
         // Comprobar si el contenedor es correcto
+        player.Score += levels[currentGame].OnSetContainerScanner(container, tag);
 
-        for (int i = 0; i < pnjwalkers.Length; i++)
+        /*for (int i = 0; i < pnjwalkers.Length; i++)
         {
             pnjwalkers[i].StopPNJ();
         }
@@ -101,7 +104,7 @@ public class GameManager : MonoBehaviour
         var numcontainer = Random.Range(1, 7);
         Debug.Log("Contenedor: " + numcontainer.ToString());
         picking.setContainer(numcontainer, Stock.manzanas.ToString(), 12);
-        _state = GameState.Picking;
+        _state = GameState.Picking;*/
     }
 
     private void ScannerLocation(string location)

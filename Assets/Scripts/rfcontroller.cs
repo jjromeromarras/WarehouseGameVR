@@ -10,7 +10,7 @@ using UnityEngine.Localization.Components;
 
 public class rfcontroller : MonoBehaviour
 {
-    public static rfcontroller instance;
+   
 
   
 
@@ -20,10 +20,7 @@ public class rfcontroller : MonoBehaviour
     public LocalizeStringEvent localize;
     public LocalizeStringEvent localizePantalla;
 
-    void Awake()
-    {
-        instance = this;
-    }
+    
 
     void Start()
     {
