@@ -10,7 +10,7 @@ using UnityEngine.Localization.Components;
 
 public class rfcontroller : MonoBehaviour
 {
-    public static rfcontroller instance;
+   // public static rfcontroller instance;
 
   
 
@@ -22,7 +22,7 @@ public class rfcontroller : MonoBehaviour
 
     void Awake()
     {
-        instance = this;
+      //  instance = this;
     }
 
     void Start()

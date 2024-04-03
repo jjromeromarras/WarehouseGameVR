@@ -16,7 +16,7 @@ public class fpsBody : MonoBehaviour {
     public float resetTime;
     public Color scannColor;
 
-    public event Action<string> onScannerContainer;
+    public event Action<string, string> onScannerContainer;
     public event Action<string> onScannerLocation;
 
     private float timer;
@@ -111,20 +111,20 @@ public class fpsBody : MonoBehaviour {
                             {
                                 ubicacion = rayHit.transform.parent.GetComponent<TextMeshPro>();
                             }
-                            Debug.Log("Colision con ubicación: " + ubicacion.text);
+              
 
                         }
                     }
                     else
                     {
-                        if (rayHit.collider.tag == "PlacaContainer" && rayHit.distance <= 4)
+                        if ((rayHit.collider.tag == "PlacaContainer" || rayHit.collider.tag == "ContainerClient") && rayHit.distance <= 4)
                         {
                             var container = rayHit.transform.GetChild(1).GetComponentInChildren<TextMeshPro>();
 
                             if (container != null)
                             {
-                                this.onScannerContainer(container.text);
-                                Debug.Log("Colision con contenedor: " + container.text);
+                                this.onScannerContainer(container.text, rayHit.collider.tag);
+
                             }
 
                         }

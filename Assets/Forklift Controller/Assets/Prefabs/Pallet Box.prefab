@@ -82,6 +82,7 @@ MonoBehaviour:
   SSC1: {fileID: 2385333891896052011}
   SSC2: {fileID: 1197626850415276398}
   centerOfMass: {fileID: 4123379006006610}
+  selectedCube: {fileID: 0}
   ssc: 
 --- !u!65 &8263133613004184525
 BoxCollider:
