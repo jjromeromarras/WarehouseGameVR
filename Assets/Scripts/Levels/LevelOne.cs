@@ -128,7 +128,7 @@ public class LevelOne : Level
                 case StateGame.ShowTutorial1:
                     {
                         setLockPlayer(true);
-                        state = StateGame.ShowTutorial2;
+                        state = StateGame.ShowTutorial5;
                     }
                     break;
                 case StateGame.ShowTutorial2:
@@ -146,12 +146,13 @@ public class LevelOne : Level
                 case StateGame.ShowTutorial4:
                     {
                         setLockPlayer(true);
-                        rfcontroller.SetPantallaTxt("Picking", new object[] { "OS1" });
+                        //rfcontroller.SetPantallaTxt("Picking", new object[] { "OS1" });
                         state = StateGame.ShowTutorial5;
                     }
                     break;
                 case StateGame.ShowTutorial5:
                     {
+                        rfcontroller.SetPantallaTxt("Picking", new object[] { "OS1" });
                         setLockPlayer(true);
                         state = StateGame.ShowClientContainer;
                     }
@@ -160,7 +161,7 @@ public class LevelOne : Level
                 case StateGame.ShowClientContainer:
                     {
                         setLockPlayer(true);
-                        state = StateGame.ShowIntroducirContainerCliente;
+                        state = StateGame.ShowScannerContainer;
                     }
                     break;
                 case StateGame.ShowIntroducirContainerCliente:
