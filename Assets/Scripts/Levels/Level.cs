@@ -7,6 +7,7 @@ public class Level : MonoBehaviour
 {
     [SerializeField] public rfcontroller rfcontroller;   
     [SerializeField] public infotextcontroller infotext;
+    [SerializeField] public timer timer;
     public event Action<bool> onSetLockPlayer;
 
     public virtual int OnSetLocationScanner(string location)
@@ -27,5 +28,6 @@ public class Level : MonoBehaviour
         {
             onSetLockPlayer(value);
         }
+        timer.SetTimerOn(!value);
     }
 }

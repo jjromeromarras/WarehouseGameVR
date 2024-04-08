@@ -2,6 +2,7 @@ using Assets.Scripts.Helper;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class LevelOne : Level
@@ -11,7 +12,10 @@ public class LevelOne : Level
     [SerializeField] private pallet[] clientsPallets;
 
     private int currentTask;
+    private string currentContainerClient;
+    private string currentOrder="OS1";
     private Game game;
+    private Order order;
     private StateGame state;
     private bool waitreading;
     private bool showerror;
@@ -22,9 +26,14 @@ public class LevelOne : Level
 
     public void Start()
     {
+        if(timer != null)
+        {
+            timer.SetTimeLeft(1200f);
+        }
         waitreading = false;
         showerror = false;
         game = new Game(warehousemanual, 1, 5, 1, OrderType.Picking);
+        order = game.Orders.FirstOrDefault();
         state = StateGame.ShowBienVenido;
         if (infotext != null)
         {
@@ -99,6 +108,7 @@ public class LevelOne : Level
     {
         if (!waitreading)
         {
+            timer.SetTimerOn(false);
             infotext.SetActiveInfo(true);
             waitreading = true;
             StartCoroutine(infotext.SetMessageKey(key, 2f));
@@ -113,7 +123,7 @@ public class LevelOne : Level
         {
             showerror = false;
             infotext.SetActiveInfo(false);
-            setLockPlayer(false);
+            setLockPlayer(false);            
         }
         else
         {
@@ -152,7 +162,7 @@ public class LevelOne : Level
                     break;
                 case StateGame.ShowTutorial5:
                     {
-                        rfcontroller.SetPantallaTxt("Picking", new object[] { "OS1" });
+                        rfcontroller.SetPantallaTxt("Picking", new object[] { currentOrder });
                         setLockPlayer(true);
                         state = StateGame.ShowClientContainer;
                     }
@@ -181,43 +191,59 @@ public class LevelOne : Level
                         }
                     }
                     break;
+                case StateGame.ShowLocationPicking:
+                    {
+                        setLockPlayer(false);
+                        infotext.SetActiveInfo(false);
+                        state = StateGame.ScannerLocation;
+                        order.Tasks[currentTask].ContainerRef.SetSelected(true);
+                    }
+                    break;
             }
         }
     }
     public override int OnSetLocationScanner(string location)
     {
+        if (state == StateGame.ScannerContainerClient)
+        {
+            if (tag == "ContainerClient")
+            {
+            }
+        }
         return 0;
     }
 
     public override int OnSetContainerScanner(string container, string tag)
     {
-        switch (state)
+        if (state == StateGame.ScannerContainerClient)
         {
-            case StateGame.ScannerContainerClient:
-                {
-                    if (tag == "ContainerClient")
-                    {
+            if (tag == "ContainerClient")
+            {
 
-                        state = StateGame.ShowLocationPicking;
-                        for (int i = 0; i < clientsPallets.Length; i++)
-                        {
-                            clientsPallets[i].SetSelected(false);
-                            if (clientsPallets[i].ssc == container)
-                            {
-                                clientsPallets[i].gameObject.SetActive(false);
-                            }
-                        }
-                        return 10;
-                    }
-                    else
+                state = StateGame.ShowLocationPicking;
+                for (int i = 0; i < clientsPallets.Length; i++)
+                {
+                    clientsPallets[i].SetSelected(false);
+                    if (clientsPallets[i].ssc == container)
                     {
-                        showerror = true;
-                        infotext.SetActiveInfo(true);
-                        StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
-                        return -5;
+                        clientsPallets[i].gameObject.SetActive(false);
+                        currentContainerClient = container;
                     }
-                    break;
                 }
+                if (order.Tasks[currentTask] is PickingTask picking)
+                {
+                    rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, currentOrder,
+                        picking.Stock, currentContainerClient});
+                }
+                return 10;
+            }
+            else
+            {
+                showerror = true;
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
+                return -5;
+            }
         }
         return 0;
     }

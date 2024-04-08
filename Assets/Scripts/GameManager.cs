@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject warehousemanual;
     [SerializeField] private GameObject warehouseautomatico;
     [SerializeField] public int currentGame;
-    [SerializeField] public panelusercontroller paneluser;
+    [SerializeField] public panelusercontroller paneluser;   
     [SerializeField] private Level[] levels;
 
     private bool showrfmenu;

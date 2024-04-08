@@ -40,25 +40,29 @@ public class Game
                 if (Random.Range(0, 10) > 6)
                 {
                     Task task = new Task();
-                    if (type == OrderType.Shipping)
+                    if (type == OrderType.Picking)
                     {
                         task = new PickingTask();
                     }
                     
 
-                    var numcontainer = Random.Range(1, 7);
-                    if (numcontainer > 3)
-                    {
-                        task.Location = (shel as shelf).level1.text;
-                    }
-                    else
-                    {
-                        task.Location = (shel as shelf).level2.text;
-                    }
+                    var numcontainer = Random.Range(1, 7);                    
+                    task.LocationRef = shel;
+
                     var container = shel.transform.GetChild(numcontainer).GetComponent<pallet>();
                     if (container != null)
                     {
+                        if (container.gameObject.transform.position.y > 2)
+                        {
+                            task.Location = (shel as shelf).level2.text;
+                        }
+                        else
+                        {
+                            task.Location = (shel as shelf).level1.text;
+                        }
+
                         task.Container = container.ssc.ToString();
+                        task.ContainerRef = container;
                         if (type == OrderType.Picking && task is PickingTask picking)
                         {
                             picking.Quantity = Random.Range(1, 11);
