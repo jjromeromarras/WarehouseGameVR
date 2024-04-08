@@ -6,6 +6,8 @@ public class Task
 {
     public string Location { get; set; }
     public string Container { get; set; }
+    public pallet ContainerRef { get; set; }
+    public shelf LocationRef { get; set; }      
 
     public int Points { get; set; }
     public int errors { get; set; }
