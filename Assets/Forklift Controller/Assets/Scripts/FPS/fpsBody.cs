@@ -107,9 +107,9 @@ public class fpsBody : MonoBehaviour {
                         }
                         finally
                         {
-                            if (ubicacion == null)
+                            if (ubicacion != null)
                             {
-                                ubicacion = rayHit.transform.parent.GetComponent<TextMeshPro>();
+                                this.onScannerLocation(ubicacion.text);                                
                             }
                             
 

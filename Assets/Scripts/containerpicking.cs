@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class containerpicking : MonoBehaviour
     public GameObject peras;
     public GameObject manzanas;
     public GameObject uvas;
+    public TextMeshPro SSC1;
 
     public string stock;
     public int cantidad;
@@ -30,9 +32,14 @@ public class containerpicking : MonoBehaviour
         stock = string.Empty;
     }
    
-
-    public void SetStock(string stock, int cantidad)
+    public void SetSSCC(string sscc)
     {
+        SSC1.text = sscc;
+    }
+
+    public void SetStock(string stock, int cantidad, string ssc)
+    {
+        SSC1.text = ssc;
         this.stock = stock;
         piña.SetActive(false);
         melocoton.SetActive(false);
@@ -62,36 +69,35 @@ public class containerpicking : MonoBehaviour
             case "uvas":
                 SetStock(uvas, cantidad);
                 break;
+            case "fresa":
+                SetStock(fresa, cantidad);
+                break;
         }
     }
 
     private void SetStock(GameObject stocktype, int cantidad)
     {
-        StartCoroutine(ActivarDespuesDeEspera(stocktype));
-       // stocktype.SetActive(true);
-        //var products = stocktype.GetComponentsInChildren<selectedBox>();
-
-        /*for (int i = 0; i < stocktype.transform.childCount; i++)
-        {
-            if (i < cantidad)
-            {
-                stocktype.transform.GetChild(i).gameObject.SetActive(true);
-            }
-            else
-            {
-                stocktype.transform.GetChild(i).gameObject.SetActive(false);
-            }
-        }*/
-
+        StartCoroutine(ActivarDespuesDeEspera(stocktype));      
     }
 
     IEnumerator ActivarDespuesDeEspera(GameObject stocktype)
     {
-        yield return new WaitForSeconds(0.25f);
-
+     
+        yield return new WaitForSeconds(0.5f);
         // Activar el objeto después de la espera
-        stocktype.SetActive(true);
+        stocktype.SetActive(true);        
+        for (int i = 0; i < stocktype.transform.childCount; i++)
+        {
+            stocktype.transform.GetChild(i).gameObject.SetActive(true);
+            var pallet = stocktype.transform.GetChild(i).GetComponent<selectedBox>();
+            if( pallet != null )
+            {
+                pallet.isSelected = false;
+            }
         }
+
+        yield return new WaitForSeconds(0.5f);
+    }
 
 
 }
