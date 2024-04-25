@@ -27,12 +27,13 @@ public class Game
             order.Level = level;
             if (type == OrderType.Shipping)
             {
-                order.Dock = "Dock_" + Random.Range(1, 5).ToString();
+                order.Dock = "M " + Random.Range(1, 5).ToString();
             } 
             else
             {
-                order.Dock = "Dock_" + Random.Range(5, 9).ToString();
+                order.Dock = "M " + Random.Range(5, 9).ToString();
             }
+            order.Name = GenerateRandomName();
             var shelf = warehouse.GetComponentsInChildren<shelf>();
             var shelforder = shelf.OrderBy(s => s.aisle);
             foreach (var shel in shelforder)
@@ -80,6 +81,17 @@ public class Game
             }
             Orders.Add(order);
         }
+    }
+
+    string GenerateRandomName()
+    {
+        System.Random random = new System.Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Caracteres alfanuméricos permitidos
+        string randomString = new string(Enumerable.Repeat(chars, 5) // Repite 5 veces para generar 5 caracteres
+            .Select(s => s[random.Next(s.Length)]) // Selecciona un carácter aleatorio de la cadena
+            .ToArray());
+
+        return "OS_" + randomString;
     }
 
     public decimal TotalPoints()

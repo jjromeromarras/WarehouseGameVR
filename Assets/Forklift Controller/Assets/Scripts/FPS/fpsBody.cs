@@ -17,7 +17,7 @@ public class fpsBody : MonoBehaviour {
     public Color scannColor;
 
     public event Action<string, string> onScannerContainer;
-    public event Action<string> onScannerLocation;
+    public event Action<string, string> onScannerLocation;
 
     private float timer;
     private Color currentColorCrossHair;
@@ -94,7 +94,7 @@ public class fpsBody : MonoBehaviour {
                 Ray currentRay = Camera.allCameras[0].ScreenPointToRay(crossHair.transform.position);
                 if (Physics.Raycast(currentRay, out rayHit))
                 {
-                    if (rayHit.collider.tag == "Ubicacion" && rayHit.distance <= 4)
+                    if ((rayHit.collider.tag == "Ubicacion" || rayHit.collider.tag == "dock" ) && rayHit.distance <= 4)
                     {
                         TextMeshPro ubicacion = null;
                         try
@@ -109,7 +109,7 @@ public class fpsBody : MonoBehaviour {
                         {
                             if (ubicacion != null)
                             {
-                                this.onScannerLocation(ubicacion.text);                                
+                                this.onScannerLocation(ubicacion.text, rayHit.collider.tag);                                
                             }
                             
 
@@ -127,7 +127,8 @@ public class fpsBody : MonoBehaviour {
                                
                             }
 
-                        }
+                        } 
+                        
                     }
                 }
                

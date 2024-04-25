@@ -11,7 +11,7 @@ public class Level : MonoBehaviour
     public event Action<bool> onSetLockPlayer;
     public event Action<string, string, shelf> onSetPickingLocation;    
 
-    public virtual int OnSetLocationScanner(string location)
+    public virtual int OnSetLocationScanner(string location, string tag)
     {
 
         return 0;
