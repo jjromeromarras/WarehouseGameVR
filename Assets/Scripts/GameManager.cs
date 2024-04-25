@@ -16,16 +16,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private fpsBody playerbody;
     [SerializeField] private pickingcamera pickingcamera;
     [SerializeField] private picking picking;
-    [SerializeField] private pnjwalker[] pnjwalkers;
-    [SerializeField] private forklift[] forklifts;
-    [SerializeField] private GameObject warehousemanual;
-    [SerializeField] private GameObject warehouseautomatico;
     [SerializeField] public int currentGame;
     [SerializeField] public panelusercontroller paneluser;   
     [SerializeField] private Level[] levels;
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject cross;
     [SerializeField] private GameObject infopicking;
+    [SerializeField] private GameObject warehouse;
 
     private bool showrfmenu;
     private GameState _state;
@@ -34,6 +31,29 @@ public class GameManager : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         _state = GameState.Traveller;
+        if(warehouse != null)
+        {
+            warehouse.SetActive(true);
+        }
+
+        if(minimap != null)
+        {
+            minimap.SetActive(true);
+        }
+
+        if(cross != null)
+        {
+            cross.SetActive(true);
+        }
+        if(infopicking != null)
+        {
+            infopicking.SetActive(false);
+        }
+
+        if(picking != null)
+        {
+            picking.gameObject.SetActive(false);    
+        }
         currentGame = 0;
         player = new Player();
 
@@ -46,6 +66,7 @@ public class GameManager : MonoBehaviour
         {
             playerbody.onScannerContainer += ScannerContainer;
             playerbody.onScannerLocation += ScannerLocation;
+       
         }
 
         for(int i = 0; i< levels.Length; i++)
@@ -92,6 +113,7 @@ public class GameManager : MonoBehaviour
     private void CancelPickingLocation()
     {
         picking.gameObject.SetActive(false);
+        warehouse.SetActive(true);
         playerbody.gameObject.SetActive(true);
         cross.SetActive(true);
         minimap.SetActive(true);
@@ -109,6 +131,7 @@ public class GameManager : MonoBehaviour
         playerbody.gameObject.SetActive(false);
         minimap.SetActive(false);
         cross.SetActive(false);
+        warehouse.SetActive(false);
         pickingcamera.ResetScene();
         _state = GameState.Picking;
         List<pallet> containers = new List<pallet>();
@@ -178,6 +201,7 @@ public class GameManager : MonoBehaviour
         if (result > 0)
         {            
             picking.gameObject.SetActive(false);
+            warehouse.SetActive(true);
             playerbody.gameObject.SetActive(true);
             cross.SetActive(true);
             minimap.SetActive(true);
@@ -195,10 +219,11 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void ScannerLocation(string location)
+    private void ScannerLocation(string location, string tag)
     {
-        player.Score += levels[currentGame].OnSetLocationScanner(location);
+        player.Score += levels[currentGame].OnSetLocationScanner(location, tag);
     }
+
 
     private void SetLockPlayer(bool value)
     {
