@@ -1,9 +1,12 @@
 using Assets.Scripts.Helper;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using static UnityEditor.FilePathAttribute;
+using static UnityEngine.Rendering.DebugUI;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,6 +15,7 @@ public class GameManager : MonoBehaviour
     private GameObject rfmenu;
 
     [SerializeField] private infotextcontroller infotext;
+    [SerializeField] private inforesultcontroller inforesult;
     [SerializeField] private rfcontroller rfcontroller;
     [SerializeField] private fpsBody playerbody;
     [SerializeField] private pickingcamera pickingcamera;
@@ -62,6 +66,7 @@ public class GameManager : MonoBehaviour
     {        
         rfmenu.SetActive(true);
         SetLockPlayer(true);
+    
         if (playerbody != null)
         {
             playerbody.onScannerContainer += ScannerContainer;
@@ -73,7 +78,8 @@ public class GameManager : MonoBehaviour
         {
             levels[i].onSetLockPlayer += SetLockPlayer;
             levels[i].onSetPickingLocation += SetPickingLocation;
-            
+            levels[i].onFinishLevel += FinishLevel;
+
         }
        
         if(pickingcamera != null)
@@ -107,7 +113,7 @@ public class GameManager : MonoBehaviour
     private void ScannerContainer(string container, string tag)
     {
         // Comprobar si el contenedor es correcto
-        player.Score += levels[currentGame].OnSetContainerScanner(container, tag);
+       levels[currentGame].OnSetContainerScanner(container, tag);
     }
 
     private void CancelPickingLocation()
@@ -196,9 +202,8 @@ public class GameManager : MonoBehaviour
 
     private void onCheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
-        var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);
-        player.Score += result;
-        if (result > 0)
+        var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);        
+        if (result)
         {            
             picking.gameObject.SetActive(false);
             warehouse.SetActive(true);
@@ -221,7 +226,7 @@ public class GameManager : MonoBehaviour
 
     private void ScannerLocation(string location, string tag)
     {
-        player.Score += levels[currentGame].OnSetLocationScanner(location, tag);
+        levels[currentGame].OnSetLocationScanner(location, tag);
     }
 
 
@@ -229,5 +234,25 @@ public class GameManager : MonoBehaviour
     {
         playerbody.setLock(value);
     }
-    
+
+    private void FinishLevel(int time, int bonificacion, int fallos)
+    {
+        StartCoroutine(ActiveFinish(time, bonificacion, fallos));
+    }
+
+    private IEnumerator ActiveFinish(int time, int bonificacion, int fallos)
+    {
+        inforesult.SetActiveInfo(true);
+        minimap.SetActive(false);
+        cross.SetActive(false);
+        rfmenu.SetActive(false);
+        playerbody.setLock(true);
+        player.Score += (bonificacion + time - fallos);
+        inforesult.SetResult((int)player.Score, time, fallos, bonificacion);
+        infotext.SetActiveInfo(false);
+        _state = GameState.FinishLevel;
+        yield return inforesult.SetMessageKey("nivelcompletado", 2f, new object[] { });
+    }
+
+
 }

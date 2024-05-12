@@ -8,24 +8,27 @@ public class Level : MonoBehaviour
     [SerializeField] public rfcontroller rfcontroller;   
     [SerializeField] public infotextcontroller infotext;
     [SerializeField] public timer timer;
+    public int bonificacion;
+    public int penalizacion;
     public event Action<bool> onSetLockPlayer;
-    public event Action<string, string, shelf> onSetPickingLocation;    
+    public event Action<string, string, shelf> onSetPickingLocation;
+    public event Action<int, int, int> onFinishLevel;
 
-    public virtual int OnSetLocationScanner(string location, string tag)
+    public virtual void OnSetLocationScanner(string location, string tag)
     {
 
-        return 0;
+        
     }
 
-    public virtual int OnSetContainerScanner(string container, string tag)
+    public virtual void OnSetContainerScanner(string container, string tag)
     {
 
-        return 0;
+        
     }
 
-    public virtual int CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
+    public virtual bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
-        return 0;
+        return false;
     }
 
     public virtual void OnExistPickingScene() { }
@@ -44,6 +47,13 @@ public class Level : MonoBehaviour
         timer.SetTimerOn(!value);
     }
 
+    public void setFinishLevel()
+    {
+        if(onFinishLevel != null)
+        {
+            onFinishLevel(Convert.ToInt16(timer.TimeLeft), bonificacion, penalizacion);
+        }
+    }
     public void setPickingLocation(string stock, string container, shelf location)
     {
         if (onSetPickingLocation != null)

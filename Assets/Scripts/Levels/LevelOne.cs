@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEditor.FilePathAttribute;
+using static UnityEngine.Rendering.DebugUI;
 
 public class LevelOne : Level
 {
@@ -26,6 +27,8 @@ public class LevelOne : Level
 
     public void Start()
     {
+        bonificacion = 0;
+        penalizacion = 0;
         showhelp = false;
         if (timer != null)
         {
@@ -269,6 +272,7 @@ public class LevelOne : Level
                 {
                     setLockPlayer(true);
                     infotext.SetActiveInfo(false);
+                    timer.SetTimerOn(true);
                     state = StateGame.PickingQuantity;
 
                 }
@@ -291,6 +295,7 @@ public class LevelOne : Level
                 {
                     setLockPlayer(true);
                     state = StateGame.FinishLevel;
+                    this.setFinishLevel();
                     break;
                 }
         }
@@ -342,7 +347,9 @@ public class LevelOne : Level
         {
             if (dock == order.Dock)
             {
-                state = StateGame.ShowFinishLevel;
+                state = StateGame.FinishLevel;
+                timer.SetTimerOn(false);                
+                this.setFinishLevel();
                 return 10;
             }
             else
@@ -364,7 +371,7 @@ public class LevelOne : Level
 
     }
 
-    public override int OnSetLocationScanner(string location, string tag)
+    public override void OnSetLocationScanner(string location, string tag)
     {
         if (state == StateGame.ScannerLocation)
         {
@@ -378,7 +385,7 @@ public class LevelOne : Level
                         state = StateGame.ShowContainerPicking;
                         rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
                         currentContainerClient, picking.Quantity});
-                        return 5;
+                        bonificacion += 5;
                     }
                     else
                     {
@@ -387,12 +394,12 @@ public class LevelOne : Level
                             showerror = true;
                             infotext.SetActiveInfo(true);
                             StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
-                            return -5;
+                            penalizacion+= 5;
                         }
-                        return 0;
+                        
                     }
                 }
-                return 0;
+                
             }
             else
             {
@@ -401,14 +408,14 @@ public class LevelOne : Level
                     showerror = true;
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
-                    return -5;
+                    penalizacion += 5;
                 }
-                return 0;
+                
             }
         } 
         else if (state == StateGame.ScannerDock)
         {
-            return OnSetDockScanner(location, tag);
+            OnSetDockScanner(location, tag);
         }
         else
         {
@@ -417,13 +424,13 @@ public class LevelOne : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { location }));
-                return -5;
+                penalizacion += 5;
             }
-            return 0;
+         
         }    
     }
 
-    public override int OnSetContainerScanner(string container, string tag)
+    public override void OnSetContainerScanner(string container, string tag)
     {
         if (state == StateGame.ScannerContainerClient)
         {
@@ -445,7 +452,7 @@ public class LevelOne : Level
                     rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, order.Name,
                         picking.Stock, currentContainerClient});
                 }
-                return 5;
+                bonificacion += 5;
             }
             else
             {
@@ -454,9 +461,9 @@ public class LevelOne : Level
                     showerror = true;
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
-                    return -5;
+                    penalizacion += 5;
                 }
-                return 0;
+         
             }
         }
         else if (state == StateGame.ScannerContainer)
@@ -469,7 +476,7 @@ public class LevelOne : Level
                     rfcontroller.SetPantallaTxt("EnterArticulo", new object[] { picking.Stock, picking.Container,
                         currentContainerClient, picking.Quantity});
                     setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
-                    return 5;
+                    bonificacion += 5;
                 }
                 else
                 {
@@ -478,12 +485,12 @@ public class LevelOne : Level
                         showerror = true;
                         infotext.SetActiveInfo(true);
                         StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedor", 2f, new object[] { container }));
-                        return -5;
+                        penalizacion += 5;
                     }
-                    return 0;
+                   
                 }
             }
-            return 0;
+            
         }
         else
         {
@@ -492,9 +499,9 @@ public class LevelOne : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { container }));
-                return -5;
+                penalizacion += 5;
             }
-            return 0;
+            
         }
         
     }
@@ -509,7 +516,7 @@ public class LevelOne : Level
         }
     }
 
-    public override int CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
+    public override bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
         // check
         if (order.Tasks[currentTask] is PickingTask picking)
@@ -527,7 +534,8 @@ public class LevelOne : Level
                 {
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("errorpickingproduct", 2f, new object[] { total, picking.Stock }));
-                    return -5;
+                    penalizacion += 5;
+                    return false;
                 }
                 else
                 {                 
@@ -542,7 +550,8 @@ public class LevelOne : Level
                         NextStep();
                     }
                     // Picking correcto
-                    return 10;
+                    bonificacion += 10;
+                    return true;
                 }
             } 
             else
@@ -550,10 +559,11 @@ public class LevelOne : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errorpickingquantity", 2f, new object[] { total, picking.Quantity }));
-                return -5;
+                penalizacion += 5;
+                return false;
             }
         }
-        return 0;
+       return false;
     }
 
     public override void onResetTask() 
