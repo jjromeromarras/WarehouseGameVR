@@ -1,14 +1,10 @@
-using Assets.Scripts.Helper;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.Tutorials.Core.Editor;
 using UnityEditor.Localization;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
-using static UnityEngine.Rendering.DebugUI;
 
 public class infotextcontroller : MonoBehaviour
 {

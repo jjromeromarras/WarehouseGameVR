@@ -40,6 +40,7 @@ namespace Assets.Scripts.Helper
         Traveller,
         Picking,
         Inventory,
+        FinishLevel,
         Dialog
     }
 
