@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Gloves
+  m_Controller: {fileID: 9100000, guid: 48296831efb5c3649b5fdf1439c4bc93, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 811f33825c46aef4b8edddbba6d9d254, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 69766c0939f2cda45a9af6f2cd66ce02, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 39716f5127c00e54cab360c43cebd76f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 50d320ac6942580409b82fe4aac930da, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: c365462c739fdfd42b47e2f737650698, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 927628f93a1ad1a41ab4d6be65379311, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: a1d95ed62d365de44b51b68f06ae433e, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 167e7fa4c11bd634585a8be8bf3ff718, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 9251803e05b57be48bb32f5308fb0f56, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c898fdfa92ab4a944b052e3cc6da43b6, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: e424931c53da3334c8c8cb8754e55711, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: e15f578a3ecf4df4dafcb1440d45e475, type: 2}
