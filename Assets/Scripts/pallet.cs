@@ -25,25 +25,25 @@ public class pallet : MonoBehaviour
         SSC2.text = ssc;
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            //it can not enter
+    //private void OnTriggerExit(Collider other)
+    //{
+    //    if (other.CompareTag("Player"))
+    //    {
+    //        //it can not enter
     
-            caninteractue = false;
-        }
-    }
+    //        caninteractue = false;
+    //    }
+    //}
 
-     private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            //it can enter
+    // private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.CompareTag("Player"))
+    //    {
+    //        //it can enter
      
-            caninteractue = true;
-        }
-    }
+    //        caninteractue = true;
+    //    }
+    //}
 
     void Update()
     {

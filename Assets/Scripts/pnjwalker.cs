@@ -14,7 +14,6 @@ public class pnjwalker : MonoBehaviour
 
     private int indexWaypointActual = 0;
     private int margenError = 2;
-    private bool pnjdetenido = false;
     private NavMeshAgent agente;
     private PNJRFState state;
     void Start()
@@ -58,24 +57,9 @@ public class pnjwalker : MonoBehaviour
         agente.enabled = false;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-            if (other.CompareTag("Player") || other.CompareTag("PNJ"))
-            {
-                pnjdetenido = true;
-                anim.SetBool("IsWalk", false);
-            }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        pnjdetenido = false;
-
-    }
-
     private void movePNJ()
     {
-        if (orderwalkers.Length > 0 && indexWaypointActual < orderwalkers.Length && !pnjdetenido)
+        if (orderwalkers.Length > 0 && indexWaypointActual < orderwalkers.Length)
         {
 
             // Calcula la distancia entre el camión y el waypoint actual
