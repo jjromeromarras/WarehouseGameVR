@@ -30,7 +30,7 @@ public class infotextcontroller : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             if (!writefulltext)
             {

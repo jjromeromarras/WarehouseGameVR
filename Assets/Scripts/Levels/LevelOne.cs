@@ -10,6 +10,8 @@ public class LevelOne : Level
 
     [SerializeField] private GameObject warehousemanual;
     [SerializeField] private pallet[] clientsPallets;
+    [SerializeField] private bool tutorial;
+    [SerializeField] private bool variospedidos;
 
     private int currentTask;
     private string currentContainerClient;
@@ -20,6 +22,8 @@ public class LevelOne : Level
     private bool waitreading;
     private bool showerror;
     private bool showhelp;
+
+    #region Public Methods
     public void Awake()
     {
         currentTask = 0;
@@ -29,14 +33,14 @@ public class LevelOne : Level
     {
         bonificacion = 0;
         penalizacion = 0;
-        showhelp = false;
+        showhelp = tutorial ? GameManager.Instance.showayuda: false;
         if (timer != null)
         {
             timer.SetTimeLeft(1200f);
         }
         waitreading = false;
         showerror = false;
-        game = new Game(warehousemanual, 1, 1, 1, OrderType.Picking);
+        game = new Game(warehousemanual, !variospedidos?1:3, tutorial? 1: UnityEngine.Random.Range(3, 12), 1, OrderType.Picking);
         order = game.Orders.FirstOrDefault();
         state = StateGame.ShowBienVenido;
         if (infotext != null)
@@ -149,8 +153,244 @@ public class LevelOne : Level
 
         }
     }
+    public int OnSetDockScanner(string dock, string tag)
+    {
 
+        if (tag == "dock")
+        {
+            if (dock == order.Dock)
+            {
+                state = StateGame.FinishLevel;
+                timer.SetTimerOn(false);
+                this.setFinishLevel();
+                return 10;
+            }
+            else
+            {
+                showerror = true;
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
+                return -5;
+            }
+        }
+        else if (!showerror && !waitreading)
+        {
+            showerror = true;
+            infotext.SetActiveInfo(true);
+            StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
+            return -5;
+        }
+        return 0;
 
+    }
+
+    public override void OnSetLocationScanner(string location, string tag)
+    {
+        if (state == StateGame.ScannerLocation)
+        {
+            if (tag == "Ubicacion")
+            {
+                if (order.Tasks[currentTask] is PickingTask picking)
+                {
+                    if (location == picking.Location)
+                    {
+                        picking.locationScan = true;
+                        state = StateGame.ShowContainerPicking;
+                        rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
+                        currentContainerClient, picking.Quantity});
+                        bonificacion += 5;
+                    }
+                    else
+                    {
+                        if (!showerror && !waitreading)
+                        {
+                            showerror = true;
+                            infotext.SetActiveInfo(true);
+                            StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
+                            penalizacion += 5;
+                        }
+
+                    }
+                }
+
+            }
+            else
+            {
+                if (!showerror && !waitreading)
+                {
+                    showerror = true;
+                    infotext.SetActiveInfo(true);
+                    StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
+                    penalizacion += 5;
+                }
+
+            }
+        }
+        else if (state == StateGame.ScannerDock)
+        {
+            OnSetDockScanner(location, tag);
+        }
+        else
+        {
+            if (!showerror && !waitreading)
+            {
+                showerror = true;
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { location }));
+                penalizacion += 5;
+            }
+
+        }
+    }
+
+    public override void OnSetContainerScanner(string container, string tag)
+    {
+        if (state == StateGame.ScannerContainerClient)
+        {
+            if (tag == "ContainerClient")
+            {
+
+                state = StateGame.ShowLocationPicking;
+                for (int i = 0; i < clientsPallets.Length; i++)
+                {
+                    clientsPallets[i].SetSelected(false);
+                    if (clientsPallets[i].ssc == container)
+                    {
+                        clientsPallets[i].gameObject.SetActive(false);
+                        currentContainerClient = container;
+                    }
+                }
+                if (order.Tasks[currentTask] is PickingTask picking)
+                {
+                    rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, order.Name,
+                        picking.Stock, currentContainerClient});
+                }
+                bonificacion += 5;
+            }
+            else
+            {
+                if (!showerror && !waitreading)
+                {
+                    showerror = true;
+                    infotext.SetActiveInfo(true);
+                    StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
+                    penalizacion += 5;
+                }
+
+            }
+        }
+        else if (state == StateGame.ScannerContainer)
+        {
+            if (order.Tasks[currentTask] is PickingTask picking)
+            {
+                if (picking.Container == container)
+                {
+                    state = StateGame.ShowIntroducirArticulo;
+                    rfcontroller.SetPantallaTxt("EnterArticulo", new object[] { picking.Stock, picking.Container,
+                        currentContainerClient, picking.Quantity});
+                    setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
+                    bonificacion += 5;
+                }
+                else
+                {
+                    if (!showerror && !waitreading)
+                    {
+                        showerror = true;
+                        infotext.SetActiveInfo(true);
+                        StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedor", 2f, new object[] { container }));
+                        penalizacion += 5;
+                    }
+
+                }
+            }
+
+        }
+        else
+        {
+            if (!showerror && !waitreading)
+            {
+                showerror = true;
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { container }));
+                penalizacion += 5;
+            }
+
+        }
+
+    }
+
+    public override void OnExistPickingScene()
+    {
+        state = StateGame.ScannerContainer;
+        if (order.Tasks[currentTask] is PickingTask picking)
+        {
+            rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
+                        currentContainerClient, picking.Quantity});
+        }
+    }
+
+    public override bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
+    {
+        // check
+        if (order.Tasks[currentTask] is PickingTask picking)
+        {
+            var total = cantfresa + cantplatano + cantperas + cantmelocoton + cantmanzana + cantuvas + cantpiña;
+            if (total == picking.Quantity)
+            {
+                if ((picking.Stock == "piña" && cantpiña != total) ||
+                     (picking.Stock == "melocton" && cantmelocoton != total) ||
+                     (picking.Stock == "platano" && cantplatano != total) ||
+                     (picking.Stock == "fresa" && cantfresa != total) ||
+                     (picking.Stock == "peras" && cantperas != total) ||
+                     (picking.Stock == "manzanas" && cantmanzana != total) ||
+                     (picking.Stock == "uvas" && cantuvas != total))
+                {
+                    infotext.SetActiveInfo(true);
+                    StartCoroutine(infotext.SetMessageKey("errorpickingproduct", 2f, new object[] { total, picking.Stock }));
+                    penalizacion += 5;
+                    return false;
+                }
+                else
+                {
+                    infotext.SetActiveInfo(true);
+                    setLockPlayer(true);
+                    if (showhelp)
+                    {
+                        StartCoroutine(infotext.SetMessageKey("primerpicking", 2f, new object[] { }));
+                    }
+                    else
+                    {
+                        NextStep();
+                    }
+                    // Picking correcto
+                    bonificacion += 10;
+                    return true;
+                }
+            }
+            else
+            {
+                showerror = true;
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("errorpickingquantity", 2f, new object[] { total, picking.Quantity }));
+                penalizacion += 5;
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public override void onResetTask()
+    {
+        if (order.Tasks[currentTask] is PickingTask picking)
+        {
+            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
+        }
+    }
+
+   
+    #endregion
+
+    #region Private Methods
     private void showTexto(string key)
     {        
         if (!waitreading)
@@ -339,240 +579,8 @@ public class LevelOne : Level
             NextStep();
         }
     }
+    #endregion
 
-    public int OnSetDockScanner(string dock, string tag)
-    {
-
-        if (tag == "dock")
-        {
-            if (dock == order.Dock)
-            {
-                state = StateGame.FinishLevel;
-                timer.SetTimerOn(false);                
-                this.setFinishLevel();
-                return 10;
-            }
-            else
-            {
-                showerror = true;
-                infotext.SetActiveInfo(true);
-                StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
-                return -5;
-            }
-        }
-        else if (!showerror && !waitreading)
-        {
-            showerror = true;
-            infotext.SetActiveInfo(true);
-            StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
-            return -5;
-        }
-        return 0;
-
-    }
-
-    public override void OnSetLocationScanner(string location, string tag)
-    {
-        if (state == StateGame.ScannerLocation)
-        {
-            if (tag == "Ubicacion")
-            {
-                if (order.Tasks[currentTask] is PickingTask picking)
-                {
-                    if (location == picking.Location)
-                    {
-                        picking.locationScan = true;
-                        state = StateGame.ShowContainerPicking;
-                        rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
-                        currentContainerClient, picking.Quantity});
-                        bonificacion += 5;
-                    }
-                    else
-                    {
-                        if (!showerror && !waitreading)
-                        {
-                            showerror = true;
-                            infotext.SetActiveInfo(true);
-                            StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
-                            penalizacion+= 5;
-                        }
-                        
-                    }
-                }
-                
-            }
-            else
-            {
-                if (!showerror && !waitreading)
-                {
-                    showerror = true;
-                    infotext.SetActiveInfo(true);
-                    StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
-                    penalizacion += 5;
-                }
-                
-            }
-        } 
-        else if (state == StateGame.ScannerDock)
-        {
-            OnSetDockScanner(location, tag);
-        }
-        else
-        {
-            if (!showerror && !waitreading)
-            {
-                showerror = true;
-                infotext.SetActiveInfo(true);
-                StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { location }));
-                penalizacion += 5;
-            }
-         
-        }    
-    }
-
-    public override void OnSetContainerScanner(string container, string tag)
-    {
-        if (state == StateGame.ScannerContainerClient)
-        {
-            if (tag == "ContainerClient")
-            {
-
-                state = StateGame.ShowLocationPicking;
-                for (int i = 0; i < clientsPallets.Length; i++)
-                {
-                    clientsPallets[i].SetSelected(false);
-                    if (clientsPallets[i].ssc == container)
-                    {
-                        clientsPallets[i].gameObject.SetActive(false);
-                        currentContainerClient = container;
-                    }
-                }
-                if (order.Tasks[currentTask] is PickingTask picking)
-                {
-                    rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, order.Name,
-                        picking.Stock, currentContainerClient});
-                }
-                bonificacion += 5;
-            }
-            else
-            {
-                if (!showerror && !waitreading)
-                {
-                    showerror = true;
-                    infotext.SetActiveInfo(true);
-                    StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
-                    penalizacion += 5;
-                }
-         
-            }
-        }
-        else if (state == StateGame.ScannerContainer)
-        {
-            if (order.Tasks[currentTask] is PickingTask picking)
-            {
-                if (picking.Container == container)
-                {
-                    state = StateGame.ShowIntroducirArticulo;
-                    rfcontroller.SetPantallaTxt("EnterArticulo", new object[] { picking.Stock, picking.Container,
-                        currentContainerClient, picking.Quantity});
-                    setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
-                    bonificacion += 5;
-                }
-                else
-                {
-                    if (!showerror && !waitreading)
-                    {
-                        showerror = true;
-                        infotext.SetActiveInfo(true);
-                        StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedor", 2f, new object[] { container }));
-                        penalizacion += 5;
-                    }
-                   
-                }
-            }
-            
-        }
-        else
-        {
-            if (!showerror && !waitreading)
-            {
-                showerror = true;
-                infotext.SetActiveInfo(true);
-                StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { container }));
-                penalizacion += 5;
-            }
-            
-        }
-        
-    }
-
-    public override void OnExistPickingScene()
-    {
-        state = StateGame.ScannerContainer;
-        if (order.Tasks[currentTask] is PickingTask picking)
-        {
-            rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
-                        currentContainerClient, picking.Quantity});
-        }
-    }
-
-    public override bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
-    {
-        // check
-        if (order.Tasks[currentTask] is PickingTask picking)
-        {
-            var total = cantfresa + cantplatano + cantperas + cantmelocoton + cantmanzana + cantuvas + cantpiña;
-            if (total == picking.Quantity)
-            {                
-                if ( (picking.Stock == "piña" && cantpiña != total) ||
-                     (picking.Stock == "melocton" && cantmelocoton != total) ||
-                     (picking.Stock == "platano" && cantplatano != total) ||
-                     (picking.Stock == "fresa" && cantfresa != total) ||
-                     (picking.Stock == "peras" && cantperas != total) ||
-                     (picking.Stock == "manzanas" && cantmanzana != total) ||
-                     (picking.Stock == "uvas" && cantuvas != total))
-                {
-                    infotext.SetActiveInfo(true);
-                    StartCoroutine(infotext.SetMessageKey("errorpickingproduct", 2f, new object[] { total, picking.Stock }));
-                    penalizacion += 5;
-                    return false;
-                }
-                else
-                {                 
-                    infotext.SetActiveInfo(true);
-                    setLockPlayer(true);
-                    if (showhelp)
-                    {
-                        StartCoroutine(infotext.SetMessageKey("primerpicking", 2f, new object[] { }));
-                    }
-                    else
-                    {
-                        NextStep();
-                    }
-                    // Picking correcto
-                    bonificacion += 10;
-                    return true;
-                }
-            } 
-            else
-            {
-                showerror = true;
-                infotext.SetActiveInfo(true);
-                StartCoroutine(infotext.SetMessageKey("errorpickingquantity", 2f, new object[] { total, picking.Quantity }));
-                penalizacion += 5;
-                return false;
-            }
-        }
-       return false;
-    }
-
-    public override void onResetTask() 
-    {
-        if (order.Tasks[currentTask] is PickingTask picking)
-        {
-            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
-        }
-    }
 }
 
     internal enum StateGame
