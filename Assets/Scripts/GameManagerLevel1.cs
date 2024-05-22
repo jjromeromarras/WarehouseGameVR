@@ -7,9 +7,7 @@ using UnityEngine;
 public class GameManagerLevel1 : MonoBehaviour
 {
     // Start is called before the first frame update
-    [SerializeField]
-    private GameObject rfmenu;
-
+    [SerializeField] private GameObject rfmenu;
     [SerializeField] private infotextcontroller infotext;
     [SerializeField] private inforesultcontroller inforesult;
     [SerializeField] private rfcontroller rfcontroller;
@@ -23,6 +21,7 @@ public class GameManagerLevel1 : MonoBehaviour
     [SerializeField] private GameObject cross;
     [SerializeField] private GameObject infopicking;
     [SerializeField] private GameObject warehouse;
+    [SerializeField] private pnjwalker[] pnjs;
 
     private bool showrfmenu;
     private GameState _state;
@@ -123,6 +122,7 @@ public class GameManagerLevel1 : MonoBehaviour
         }
     }
 
+    #region Private Methods
     private void ScannerContainer(string container, string tag)
     {
         // Comprobar si el contenedor es correcto
@@ -135,6 +135,11 @@ public class GameManagerLevel1 : MonoBehaviour
         warehouse.SetActive(true);
         playerbody.gameObject.SetActive(true);
         cross.SetActive(true);
+        for (int i = 0; i < pnjs.Length; i++)
+        {
+            pnjs[i].ResumePNJ();
+        }
+
         minimap.SetActive(GameManager.Instance.showminimap);
         infopicking.SetActive(false);
         SetLockPlayer(false);
@@ -150,7 +155,12 @@ public class GameManagerLevel1 : MonoBehaviour
         playerbody.gameObject.SetActive(false);
         minimap.SetActive(false);
         cross.SetActive(false);
+        for(int i=0; i<pnjs.Length; i++)
+        {
+            pnjs[i].StopPNJ();
+        }
         warehouse.SetActive(false);
+        
         pickingcamera.ResetScene();
         _state = GameState.Picking;
         List<pallet> containers = new List<pallet>();
@@ -220,6 +230,11 @@ public class GameManagerLevel1 : MonoBehaviour
         {            
             picking.gameObject.SetActive(false);
             warehouse.SetActive(true);
+            for (int i = 0; i < pnjs.Length; i++)
+            {
+                pnjs[i].ResumePNJ();
+            }
+
             playerbody.gameObject.SetActive(true);
             cross.SetActive(true);
             minimap.SetActive(GameManager.Instance.showminimap);
@@ -266,6 +281,6 @@ public class GameManagerLevel1 : MonoBehaviour
         _state = GameState.FinishLevel;
         yield return inforesult.SetMessageKey("nivelcompletado", 2f, new object[] { });
     }
-
+    #endregion
 
 }
