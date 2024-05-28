@@ -8,6 +8,7 @@ public class Level : MonoBehaviour
     [SerializeField] public rfcontroller rfcontroller;   
     [SerializeField] public infotextcontroller infotext;
     [SerializeField] public timer timer;
+    [SerializeField] public AudioClip scannerOK, scannerError;
     public int bonificacion;
     public int penalizacion;
     public event Action<bool> onSetLockPlayer;

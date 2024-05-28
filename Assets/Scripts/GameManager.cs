@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] public bool showminimap;
     [SerializeField] public bool penalización;
     [SerializeField] public int minlevel;
-    
+
+
     public Player player;
 
     private void Awake()
