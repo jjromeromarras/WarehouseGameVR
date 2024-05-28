@@ -72,7 +72,7 @@ public class infotextbase : MonoBehaviour
             foreach (var item in msg)
             {
                 textinfo.text += item;
-                SoundManager.SharedInstance.PlaySound(writesound);
+                SoundManager.SharedInstance.PlayWrite(writesound);
                 yield return new WaitForSeconds(0.03f);
                 if (writefulltext)
                 {

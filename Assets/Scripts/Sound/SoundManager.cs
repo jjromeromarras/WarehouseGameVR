@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
-    [SerializeField] AudioSource effectsSource, musicSource;
-
-    public Vector2 pitchRange = Vector2.zero;
-
+    [SerializeField] AudioSource effectsSource, musicSource, textSource;
     public static SoundManager SharedInstance;
 
     private void Awake()
@@ -25,23 +22,23 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySound(AudioClip clip)
     {
-        effectsSource.Stop();
-        effectsSource.clip = clip;
-        effectsSource.Play();
+        PlayClip(effectsSource, clip);
     }
 
     public void PlayMusic(AudioClip clip)
     {
-        musicSource.Stop();
-        musicSource.clip = clip;
-        musicSource.Play();
+        PlayClip(musicSource, clip);
     }
 
-    public void RandomSoundEffect(params AudioClip[] clips)
+    public void PlayWrite(AudioClip clip)
     {
-        int indx = Random.Range(0, clips.Length);
-        float pitch = Random.Range(pitchRange.x, pitchRange.y);
-        effectsSource.pitch = pitch;
-        PlaySound(clips[indx]);
+        PlayClip(textSource, clip);
+    }    
+
+    private void PlayClip(AudioSource audio, AudioClip clip)
+    {
+        audio.Stop();
+        audio.clip = clip;
+        audio.Play();
     }
 }
