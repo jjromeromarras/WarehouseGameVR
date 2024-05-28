@@ -15,6 +15,7 @@ public class fpsBody : MonoBehaviour {
     public GameObject crossHair;
     public float resetTime;
     public Color scannColor;
+    public AudioClip soundScanner;
 
     public event Action<string, string> onScannerContainer;
     public event Action<string, string> onScannerLocation;
@@ -62,6 +63,7 @@ public class fpsBody : MonoBehaviour {
                 timer -= Time.deltaTime;
                 if (timer < 0f)
                 {
+                    SoundManager.SharedInstance.PlaySound(soundScanner);
                     if (currentColorCrossHair == Color.white) currentColorCrossHair = Color.red; else currentColorCrossHair = Color.white;
                     this.ScannerAtPoint(currentColorCrossHair);
                     timer = resetTime;
