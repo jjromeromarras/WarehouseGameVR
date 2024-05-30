@@ -1,9 +1,6 @@
 using Assets.Scripts.Helper;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using static UnityEditor.FilePathAttribute;
-using static UnityEngine.Rendering.DebugUI;
 
 public class LevelOne : Level
 {
@@ -42,7 +39,8 @@ public class LevelOne : Level
         showerror = false;
         game = new Game(warehousemanual, !variospedidos?1:3, tutorial? 1: UnityEngine.Random.Range(3, 12), 1, OrderType.Picking);
         order = game.Orders.FirstOrDefault();
-        state = StateGame.ShowBienVenido;
+        
+        
         if (infotext != null)
         {
             infotext.onFinishInfoText += FinishInfoText;
@@ -51,6 +49,20 @@ public class LevelOne : Level
         if (rfcontroller != null)
         {
             rfcontroller.SetTitle("TareasAutomaticas");
+        }
+        switch (numberlevel)
+        {
+            case 1:
+                state = StateGame.ShowBienVenido;
+                break;
+            case 2:
+                showhelp = true;
+                state = StateGame.ShowTutorial2;
+                break;
+            case 3:
+                showhelp = true;
+                state = StateGame.ShowTutorial3;
+                break;
         }
     }
 
@@ -67,7 +79,17 @@ public class LevelOne : Level
                 {
                     showTexto("Reto1Tutorial1");
                     break;
-                }           
+                }
+            case StateGame.ShowTutorial2:
+                {
+                    showTexto("Reto1Level2");
+                    break;
+                }
+            case StateGame.ShowTutorial3:
+                {
+                    showTexto("Reto2Level3");
+                    break;
+                }
             case StateGame.ShowClientContainer:
                 {
                     showTexto("ContainerCliente");
@@ -391,7 +413,16 @@ public class LevelOne : Level
                     setLockPlayer(true);
                     state = StateGame.ShowClientContainer;
                 }
-                break;            
+                break;
+            case StateGame.ShowTutorial2:
+            case StateGame.ShowTutorial3:
+                {
+                    showhelp = false;
+                    rfcontroller.SetPantallaTxt("Picking", new object[] { order.Name });
+                    setLockPlayer(true);
+                    state = StateGame.ShowClientContainer;
+                }
+                break;
             case StateGame.ShowClientContainer:
                 {
                     setLockPlayer(true);
@@ -409,9 +440,12 @@ public class LevelOne : Level
                     setLockPlayer(false);
                     infotext.SetActiveInfo(false);
                     state = StateGame.ScannerContainerClient;
-                    for (int i = 0; i < clientsPallets.Length; i++)
+                    if (tutorial)
                     {
-                        clientsPallets[i].SetSelected(true);
+                        for (int i = 0; i < clientsPallets.Length; i++)
+                        {
+                            clientsPallets[i].SetSelected(true);
+                        }
                     }
                 }
                 break;
@@ -420,7 +454,10 @@ public class LevelOne : Level
                     setLockPlayer(false);
                     infotext.SetActiveInfo(false);
                     state = StateGame.ScannerLocation;
-                    order.Tasks[currentTask].LocationRef.SetSelectLevel(order.Tasks[currentTask].Location);
+                    if (tutorial)
+                    {
+                        order.Tasks[currentTask].LocationRef.SetSelectLevel(order.Tasks[currentTask].Location);
+                    }
                 }
                 break;
             case StateGame.ShowContainerPicking:
@@ -428,7 +465,10 @@ public class LevelOne : Level
                     setLockPlayer(false);
                     infotext.SetActiveInfo(false);
                     state = StateGame.ScannerContainer;
-                    order.Tasks[currentTask].ContainerRef.SetSelected(true);
+                    if (tutorial)
+                    {
+                        order.Tasks[currentTask].ContainerRef.SetSelected(true);
+                    }
                     order.Tasks[currentTask].LocationRef.UnSelectionShelf();
 
                 }
@@ -474,7 +514,10 @@ public class LevelOne : Level
         if (currentTask < order.Tasks.Count)
         {
             state = StateGame.ScannerLocation;
-            order.Tasks[currentTask].ContainerRef.SetSelected(true);
+            if (tutorial)
+            {
+                order.Tasks[currentTask].ContainerRef.SetSelected(true);
+            }
             if (order.Tasks[currentTask] is PickingTask picking)
             {
                 rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, order.Name,

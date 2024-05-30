@@ -11,7 +11,7 @@ public class pnjwalker : MonoBehaviour
     [Header("PNJ")]
     public orderwalker[] orderwalkers;
     public Animator anim;
-
+    public AudioSource footstepSource;
     private int indexWaypointActual = 0;
     private int margenError = 2;
     private NavMeshAgent agente;
@@ -20,6 +20,7 @@ public class pnjwalker : MonoBehaviour
     {
           anim.SetBool("IsWalk", false);
           anim.SetBool("IsPicking", false);
+          footstepSource.enabled = false;
     }
 
     // Update is called once per frame
@@ -33,18 +34,20 @@ public class pnjwalker : MonoBehaviour
                     break;
                 }
             case PNJRFState.eNothing: {
+                    footstepSource.enabled = false;
                     anim.SetBool("IsWalk", false);
                     anim.SetBool("IsPicking", false);                                        
                     break;
                 }
             case PNJRFState.eDoPicking:
                 {
+                    footstepSource.enabled = false;
                     DoPicking();
                     break;
                 }
             case PNJRFState.eRotateToPallet:
                 {
-
+                    footstepSource.enabled = false;
                     break;
                 }
         }
@@ -67,7 +70,7 @@ public class pnjwalker : MonoBehaviour
 
             if (distancia > margenError)
             {
-
+                footstepSource.enabled = true;
                 anim.SetBool("IsWalk", true);
                 anim.SetBool("IsPicking", false);
                 anim.Play("walking", 0);
@@ -79,6 +82,7 @@ public class pnjwalker : MonoBehaviour
             }
             else
             {
+                footstepSource.enabled = false;
                 anim.SetBool("IsWalk", false);
                 agente.enabled = false;
                 if (orderwalkers[indexWaypointActual].ispicking)

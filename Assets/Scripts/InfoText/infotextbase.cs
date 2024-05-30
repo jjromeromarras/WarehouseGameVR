@@ -23,7 +23,6 @@ public class infotextbase : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SetActiveInfo(false);
         this.WriteInfoText(string.Empty);
     }
 
