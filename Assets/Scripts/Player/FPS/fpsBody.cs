@@ -5,7 +5,6 @@ using System;
 public class fpsBody : MonoBehaviour {
 
     public static fpsBody instance;
-
     public string horizontalInputName;
     public string verticalInputName;
     public float Speed;
@@ -16,7 +15,7 @@ public class fpsBody : MonoBehaviour {
     public float resetTime;
     public Color scannColor;
     public AudioClip soundScanner;
-
+    public AudioSource footstepSource;
     public event Action<string, string> onScannerContainer;
     public event Action<string, string> onScannerLocation;
 
@@ -37,6 +36,7 @@ public class fpsBody : MonoBehaviour {
         timer = resetTime;
         currentColorCrossHair = Color.white;
         islocked = isScanning = false;
+        footstepSource.enabled = false;
     }
 
     private void Update()
@@ -59,6 +59,7 @@ public class fpsBody : MonoBehaviour {
 
             if (Input.GetMouseButton(0))
             {
+                footstepSource.enabled = false;
                 isScanning = true;
                 timer -= Time.deltaTime;
                 if (timer < 0f)
@@ -76,6 +77,10 @@ public class fpsBody : MonoBehaviour {
                 isScanning = false;
                 this.ScannerAtPoint(currentColorCrossHair);
             }
+        }
+        else
+        {
+            footstepSource.enabled = false;
         }
     }
 
@@ -150,7 +155,9 @@ public class fpsBody : MonoBehaviour {
         Vector3 rightMovement = transform.right * horizInput;
 
         charController.SimpleMove(forwardMovement + rightMovement);
+        footstepSource.enabled = forwardMovement.magnitude + rightMovement.magnitude > 0;
         anim.SetBool("IsWalker", forwardMovement.magnitude + rightMovement.magnitude>0);
+
     }
 
     public void setLock(bool value)

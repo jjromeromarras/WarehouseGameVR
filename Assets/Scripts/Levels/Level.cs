@@ -9,11 +9,13 @@ public class Level : MonoBehaviour
     [SerializeField] public infotextcontroller infotext;
     [SerializeField] public timer timer;
     [SerializeField] public AudioClip scannerOK, scannerError;
+    [SerializeField] public int numberlevel;
     public int bonificacion;
     public int penalizacion;
     public event Action<bool> onSetLockPlayer;
     public event Action<string, string, shelf> onSetPickingLocation;
     public event Action<int, int, int> onFinishLevel;
+
 
     public virtual void OnSetLocationScanner(string location, string tag)
     {

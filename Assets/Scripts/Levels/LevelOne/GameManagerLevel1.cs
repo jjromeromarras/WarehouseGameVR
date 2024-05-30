@@ -177,46 +177,51 @@ public class GameManagerLevel1 : MonoBehaviour
 
         foreach (var item in containers)
         {
-            var stockpallet = Enum.GetValues(typeof(Stock)).GetValue(UnityEngine.Random.Range(0, 7)).ToString();
-            if (item.ssc == containersscc)
+            if (!String.IsNullOrEmpty(item.ssc))
             {
-                stockpallet = stock;
-            }
-           
-            if (item.transform.localPosition.y < 2)
-            {
-                // Abajo
-                if(item.transform.localPosition.x > 1)
+                var stockpallet = Enum.GetValues(typeof(Stock)).GetValue(UnityEngine.Random.Range(0, 7)).ToString();
+                if (item.ssc == containersscc)
                 {
-                    // izquierda
-                    picking.setContainer(0, stockpallet, 12, item.ssc);
-                } else if (item.transform.localPosition.x < 1 && item.transform.localPosition.x > -1)
-                {
-                    // centrado
-                    picking.setContainer(1, stockpallet, 12, item.ssc);
-                } else
-                {
-                    // derecha
-                    picking.setContainer(2, stockpallet, 12, item.ssc);
+                    stockpallet = stock;
                 }
-            }
-            else
-            {
-                // Arriba
-                if (item.transform.localPosition.x > 1)
+
+                if (item.transform.localPosition.y < 2)
                 {
-                    // izquierda
-                    picking.setContainer(3, stockpallet, 12, item.ssc);
-                }
-                else if (item.transform.localPosition.x < 1 && item.transform.localPosition.x > -1)
-                {
-                    // centrado
-                    picking.setContainer(4, stockpallet, 12, item.ssc);
+                    // Abajo
+                    if (item.transform.localPosition.x > 1)
+                    {
+                        // izquierda
+                        picking.setContainer(0, stockpallet, 12, item.ssc);
+                    }
+                    else if (item.transform.localPosition.x < 1 && item.transform.localPosition.x > -1)
+                    {
+                        // centrado
+                        picking.setContainer(1, stockpallet, 12, item.ssc);
+                    }
+                    else
+                    {
+                        // derecha
+                        picking.setContainer(2, stockpallet, 12, item.ssc);
+                    }
                 }
                 else
                 {
-                    // derecha
-                    picking.setContainer(5, stockpallet, 12, item.ssc);
+                    // Arriba
+                    if (item.transform.localPosition.x > 1)
+                    {
+                        // izquierda
+                        picking.setContainer(3, stockpallet, 12, item.ssc);
+                    }
+                    else if (item.transform.localPosition.x < 1 && item.transform.localPosition.x > -1)
+                    {
+                        // centrado
+                        picking.setContainer(4, stockpallet, 12, item.ssc);
+                    }
+                    else
+                    {
+                        // derecha
+                        picking.setContainer(5, stockpallet, 12, item.ssc);
+                    }
                 }
             }
         }
