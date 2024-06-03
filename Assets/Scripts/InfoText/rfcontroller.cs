@@ -15,8 +15,8 @@ public class rfcontroller : MonoBehaviour
     public TextMeshProUGUI title;
     public LocalizeStringEvent localize;
     public LocalizeStringEvent localizePantalla;
+    public LocalizedStringTable table_tooltips;
 
-    
 
     void Start()
     {
@@ -53,8 +53,7 @@ public class rfcontroller : MonoBehaviour
     private LocalizedString GenerateLocalizedStringInEditor(string key)
     {
         // The main advantage to using a table Guid and entry Id is that references will not be lost when changes are made to the Table name or Entry name.
-        var collection = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection("PickingTable");
-        var entry = collection.SharedData.GetEntry(key);
-        return new LocalizedString(collection.SharedData.TableCollectionNameGuid, entry.Id);
+        var entry = table_tooltips.GetTable().GetEntry(key);
+        return new LocalizedString(table_tooltips.TableReference, entry.KeyId);
     }
 }
