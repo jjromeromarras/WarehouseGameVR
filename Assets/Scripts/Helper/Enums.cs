@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
-
-namespace Assets.Scripts.Helper
+﻿namespace Assets.Scripts.Helper
 {
     public enum ForkLiftState
     {
@@ -40,8 +33,10 @@ namespace Assets.Scripts.Helper
         Traveller,
         Picking,
         Inventory,
+        FinishTask,
         FinishLevel,
-        Dialog
+        Dialog,
+        Pause
     }
 
     public enum Stock

@@ -17,6 +17,7 @@ public class pickingcamera : MonoBehaviour
     [SerializeField] public TextMeshProUGUI txtmelocoton;
     [SerializeField] public TextMeshProUGUI txtmanzanas;
     [SerializeField] public TextMeshProUGUI txtfresas;
+    [SerializeField] public AudioClip clipPicking;
 
     public event Action onCancelPickingLocation;
     public event Action<int, int, int, int, int, int, int> onCheckPicking;
@@ -35,7 +36,7 @@ public class pickingcamera : MonoBehaviour
     private int cantidadmanzanas;
     private int cantidadfresas;
     private float time;
-    private float resetTime = 0.25f;
+    private float resetTime = 0.2f;
     // Update is called once per frame
     private void Start()
     {
@@ -207,12 +208,14 @@ public class pickingcamera : MonoBehaviour
                 }
                 else if (boxType == boxType.bottonreset)
                 {
+                    SoundManager.SharedInstance.PlaySound(clipPicking);
                     this.onResetPicking();
                 }
                 else
                 {
                     if (cajaSeleccionada != null)
                     {
+                        SoundManager.SharedInstance.PlaySound(clipPicking);
                         cajaSeleccionada.gameObject.SetActive(false);
                         cajaSeleccionada = null;
                         switch (boxType)

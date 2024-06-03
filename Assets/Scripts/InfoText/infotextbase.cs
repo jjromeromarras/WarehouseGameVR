@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Localization;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
@@ -17,7 +15,7 @@ public class infotextbase : MonoBehaviour
 
     public event Action onFinishInfoText;
 
-    protected bool writefulltext = false;
+    public bool writefulltext = false;
     
 
     // Start is called before the first frame update
@@ -88,7 +86,7 @@ public class infotextbase : MonoBehaviour
     public LocalizedString GenerateLocalizedStringInEditor(string key)
     {
         // The main advantage to using a table Guid and entry Id is that references will not be lost when changes are made to the Table name or Entry name.
-        var collection = LocalizationEditorSettings.GetStringTableCollection("StringsGames");
+        var collection = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection("StringsGames");
         var entry = collection.SharedData.GetEntry(key);
         return new LocalizedString(collection.SharedData.TableCollectionNameGuid, entry.Id);
     }

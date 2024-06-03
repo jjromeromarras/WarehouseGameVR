@@ -12,6 +12,7 @@ public class GameManagerLevel1 : MonoBehaviour
     [SerializeField] private inforesultcontroller inforesult;
     [SerializeField] private rfcontroller rfcontroller;
     [SerializeField] private fpsBody playerbody;
+    [SerializeField] private fpsCamera fpscamera;
     [SerializeField] private pickingcamera pickingcamera;
     [SerializeField] private picking picking;
     [SerializeField] public int currentGame;
@@ -20,11 +21,14 @@ public class GameManagerLevel1 : MonoBehaviour
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject cross;
     [SerializeField] private GameObject infopicking;
+    [SerializeField] private GameObject paneloptions;
     [SerializeField] private GameObject warehouse;
     [SerializeField] private pnjwalker[] pnjs;
-    [SerializeField] private AudioClip warehouseAmbient;
+    [SerializeField] private AudioClip warehouseAmbient, pickingOK, pickingFail;
     private bool showrfmenu;
     private GameState _state;
+    private GameState _backstate;
+    
     
     private void Awake()
     {
@@ -73,7 +77,7 @@ public class GameManagerLevel1 : MonoBehaviour
         {
             levels[i].onSetLockPlayer += SetLockPlayer;
             levels[i].onSetPickingLocation += SetPickingLocation;
-            levels[i].onFinishLevel += FinishLevel;
+            levels[i].onFinishTask += FinishTask;
 
         }
        
@@ -90,21 +94,34 @@ public class GameManagerLevel1 : MonoBehaviour
     void Update()
     {
         paneluser.SetScore(new object[] { GameManager.Instance.player.Score });
-        if (_state == GameState.Traveller)
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            if (Input.GetKeyDown(KeyCode.T))
+            if (_state != GameState.Pause)
             {
-
-                showrfmenu = !showrfmenu;
-                rfmenu.SetActive(showrfmenu);
-                playerbody.setLock(showrfmenu);
+                Cursor.lockState = CursorLockMode.None;
+                _backstate = _state;
+                _state = GameState.Pause;
             }
-        }
-        else if (_state == GameState.FinishLevel)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
+            else
             {
-                if (currentGame < 2)
+                Cursor.lockState = CursorLockMode.Locked;
+                _state = _backstate;
+            }
+            playerbody.setLock(_state == GameState.Pause);
+            fpscamera.SetLock(_state == GameState.Pause);
+            paneloptions.SetActive(_state == GameState.Pause);
+        }
+        if (Input.GetKeyDown(KeyCode.C) && _state == GameState.Pause)
+        {
+
+            CloseLevel();
+        }
+
+        if (_state == GameState.FinishTask)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) && inforesult.writefulltext)
+            {
+                if (currentGame < 1)
                 {
                     levels[currentGame].gameObject.SetActive(false);
                     currentGame++;
@@ -112,10 +129,12 @@ public class GameManagerLevel1 : MonoBehaviour
                     minimap.SetActive(GameManager.Instance.showminimap);
                     cross.SetActive(true);
                     rfmenu.SetActive(true);
-                    playerbody.setLock(false);
                     infotext.SetActiveInfo(false);
                     _state = GameState.Traveller;
                     levels[currentGame].gameObject.SetActive(true);
+                }
+                else
+                {
 
                 }
             }
@@ -232,7 +251,8 @@ public class GameManagerLevel1 : MonoBehaviour
     {
         var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);        
         if (result)
-        {            
+        {
+            SoundManager.SharedInstance.PlaySound(pickingOK);
             picking.gameObject.SetActive(false);
             warehouse.SetActive(true);
             for (int i = 0; i < pnjs.Length; i++)
@@ -246,6 +266,10 @@ public class GameManagerLevel1 : MonoBehaviour
             infopicking.SetActive(false);
             SetLockPlayer(false);
             _state = GameState.Traveller;
+        }
+        else
+        {
+            SoundManager.SharedInstance.PlaySound(pickingFail);
         }
     }
 
@@ -266,25 +290,42 @@ public class GameManagerLevel1 : MonoBehaviour
     private void SetLockPlayer(bool value)
     {
         playerbody.setLock(value);
+        fpscamera.SetLock(value);
     }
 
-    private void FinishLevel(int time, int bonificacion, int fallos)
+    private void FinishTask(int time, int bonificacion, int fallos)
     {
         StartCoroutine(ActiveFinish(time, bonificacion, fallos));
     }
 
     private IEnumerator ActiveFinish(int time, int bonificacion, int fallos)
     {
+        SoundManager.SharedInstance.PlaySound(pickingOK);
         inforesult.SetActiveInfo(true);
         minimap.SetActive(false);
         cross.SetActive(false);
         rfmenu.SetActive(false);
         playerbody.setLock(true);
+        fpscamera.SetLock(true);
         GameManager.Instance.player.Score += (bonificacion + time - fallos);
         inforesult.SetResult((int)GameManager.Instance.player.Score, time, fallos, bonificacion);
         infotext.SetActiveInfo(false);
-        _state = GameState.FinishLevel;
+        _state = GameState.FinishTask;
         yield return inforesult.SetMessageKey(2f, new object[] { });
+    }
+    #endregion
+
+    #region Public Methods
+    public void CloseOption()
+    {
+        playerbody.setLock(false);
+        fpscamera.SetLock(false);
+        paneloptions.SetActive(false);
+    }
+
+    public void CloseLevel()
+    {
+        StartCoroutine(GameManager.Instance.BackMenu());
     }
     #endregion
 

@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Level : MonoBehaviour
@@ -14,7 +12,7 @@ public class Level : MonoBehaviour
     public int penalizacion;
     public event Action<bool> onSetLockPlayer;
     public event Action<string, string, shelf> onSetPickingLocation;
-    public event Action<int, int, int> onFinishLevel;
+    public event Action<int, int, int> onFinishTask;
 
 
     public virtual void OnSetLocationScanner(string location, string tag)
@@ -52,9 +50,9 @@ public class Level : MonoBehaviour
 
     public void setFinishLevel()
     {
-        if(onFinishLevel != null)
+        if(onFinishTask != null)
         {
-            onFinishLevel(Convert.ToInt16(timer.TimeLeft), bonificacion, penalizacion);
+            onFinishTask(Convert.ToInt16(timer.TimeLeft), bonificacion, penalizacion);
         }
     }
     public void setPickingLocation(string stock, string container, shelf location)

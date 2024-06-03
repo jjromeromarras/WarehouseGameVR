@@ -9,18 +9,21 @@ public class fpsCamera : MonoBehaviour {
     public float mouseSensitivity;
 
     public Transform playerBody;
-
+    private bool _lock;
     private float limit;
 
     private void Awake()
     {
-      
-        limit = 0.0f;
+        _lock = false;
+          limit = 0.0f;
     }
 
     private void Update()
     {
-        CameraRotation();
+        if (!_lock)
+        {
+            CameraRotation();
+        }
     }
 
     private void CameraRotation()
@@ -59,5 +62,10 @@ public class fpsCamera : MonoBehaviour {
         Vector3 eulerRotation = transform.eulerAngles;
         eulerRotation.x = value;
         transform.eulerAngles = eulerRotation;
+    }
+
+    public void SetLock(bool value)
+    {
+        _lock = value;
     }
 }

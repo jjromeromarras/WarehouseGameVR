@@ -1,6 +1,5 @@
 using Assets.Scripts.Helper;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -34,8 +33,8 @@ public class Game
                 order.Dock = "M " + Random.Range(5, 9).ToString();
             }
             order.Name = GenerateRandomName();
-            var shelf = warehouse.GetComponentsInChildren<shelf>();
-            var shelforder = shelf.OrderBy(s => s.aisle);
+            var shelforder = warehouse.GetComponentsInChildren<shelf>();
+            
             foreach (var shel in shelforder)
             {
                 if (Random.Range(0, 10) > 6)

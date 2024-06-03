@@ -31,15 +31,10 @@ public class LevelOne : Level
         bonificacion = 0;
         penalizacion = 0;
         showhelp = tutorial ? GameManager.Instance.showayuda: false;
-        if (timer != null)
-        {
-            timer.SetTimeLeft(1200f);
-        }
+        
         waitreading = false;
         showerror = false;
-        game = new Game(warehousemanual, !variospedidos?1:3, tutorial? 1: UnityEngine.Random.Range(3, 12), 1, OrderType.Picking);
-        order = game.Orders.FirstOrDefault();
-        
+    
         
         if (infotext != null)
         {
@@ -53,17 +48,24 @@ public class LevelOne : Level
         switch (numberlevel)
         {
             case 1:
+                game = new Game(warehousemanual, 1 , 1 , 1, OrderType.Picking);
                 state = StateGame.ShowBienVenido;
+                if (timer != null)
+                {
+                    timer.SetTimeLeft(300f);
+                }
                 break;
             case 2:
+                game = new Game(warehousemanual, 1, 15, 1, OrderType.Picking);
                 showhelp = true;
                 state = StateGame.ShowTutorial2;
-                break;
-            case 3:
-                showhelp = true;
-                state = StateGame.ShowTutorial3;
-                break;
+                if (timer != null)
+                {
+                    timer.SetTimeLeft(900f);
+                }
+                break;   
         }
+        order = game.Orders.FirstOrDefault();
     }
 
     public void Update()
@@ -149,14 +151,17 @@ public class LevelOne : Level
             {
                 state = StateGame.FinishLevel;
                 timer.SetTimerOn(false);
+                GameManager.Instance.player.Data[0].TotalTime += timer.TimeLeft;
+                bonificacion += 10;
                 this.setFinishLevel();
-                return 10;
+                return 1;
             }
             else
             {
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
+                penalizacion -= 5;
                 return -5;
             }
         }
@@ -187,6 +192,7 @@ public class LevelOne : Level
                         rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
                         currentContainerClient, picking.Quantity});
                         bonificacion += 5;
+                        GameManager.Instance.player.Data[0].Aciertos += 1;
                     }
                     else
                     {
@@ -197,6 +203,7 @@ public class LevelOne : Level
                             infotext.SetActiveInfo(true);
                             StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
                             penalizacion += 5;
+                            GameManager.Instance.player.Data[0].Errors += 1;
                         }
 
                     }
@@ -212,6 +219,7 @@ public class LevelOne : Level
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
                     penalizacion += 5;
+                    GameManager.Instance.player.Data[0].Errors += 1;
                 }
 
             }
@@ -229,6 +237,7 @@ public class LevelOne : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { location }));
                 penalizacion += 5;
+                GameManager.Instance.player.Data[0].Errors += 1;
             }
 
         }
@@ -257,6 +266,7 @@ public class LevelOne : Level
                         picking.Stock, currentContainerClient});
                 }
                 bonificacion += 5;
+                GameManager.Instance.player.Data[0].Aciertos += 1;
             }
             else
             {
@@ -267,6 +277,7 @@ public class LevelOne : Level
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
                     penalizacion += 5;
+                    GameManager.Instance.player.Data[0].Errors += 1;
                 }
 
             }
@@ -283,6 +294,7 @@ public class LevelOne : Level
                         currentContainerClient, picking.Quantity});
                     setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
                     bonificacion += 5;
+                    GameManager.Instance.player.Data[0].Aciertos+= 1;
                 }
                 else
                 {
@@ -293,6 +305,7 @@ public class LevelOne : Level
                         infotext.SetActiveInfo(true);
                         StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedor", 2f, new object[] { container }));
                         penalizacion += 5;
+                        GameManager.Instance.player.Data[0].Errors += 1;
                     }
 
                 }
@@ -308,6 +321,7 @@ public class LevelOne : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { container }));
                 penalizacion += 5;
+                GameManager.Instance.player.Data[0].Errors += 1;
             }
 
         }
@@ -343,6 +357,7 @@ public class LevelOne : Level
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("errorpickingproduct", 2f, new object[] { total, picking.Stock }));
                     penalizacion += 5;
+                    GameManager.Instance.player.Data[0].Errors += 1;
                     return false;
                 }
                 else
@@ -352,6 +367,7 @@ public class LevelOne : Level
                     NextStep();
                     // Picking correcto
                     bonificacion += 10;
+                    GameManager.Instance.player.Data[0].Aciertos += 1;
                     return true;
                 }
             }
@@ -361,6 +377,7 @@ public class LevelOne : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errorpickingquantity", 2f, new object[] { total, picking.Quantity }));
                 penalizacion += 5;
+                GameManager.Instance.player.Data[0].Errors += 1;
                 return false;
             }
         }
@@ -498,7 +515,8 @@ public class LevelOne : Level
             case StateGame.ShowFinishLevel:
                 {
                     setLockPlayer(true);
-                    state = StateGame.FinishLevel;
+                    state = StateGame.FinishLevel; 
+                    GameManager.Instance.player.Data[0].TotalTime += timer.TimeLeft;
                     this.setFinishLevel();
                     break;
                 }
