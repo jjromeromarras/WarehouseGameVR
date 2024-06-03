@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
 
     public Player player;
+    private UnityEngine.AsyncOperation asyncLoad;
 
     private void Awake()
     {
@@ -30,5 +31,13 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+    }
+
+    public IEnumerator BackMenu()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene("MainMenu");
+        yield return null;
     }
 }

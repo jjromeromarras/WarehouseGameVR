@@ -1,15 +1,10 @@
 using System.Collections;
-using System.ComponentModel;
-using TMPro;
-using UnityEditor.Localization;
+
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
 using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class SC_MainMenu : MonoBehaviour
 {
@@ -61,8 +56,7 @@ public class SC_MainMenu : MonoBehaviour
         panelconsentimiento.SetActive(false);
         ui_barra.fillAmount = 0;
         yield return new WaitForSeconds(1f);
-        asyncLoad = SceneManager.LoadSceneAsync("Level_"+currentlevel.ToString());
-        SceneManager.LoadSceneAsync("StaticGame", LoadSceneMode.Additive);
+        asyncLoad = SceneManager.LoadSceneAsync("Level_"+currentlevel.ToString());   
         asyncLoad.allowSceneActivation = false;
         float progress = 0f;
         //wait until the asynchronous scene fully loads
@@ -198,7 +192,7 @@ public class SC_MainMenu : MonoBehaviour
     private LocalizedString GenerateLocalizedStringInEditor(string key)
     {
         // The main advantage to using a table Guid and entry Id is that references will not be lost when changes are made to the Table name or Entry name.
-        var collection = LocalizationEditorSettings.GetStringTableCollection("StringsGames");
+        var collection = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection("StringsGames");
         var entry = collection.SharedData.GetEntry(key);
         return new LocalizedString(collection.SharedData.TableCollectionNameGuid, entry.Id);
     }

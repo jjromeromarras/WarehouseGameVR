@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class PickingTask : Task
 {
     public string Stock {  get; set; }
