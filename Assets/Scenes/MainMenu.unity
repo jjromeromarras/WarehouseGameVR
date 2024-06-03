@@ -1744,6 +1744,9 @@ MonoBehaviour:
   ui_barra: {fileID: 122833183}
   menuMusic: {fileID: 8300000, guid: cbd5ee476a488444aaeb06b7e1fb04e0, type: 3}
   bottonClip: {fileID: 8300000, guid: 92d9128629e9e7a45afd47f4eff2c461, type: 3}
+  table_tooltips:
+    m_TableReference:
+      m_TableCollectionName: GUID:caec0fac3edf46842a9f65408c23aba1
 --- !u!1 &361278475
 GameObject:
   m_ObjectHideFlags: 0

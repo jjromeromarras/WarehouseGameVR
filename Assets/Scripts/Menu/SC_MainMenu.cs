@@ -22,7 +22,7 @@ public class SC_MainMenu : MonoBehaviour
     [SerializeField] GameObject panelloading;
     [SerializeField] UnityEngine.UI.Image ui_barra;
     [SerializeField] AudioClip menuMusic, bottonClip;
-
+    [SerializeField] public LocalizedStringTable table_tooltips;
     private bool changelanguage = false;   
     private int currentlevel = 1;
    
@@ -192,9 +192,8 @@ public class SC_MainMenu : MonoBehaviour
     private LocalizedString GenerateLocalizedStringInEditor(string key)
     {
         // The main advantage to using a table Guid and entry Id is that references will not be lost when changes are made to the Table name or Entry name.
-        var collection = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection("StringsGames");
-        var entry = collection.SharedData.GetEntry(key);
-        return new LocalizedString(collection.SharedData.TableCollectionNameGuid, entry.Id);
+        var entry = table_tooltips.GetTable().GetEntry(key);
+        return new LocalizedString(table_tooltips.TableReference, entry.KeyId);
     }
     #endregion
 }

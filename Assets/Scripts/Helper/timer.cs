@@ -1,4 +1,5 @@
 
+
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
@@ -7,7 +8,7 @@ public class timer : MonoBehaviour
 {
     public float TimeLeft = 3f*60f;    
     public LocalizeStringEvent localizescore;
-
+    public LocalizedStringTable table_tooltips;
     private string keyscore = "tiempo";
     private bool TimerOn = false;
 
@@ -65,8 +66,7 @@ public class timer : MonoBehaviour
     private LocalizedString GenerateLocalizedStringInEditor(string key)
     {
         // The main advantage to using a table Guid and entry Id is that references will not be lost when changes are made to the Table name or Entry name.
-        var collection = UnityEditor.Localization.LocalizationEditorSettings.GetStringTableCollection("StringsGames");
-        var entry = collection.SharedData.GetEntry(key);
-        return new LocalizedString(collection.SharedData.TableCollectionNameGuid, entry.Id);
+        var entry = table_tooltips.GetTable().GetEntry(key);
+        return new LocalizedString(table_tooltips.TableReference, entry.KeyId);
     }
 }
