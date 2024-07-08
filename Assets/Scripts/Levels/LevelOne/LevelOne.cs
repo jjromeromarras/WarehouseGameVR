@@ -1,4 +1,5 @@
 using Assets.Scripts.Helper;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,21 +11,14 @@ public class LevelOne : Level
     [SerializeField] private bool tutorial;
     [SerializeField] private bool variospedidos;
 
-    private int currentTask;
-    private string currentContainerClient;
-
-    private Game game;
-    private Order order;
+    private Task currentTask; 
+    private Queue<Task> tasks;
     private StateGame state;
     private bool waitreading;
     private bool showerror;
     private bool showhelp;
 
-    #region Public Methods
-    public void Awake()
-    {
-        currentTask = 0;
-    }
+    #region Public Methods  
 
     public void Start()
     {
@@ -48,7 +42,7 @@ public class LevelOne : Level
         switch (numberlevel)
         {
             case 1:
-                game = new Game(warehousemanual, 1 , 1 , 1, OrderType.Picking);
+                game = new Game(warehousemanual, 1 , 1 , OrderType.Picking);
                 state = StateGame.ShowBienVenido;
                 if (timer != null)
                 {
@@ -56,16 +50,27 @@ public class LevelOne : Level
                 }
                 break;
             case 2:
-                game = new Game(warehousemanual, 1, 15, 1, OrderType.Picking);
+                game = new Game(warehousemanual, 1, 15, OrderType.Picking);
                 showhelp = true;
                 state = StateGame.ShowTutorial2;
                 if (timer != null)
                 {
                     timer.SetTimeLeft(900f);
                 }
-                break;   
+                break;
+            case 3:
+                game = new Game(warehousemanual, 3, 6, OrderType.Picking);
+                showhelp = false;
+                state = StateGame.ShowTutorial3;
+                if (timer != null)
+                {
+                    timer.SetTimeLeft(1800f);
+                }
+                break;
         }
-        order = game.Orders.FirstOrDefault();
+        tasks = new Queue<Task>();
+        game.Orders.SelectMany(p => p.Tasks).OrderBy(t => t.LocationRef.aisle).ToList().ForEach(task => tasks.Enqueue(task));
+        currentTask = tasks.Dequeue();
     }
 
     public void Update()
@@ -142,37 +147,44 @@ public class LevelOne : Level
 
         }
     }
-    public int OnSetDockScanner(string dock, string tag)
+    public override void OnSetDockScanner(string dock, string tag)
     {
 
         if (tag == "dock")
         {
-            if (dock == order.Dock)
+            if (dock == currentTask.parentOrder.Dock)
             {
-                state = StateGame.FinishLevel;
+                SoundManager.SharedInstance.PlaySound(scannerOK);                
                 timer.SetTimerOn(false);
                 GameManager.Instance.player.Data[0].TotalTime += timer.TimeLeft;
                 bonificacion += 10;
-                this.setFinishLevel();
-                return 1;
+                currentTask.parentOrder.ContainerClient = string.Empty;
+                if (!GetTask())
+                {
+                    state = StateGame.FinishLevel;
+                    this.setFinishLevel();
+                }
+        
             }
             else
             {
+                SoundManager.SharedInstance.PlaySound(scannerError);
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
                 penalizacion -= 5;
-                return -5;
+             
             }
         }
         else if (!showerror && !waitreading)
         {
+            SoundManager.SharedInstance.PlaySound(scannerError);
             showerror = true;
             infotext.SetActiveInfo(true);
             StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
-            return -5;
+        
         }
-        return 0;
+      
 
     }
 
@@ -182,7 +194,7 @@ public class LevelOne : Level
         {
             if (tag == "Ubicacion")
             {
-                if (order.Tasks[currentTask] is PickingTask picking)
+                if (currentTask is PickingTask picking)
                 {
                     if (location == picking.Location)
                     {
@@ -190,7 +202,7 @@ public class LevelOne : Level
                         picking.locationScan = true;
                         state = StateGame.ShowContainerPicking;
                         rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
-                        currentContainerClient, picking.Quantity});
+                        currentTask.parentOrder.ContainerClient, picking.Quantity});
                         bonificacion += 5;
                         GameManager.Instance.player.Data[0].Aciertos += 1;
                     }
@@ -257,13 +269,13 @@ public class LevelOne : Level
                     if (clientsPallets[i].ssc == container)
                     {
                         clientsPallets[i].gameObject.SetActive(false);
-                        currentContainerClient = container;
+                        currentTask.parentOrder.ContainerClient = container;
                     }
                 }
-                if (order.Tasks[currentTask] is PickingTask picking)
+                if (currentTask is PickingTask picking)
                 {
-                    rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, order.Name,
-                        picking.Stock, currentContainerClient});
+                    rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, currentTask.parentOrder.Name,
+                        picking.Stock, currentTask.parentOrder.ContainerClient});
                 }
                 bonificacion += 5;
                 GameManager.Instance.player.Data[0].Aciertos += 1;
@@ -284,15 +296,16 @@ public class LevelOne : Level
         }
         else if (state == StateGame.ScannerContainer)
         {
-            if (order.Tasks[currentTask] is PickingTask picking)
+            if (currentTask is PickingTask picking)
             {
                 if (picking.Container == container)
                 {
                     SoundManager.SharedInstance.PlaySound(scannerOK);
                     state = StateGame.ShowIntroducirArticulo;
                     rfcontroller.SetPantallaTxt("EnterArticulo", new object[] { picking.Stock, picking.Container,
-                        currentContainerClient, picking.Quantity});
-                    setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
+                        currentTask.parentOrder.ContainerClient, picking.Quantity});
+                    setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, game.Orders[0].ContainerClient,
+                        game.Orders.Count > 1 ? game.Orders[1].ContainerClient : string.Empty, game.Orders.Count > 2 ? game.Orders[2].ContainerClient : string.Empty, currentTask.parentOrder.Level);
                     bonificacion += 5;
                     GameManager.Instance.player.Data[0].Aciertos+= 1;
                 }
@@ -331,17 +344,17 @@ public class LevelOne : Level
     public override void OnExistPickingScene()
     {
         state = StateGame.ScannerContainer;
-        if (order.Tasks[currentTask] is PickingTask picking)
+        if (currentTask is PickingTask picking)
         {
             rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
-                        currentContainerClient, picking.Quantity});
+                        currentTask.parentOrder.ContainerClient, picking.Quantity});
         }
     }
 
     public override bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
         // check
-        if (order.Tasks[currentTask] is PickingTask picking)
+        if (currentTask is PickingTask picking)
         {
             var total = cantfresa + cantplatano + cantperas + cantmelocoton + cantmanzana + cantuvas + cantpiña;
             if (total == picking.Quantity)
@@ -386,13 +399,26 @@ public class LevelOne : Level
 
     public override void onResetTask()
     {
-        if (order.Tasks[currentTask] is PickingTask picking)
+        if (currentTask is PickingTask picking)
         {
-            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef);
+            penalizacion += 5;
+            GameManager.Instance.player.Data[0].Errors += 1;
+            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, currentTask.parentOrder.ContainerClient,
+                game.Orders.Count > 1 ? game.Orders[1].ContainerClient: string.Empty, game.Orders.Count > 2 ? game.Orders[2].ContainerClient: string.Empty,
+                currentTask.parentOrder.Level);
         }
     }
 
-   
+    public override void onErrorPicking()
+    {
+        showerror = true;
+        infotext.SetActiveInfo(true);
+        StartCoroutine(infotext.SetMessageKey("errorpickingotherclient", 2f, new object[] { }));
+        penalizacion += 5;
+        GameManager.Instance.player.Data[0].Errors += 1;  
+    }
+
+
     #endregion
 
     #region Private Methods
@@ -425,17 +451,14 @@ public class LevelOne : Level
                 }
                 break;
             case StateGame.ShowTutorial1:
-                {
-                    rfcontroller.SetPantallaTxt("Picking", new object[] { order.Name });
-                    setLockPlayer(true);
-                    state = StateGame.ShowClientContainer;
-                }
-                break;
             case StateGame.ShowTutorial2:
             case StateGame.ShowTutorial3:
                 {
-                    showhelp = false;
-                    rfcontroller.SetPantallaTxt("Picking", new object[] { order.Name });
+                    if (state != StateGame.ShowTutorial1)
+                    {
+                        showhelp = false;
+                    }
+                    rfcontroller.SetPantallaTxt("Picking", new object[] { currentTask.parentOrder.Name });
                     setLockPlayer(true);
                     state = StateGame.ShowClientContainer;
                 }
@@ -473,7 +496,7 @@ public class LevelOne : Level
                     state = StateGame.ScannerLocation;
                     if (tutorial)
                     {
-                        order.Tasks[currentTask].LocationRef.SetSelectLevel(order.Tasks[currentTask].Location);
+                        currentTask.LocationRef.SetSelectLevel(currentTask.Location);
                     }
                 }
                 break;
@@ -484,9 +507,9 @@ public class LevelOne : Level
                     state = StateGame.ScannerContainer;
                     if (tutorial)
                     {
-                        order.Tasks[currentTask].ContainerRef.SetSelected(true);
+                        currentTask.ContainerRef.SetSelected(true);
                     }
-                    order.Tasks[currentTask].LocationRef.UnSelectionShelf();
+                    currentTask.LocationRef.UnSelectionShelf();
 
                 }
                 break;
@@ -509,7 +532,7 @@ public class LevelOne : Level
                     setLockPlayer(false);
                     infotext.SetActiveInfo(false);
                     state = StateGame.ScannerDock;
-                    rfcontroller.SetPantallaTxt("NoMasTareas", new object[] {order.Name, order.Dock, currentContainerClient });              
+                    rfcontroller.SetPantallaTxt("NoMasTareas", new object[] {currentTask.parentOrder.Name, currentTask.parentOrder.Dock, currentTask.parentOrder.ContainerClient });              
                     break;
                 }
             case StateGame.ShowFinishLevel:
@@ -526,28 +549,43 @@ public class LevelOne : Level
     private void NexTask()
     {
         infotext.SetActiveInfo(false);
-        order.Tasks[currentTask].ContainerRef.SetSelected(false);
-        currentTask += 1;
-
-        if (currentTask < order.Tasks.Count)
+        currentTask.ContainerRef.SetSelected(false);
+        if (currentTask.isLast)
         {
-            state = StateGame.ScannerLocation;
-            if (tutorial)
-            {
-                order.Tasks[currentTask].ContainerRef.SetSelected(true);
-            }
-            if (order.Tasks[currentTask] is PickingTask picking)
-            {
-                rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, order.Name,
-                                picking.Stock, currentContainerClient});
-            }
+            state = StateGame.ShowDockConfirmation;
         }
         else
         {
-               // No mas tareas
-                // ayuda llevar a muelle
-                state = StateGame.ShowDockConfirmation;
+            GetTask();
         }
+    }
+
+    private bool GetTask()
+    {
+        if (tasks.Count > 0)
+        {
+            currentTask = tasks.Dequeue();
+            state = StateGame.ScannerLocation;
+            if (tutorial)
+            {
+                currentTask.ContainerRef.SetSelected(true);
+            }
+            if (currentTask is PickingTask picking)
+            {
+                if (currentTask.parentOrder.ContainerClient == null)
+                {
+                    state = StateGame.ScannerContainerClient;
+                    rfcontroller.SetPantallaTxt("Picking", new object[] { currentTask.parentOrder.Name });
+                }
+                else
+                {
+                    rfcontroller.SetPantallaTxt("EnterLocation", new object[] { picking.Location, currentTask.parentOrder.Name,
+                                picking.Stock, currentTask.parentOrder.ContainerClient});
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private void FinishInfoText()

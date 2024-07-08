@@ -16,12 +16,13 @@ public class infotextbase : MonoBehaviour
     public event Action onFinishInfoText;
 
     public bool writefulltext = false;
-    
+    public bool isWriting = false;
 
     // Start is called before the first frame update
     void Start()
     {
         this.WriteInfoText(string.Empty);
+        isWriting = false;
     }
 
     // Update is called once per frame
@@ -29,9 +30,10 @@ public class infotextbase : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            isWriting = false;
             if (!writefulltext)
             {
-                writefulltext = true;
+                writefulltext = true;    
             }
             else
             {
@@ -66,6 +68,7 @@ public class infotextbase : MonoBehaviour
 
             textinfo.text = "";
             writefulltext = false;
+            isWriting = true;
             foreach (var item in msg)
             {
                 textinfo.text += item;
@@ -78,6 +81,7 @@ public class infotextbase : MonoBehaviour
                 }
             }
             writefulltext = true;
+            isWriting = false;
             yield return new WaitForSeconds(timeToWaitAfecterText);
 
         }

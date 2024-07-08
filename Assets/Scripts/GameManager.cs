@@ -15,7 +15,11 @@ public class GameManager : MonoBehaviour
 
     public Player player;
     private UnityEngine.AsyncOperation asyncLoad;
-
+    private Logger logger;
+    private void Start()
+    {
+        logger = FindObjectOfType<Logger>();
+    }
     private void Awake()
     {
         if(GameManager.Instance == null)
@@ -39,5 +43,10 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene("MainMenu");
         yield return null;
+    }
+
+    public void WriteLog(string msg)
+    {
+        logger.Log(msg);
     }
 }

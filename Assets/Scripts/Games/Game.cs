@@ -15,15 +15,15 @@ public class Game
     public List<Order> Orders { get; set; }
 
 
-    public Game(GameObject warehouse, int numorder, int numtareasmax, int level, OrderType type)
-    { 
-        Orders = new List<Order>();
+    public Game(GameObject warehouse, int numorder, int numtareasmax, OrderType type)
+    {
+         Orders = new List<Order>();
 
         for (int i = 0; i < numorder; i++)
         {
             Order order = new Order();
             order.Type = type;
-            order.Level = level;
+            order.Level = i+1;
             if (type == OrderType.Shipping)
             {
                 order.Dock = "M " + Random.Range(1, 5).ToString();
@@ -39,13 +39,8 @@ public class Game
             {
                 if (Random.Range(0, 10) > 6)
                 {
-                    Task task = new Task();
-                    if (type == OrderType.Picking)
-                    {
-                        task = new PickingTask();
-                    }
-                    
-
+                    Task task = type == OrderType.Picking ?  new PickingTask(): new Task();
+                    task.parentOrder = order;
                     var numcontainer = Random.Range(1, 7);                    
                     task.LocationRef = shel;
 
@@ -71,6 +66,7 @@ public class Game
                         order.Tasks.Add(task);
                         if (order.Tasks.Count == numtareasmax)
                         {
+                            task.isLast = true;
                             break;
                         }
                     }
@@ -78,8 +74,12 @@ public class Game
 
                 }
             }
+            order.Tasks = order.Tasks.OrderBy(x => x.LocationRef.aisle).ToList();
             Orders.Add(order);
+            GameManager.Instance.WriteLog($"Create Game: numorder: {numorder} - numtareasmax: {numtareasmax} - ordertype: {type.ToString()}");
+
         }
+
     }
 
     string GenerateRandomName()

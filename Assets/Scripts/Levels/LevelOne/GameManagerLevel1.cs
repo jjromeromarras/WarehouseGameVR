@@ -2,7 +2,10 @@ using Assets.Scripts.Helper;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class GameManagerLevel1 : MonoBehaviour
 {
@@ -25,7 +28,10 @@ public class GameManagerLevel1 : MonoBehaviour
     [SerializeField] private GameObject warehouse;
     [SerializeField] private pnjwalker[] pnjs;
     [SerializeField] private AudioClip warehouseAmbient, pickingOK, pickingFail;
-    private bool showrfmenu;
+    [SerializeField] private GameObject contgame;
+    [SerializeField] private GameObject contpicking;
+    [SerializeField] private Button btngame;
+    [SerializeField] private Button btnpicking;
     private GameState _state;
     private GameState _backstate;
     
@@ -57,7 +63,7 @@ public class GameManagerLevel1 : MonoBehaviour
         {
             picking.gameObject.SetActive(false);    
         }
-        currentGame = 0;
+     
        
 
     }
@@ -82,10 +88,10 @@ public class GameManagerLevel1 : MonoBehaviour
         }
        
         if(pickingcamera != null)
-        {
-            pickingcamera.onCancelPickingLocation += CancelPickingLocation;
+        {       
             pickingcamera.onCheckPicking += onCheckPicking;
             pickingcamera.onResetPicking += onResetPicking;
+            pickingcamera.onErrorPicking += onErrorPicking;
         }
          
     }
@@ -121,11 +127,11 @@ public class GameManagerLevel1 : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space) && inforesult.writefulltext)
             {
+                inforesult.SetActiveInfo(false);
+                levels[currentGame].gameObject.SetActive(false);
                 if (currentGame < 1)
                 {
-                    levels[currentGame].gameObject.SetActive(false);
                     currentGame++;
-                    inforesult.SetActiveInfo(false);
                     minimap.SetActive(GameManager.Instance.showminimap);
                     cross.SetActive(true);
                     rfmenu.SetActive(true);
@@ -135,8 +141,20 @@ public class GameManagerLevel1 : MonoBehaviour
                 }
                 else
                 {
-
+                    GameManager.Instance.WriteLog($"[FinishTask] - Level: {GameManager.Instance.player.Level}");
+                    if (GameManager.Instance.player.Level < 2)
+                        GameManager.Instance.player.Level = 2;
+                    _state = GameState.FinishLevel;
+                    infotext.SetActiveInfo(true);
+                    StartCoroutine(infotext.SetMessageKey("RetoCompletado", 2f, new object[] { }));
                 }
+            }
+        }
+        if (_state == GameState.FinishLevel)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) && infotext.writefulltext)
+            {
+                CloseLevel();
             }
         }
     }
@@ -144,31 +162,20 @@ public class GameManagerLevel1 : MonoBehaviour
     #region Private Methods
     private void ScannerContainer(string container, string tag)
     {
+        GameManager.Instance.WriteLog($"[ScannerContainer] - container: {container} - tag: {tag}");
         // Comprobar si el contenedor es correcto
-       levels[currentGame].OnSetContainerScanner(container, tag);
+        levels[currentGame].OnSetContainerScanner(container, tag);
     }
 
-    private void CancelPickingLocation()
+    private void SetPickingLocation(string stock, string containersscc, shelf shelf, string contclient1, string contclient2, string contclient3, int pedido)
     {
-        picking.gameObject.SetActive(false);
-        warehouse.SetActive(true);
-        playerbody.gameObject.SetActive(true);
-        cross.SetActive(true);
-        for (int i = 0; i < pnjs.Length; i++)
-        {
-            pnjs[i].ResumePNJ();
-        }
-
-        minimap.SetActive(GameManager.Instance.showminimap);
-        infopicking.SetActive(false);
-        SetLockPlayer(false);
-        GameManager.Instance.player.Score -= 5;
-        levels[currentGame].OnExistPickingScene();
-        _state = GameState.Traveller;
-    }
-
-    private void SetPickingLocation(string stock, string containersscc, shelf shelf)
-    {
+       
+        pickingcamera.pedidopreparando = pedido;
+        pickingcamera.contclient1 = "F1:"+contclient1;
+        pickingcamera.contclient2 = "F2:"+contclient2;
+        pickingcamera.contclient3 = "F3:"+contclient3;
+        pickingcamera.selectclient = 0;
+        pickingcamera.ResetScene();
         picking.gameObject.SetActive(true);
         infopicking.SetActive(true);
         playerbody.gameObject.SetActive(false);
@@ -179,8 +186,7 @@ public class GameManagerLevel1 : MonoBehaviour
             pnjs[i].StopPNJ();
         }
         warehouse.SetActive(false);
-        
-        pickingcamera.ResetScene();
+
         _state = GameState.Picking;
         List<pallet> containers = new List<pallet>();
         for (int i=0; i<6; i++)
@@ -198,6 +204,7 @@ public class GameManagerLevel1 : MonoBehaviour
         {
             if (!String.IsNullOrEmpty(item.ssc))
             {
+                item.gameObject.SetActive(true);
                 var stockpallet = Enum.GetValues(typeof(Stock)).GetValue(UnityEngine.Random.Range(0, 7)).ToString();
                 if (item.ssc == containersscc)
                 {
@@ -242,6 +249,9 @@ public class GameManagerLevel1 : MonoBehaviour
                         picking.setContainer(5, stockpallet, 12, item.ssc);
                     }
                 }
+            } else
+            {
+                item.gameObject.SetActive(false);
             }
         }
        
@@ -249,9 +259,14 @@ public class GameManagerLevel1 : MonoBehaviour
 
     private void onCheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
+        GameManager.Instance.WriteLog($"[onCheckPicking] - cantplatano: {cantplatano} - cantuvas: {cantuvas} " +
+            $"- cantpiña: {cantpiña} - cantmelocoton: {cantmelocoton} - cantmanzana: {cantmanzana} - cantfresa: {cantfresa}");
+
         var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);        
         if (result)
         {
+            GameManager.Instance.WriteLog($"[onCheckPicking] - Picking OK");
+
             SoundManager.SharedInstance.PlaySound(pickingOK);
             picking.gameObject.SetActive(false);
             warehouse.SetActive(true);
@@ -269,20 +284,31 @@ public class GameManagerLevel1 : MonoBehaviour
         }
         else
         {
+            GameManager.Instance.WriteLog($"[onCheckPicking] - Picking Fail");
             SoundManager.SharedInstance.PlaySound(pickingFail);
         }
     }
 
     private void onResetPicking()
     {
-        GameManager.Instance.player.Score -= 5;
+        GameManager.Instance.WriteLog($"[onResetTask]");
+        SoundManager.SharedInstance.PlaySound(pickingFail); 
         levels[currentGame].onResetTask();
         pickingcamera.ResetScene();
 
     }
 
+    private void onErrorPicking()
+    {
+        GameManager.Instance.WriteLog($"[onErrorPicking]");
+        levels[currentGame].onErrorPicking();
+        SoundManager.SharedInstance.PlaySound(pickingFail);
+    }
+
     private void ScannerLocation(string location, string tag)
     {
+        GameManager.Instance.WriteLog($"[ScannerLocation] - location: {location} - tage: {tag}");
+
         levels[currentGame].OnSetLocationScanner(location, tag);
     }
 
@@ -300,6 +326,8 @@ public class GameManagerLevel1 : MonoBehaviour
 
     private IEnumerator ActiveFinish(int time, int bonificacion, int fallos)
     {
+        GameManager.Instance.WriteLog($"[ActiveFinish] - Game 1: {currentGame}");
+
         SoundManager.SharedInstance.PlaySound(pickingOK);
         inforesult.SetActiveInfo(true);
         minimap.SetActive(false);
@@ -329,4 +357,21 @@ public class GameManagerLevel1 : MonoBehaviour
     }
     #endregion
 
+    public void SetBtnJuego()
+    {
+        btngame.image.color = Color.green;
+        btnpicking.image.color = Color.white;
+        contgame.SetActive(true);
+        contpicking.SetActive(false);
+    }
+
+    public void SetBtnPicking()
+    {
+        btngame.image.color = Color.white;
+        btnpicking.image.color = Color.green;
+        contgame.SetActive(false);
+        contpicking.SetActive(true);
+
+    }
 }
+

@@ -12,4 +12,8 @@ public class Task
     public bool locationScan { get; set; } = false;
     public bool containerScan { get; set; } = false;
 
+    public Order parentOrder { get; set; }
+
+    public bool isLast { get; set; }
+
 }
