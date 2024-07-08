@@ -17,8 +17,10 @@ public class inforesultcontroller : infotextbase
         numfallos.text = fallos.ToString();
         numresultado.text = resultado.ToString();
         numtiempo.text = tiempo.ToString();
+        GameManager.Instance.WriteLog($"[SetResult] - Score: {resultado} - tiempo: {tiempo} - fallos: {fallos} - bonificacion: {bonificacion}");
     }
-    
+
+
 
     public IEnumerator SetMessageKey(float timeToWaitAfecterText, object[] arguments = null)
     {

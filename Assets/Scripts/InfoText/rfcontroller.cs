@@ -38,6 +38,7 @@ public class rfcontroller : MonoBehaviour
 
     public void SetPantallaTxt(string key , object[] arguments)
     {
+        GameManager.Instance.WriteLog($"SetPantallaTxt: {key} - Arguments: {string.Join(", ",arguments)}");
         var localizedstring = GenerateLocalizedStringInEditor(key);
         localizedstring.Arguments = arguments;
         localizePantalla.StringReference = localizedstring;

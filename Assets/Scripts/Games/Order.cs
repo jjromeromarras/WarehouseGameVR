@@ -11,6 +11,8 @@ public class Order
     public OrderType Type { get; set; }
     public string Dock {  get; set; }
 
+    public string ContainerClient { get; set; }
+
     public Order()
     {
         Tasks = new List<Task>();
