@@ -31,6 +31,9 @@ public class pickingcamera : MonoBehaviour
     public event Action<int, int, int, int, int, int, int> onCheckPicking;
     public event Action onErrorPicking;
     public event Action onResetPicking;
+    public event Action onErrorContainerClient;
+    public event Func<string, bool> onCheckContainerPicking;
+
     public int pedidopreparando;
     public string contclient1, contclient2, contclient3;
 
@@ -212,62 +215,86 @@ public class pickingcamera : MonoBehaviour
             this.onResetPicking();
         }
 
-        if (Input.GetMouseButton(0) && selectclient > 0)
+        if (Input.GetMouseButton(0))
         {
+
+
             time -= Time.deltaTime;
             if (time < 0f)
             {
-                if (cajaSeleccionada != null)
+                if (selectclient > 0)
                 {
-                    SoundManager.SharedInstance.PlaySound(clipPicking);
-                    cajaSeleccionada.gameObject.SetActive(false);
-                    cajaSeleccionada = null;
-                    switch (boxType)
+                    if (cajaSeleccionada != null)
                     {
-                        case boxType.piña:
-                            {
+                        string sscc = string.Empty;
+                        try
+                        {
+                            sscc = cajaSeleccionada.parent.parent.GetComponentsInChildren<TextMeshPro>()[0].text;
+                        }
+                        catch
+                        {
+                            sscc = string.Empty;
+                        }
 
-                                pickings[selectclient - 1].cantidadpiñas += 1;
-                                txtpiñas.text = pickings[selectclient - 1].cantidadpiñas.ToString();
-                                break;
-                            }
-                        case boxType.melocoton:
-                            {
-                                pickings[selectclient - 1].cantidadmelocoton += 1;
-                                txtmelocoton.text = pickings[selectclient - 1].cantidadmelocoton.ToString();
-                                break;
-                            }
-                        case boxType.platano:
-                            {
-                                pickings[selectclient - 1].cantidadplatano += 1;
-                                txtplatano.text = pickings[selectclient - 1].cantidadplatano.ToString();
-                                break;
-                            }
-                        case boxType.fresa:
-                            {
-                                pickings[selectclient - 1].cantidadfresas += 1;
-                                txtfresas.text = pickings[selectclient - 1].cantidadfresas.ToString();
-                                break;
-                            }
-                        case boxType.peras:
-                            {
-                                pickings[selectclient - 1].cantidadperas += 1;
-                                txtperas.text = pickings[selectclient - 1].cantidadperas.ToString();
-                                break;
-                            }
-                        case boxType.manzanas:
-                            {
-                                pickings[selectclient - 1].cantidadmanzanas += 1;
+                        if (onCheckContainerPicking.Invoke(sscc))
+                        {
 
-                                break;
-                            }
-                        case boxType.uvas:
+                            SoundManager.SharedInstance.PlaySound(clipPicking);
+                            cajaSeleccionada.gameObject.SetActive(false);
+                            cajaSeleccionada = null;
+                            switch (boxType)
                             {
-                                pickings[selectclient - 1].cantidaduvas += 1;
+                                case boxType.piña:
+                                    {
 
-                                break;
+                                        pickings[selectclient - 1].cantidadpiñas += 1;
+                                        txtpiñas.text = pickings[selectclient - 1].cantidadpiñas.ToString();
+                                        break;
+                                    }
+                                case boxType.melocoton:
+                                    {
+                                        pickings[selectclient - 1].cantidadmelocoton += 1;
+                                        txtmelocoton.text = pickings[selectclient - 1].cantidadmelocoton.ToString();
+                                        break;
+                                    }
+                                case boxType.platano:
+                                    {
+                                        pickings[selectclient - 1].cantidadplatano += 1;
+                                        txtplatano.text = pickings[selectclient - 1].cantidadplatano.ToString();
+                                        break;
+                                    }
+                                case boxType.fresa:
+                                    {
+                                        pickings[selectclient - 1].cantidadfresas += 1;
+                                        txtfresas.text = pickings[selectclient - 1].cantidadfresas.ToString();
+                                        break;
+                                    }
+                                case boxType.peras:
+                                    {
+                                        pickings[selectclient - 1].cantidadperas += 1;
+                                        txtperas.text = pickings[selectclient - 1].cantidadperas.ToString();
+                                        break;
+                                    }
+                                case boxType.manzanas:
+                                    {
+                                        pickings[selectclient - 1].cantidadmanzanas += 1;
+
+                                        break;
+                                    }
+                                case boxType.uvas:
+                                    {
+                                        pickings[selectclient - 1].cantidaduvas += 1;
+
+                                        break;
+                                    }
                             }
+                        }
                     }
+
+                }
+                else
+                {
+                    onErrorContainerClient();
                 }
 
                 time = resetTime;
@@ -313,13 +340,16 @@ public class pickingcamera : MonoBehaviour
     }
     private void ShowPickings()
     {
-        txtpiñas.text = pickings[selectclient - 1].cantidadpiñas.ToString();
-        txtmelocoton.text = pickings[selectclient - 1].cantidadmelocoton.ToString();
-        txtplatano.text = pickings[selectclient - 1].cantidadplatano.ToString();
-        txtfresas.text = pickings[selectclient - 1].cantidadfresas.ToString();
-        txtperas.text = pickings[selectclient - 1].cantidadperas.ToString();
-        txtmanzanas.text = pickings[selectclient - 1].cantidadmanzanas.ToString();
-        txtuvas.text = pickings[selectclient - 1].cantidaduvas.ToString();
+        if (selectclient > 0)
+        {
+            txtpiñas.text = pickings[selectclient - 1].cantidadpiñas.ToString();
+            txtmelocoton.text = pickings[selectclient - 1].cantidadmelocoton.ToString();
+            txtplatano.text = pickings[selectclient - 1].cantidadplatano.ToString();
+            txtfresas.text = pickings[selectclient - 1].cantidadfresas.ToString();
+            txtperas.text = pickings[selectclient - 1].cantidadperas.ToString();
+            txtmanzanas.text = pickings[selectclient - 1].cantidadmanzanas.ToString();
+            txtuvas.text = pickings[selectclient - 1].cantidaduvas.ToString();
+        }
     }
 
     public void ResetScene()

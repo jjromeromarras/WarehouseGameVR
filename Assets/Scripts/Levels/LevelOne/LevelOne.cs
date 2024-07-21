@@ -351,6 +351,36 @@ public class LevelOne : Level
         }
     }
 
+    public override bool CheckContainerPicking(string container)
+    {
+        if (currentTask is PickingTask picking)
+        {
+            if(picking.Container != container)
+            {
+                showerror = true;
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("containerpickingerror", 2f, new object[] { container }));
+                penalizacion += 5;
+                GameManager.Instance.player.Data[0].Errors += 1;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override void onErrorContainerClient() 
+    {
+        showerror = true;
+        infotext.SetActiveInfo(true);
+        StartCoroutine(infotext.SetMessageKey("errorcontainerclient", 2f, new object[] { }));
+        penalizacion += 5;
+        GameManager.Instance.player.Data[0].Errors += 1;
+    }
+
     public override bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
         // check

@@ -35,7 +35,14 @@ public class Level : MonoBehaviour
 
     }
 
+    public virtual void onErrorContainerClient() { }
+
     public virtual bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
+    {
+        return false;
+    }
+
+    public virtual bool CheckContainerPicking(string container)
     {
         return false;
     }
