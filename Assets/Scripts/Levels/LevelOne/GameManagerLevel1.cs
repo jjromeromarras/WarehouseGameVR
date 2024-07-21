@@ -92,6 +92,8 @@ public class GameManagerLevel1 : MonoBehaviour
             pickingcamera.onCheckPicking += onCheckPicking;
             pickingcamera.onResetPicking += onResetPicking;
             pickingcamera.onErrorPicking += onErrorPicking;
+            pickingcamera.onCheckContainerPicking += onCheckContainerPicking;
+            pickingcamera.onErrorContainerClient += onErrorContainerClient;
         }
          
     }
@@ -255,6 +257,25 @@ public class GameManagerLevel1 : MonoBehaviour
             }
         }
        
+    }
+    private bool onCheckContainerPicking(string container)
+    {
+        GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container}");
+        var result = levels[currentGame].CheckContainerPicking(container);
+        if(!result) {
+            GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container} Fail");
+            SoundManager.SharedInstance.PlaySound(pickingFail);
+        }
+        GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container} OK");
+        return result;
+
+    }
+
+    private void onErrorContainerClient()
+    {
+        GameManager.Instance.WriteLog($"[onCheckContainerPicking] - onErrorContainerClient");
+        levels[currentGame].onErrorContainerClient();
+        SoundManager.SharedInstance.PlaySound(pickingFail);
     }
 
     private void onCheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
