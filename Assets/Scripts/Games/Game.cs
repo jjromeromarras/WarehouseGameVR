@@ -15,9 +15,10 @@ public class Game
     public List<Order> Orders { get; set; }
 
 
-    public Game(GameObject warehouse, int numorder, int numtareasmax, OrderType type)
+    public Game(GameObject warehouse, int numorder, int numtareasmax, OrderType type, string name)
     {
-         Orders = new List<Order>();
+        Name = name;
+        Orders = new List<Order>();
 
         for (int i = 0; i < numorder; i++)
         {
@@ -74,7 +75,7 @@ public class Game
 
                 }
             }
-            order.Tasks = order.Tasks.OrderBy(x => x.LocationRef.aisle).ToList();
+            order.Tasks = order.Tasks.OrderBy(x => x.LocationRef.aisle).ThenBy(p=>p.LocationRef.logicalx).ToList();
             Orders.Add(order);
             GameManager.Instance.WriteLog($"Create Game: numorder: {numorder} - numtareasmax: {numtareasmax} - ordertype: {type.ToString()}");
 

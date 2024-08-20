@@ -131,7 +131,7 @@ public class GameManagerLevel1 : MonoBehaviour
             {
                 inforesult.SetActiveInfo(false);
                 levels[currentGame].gameObject.SetActive(false);
-                if (currentGame < 1)
+                if (currentGame < 2)
                 {
                     currentGame++;
                     minimap.SetActive(GameManager.Instance.showminimap);
@@ -260,7 +260,6 @@ public class GameManagerLevel1 : MonoBehaviour
     }
     private bool onCheckContainerPicking(string container)
     {
-        GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container}");
         var result = levels[currentGame].CheckContainerPicking(container);
         if(!result) {
             GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container} Fail");
@@ -347,7 +346,7 @@ public class GameManagerLevel1 : MonoBehaviour
 
     private IEnumerator ActiveFinish(int time, int bonificacion, int fallos)
     {
-        GameManager.Instance.WriteLog($"[ActiveFinish] - Game 1: {currentGame}");
+        GameManager.Instance.WriteLog($"[ActiveFinish] - Game 1: {levels[currentGame].game.Name}");
 
         SoundManager.SharedInstance.PlaySound(pickingOK);
         inforesult.SetActiveInfo(true);

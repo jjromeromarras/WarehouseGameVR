@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class Logger : MonoBehaviour
     void Start()
     {
         // Define el path del log file
-        logFilePath = Path.Combine(Application.persistentDataPath, "game_log.txt");
+        logFilePath = Path.Combine(Application.persistentDataPath, $"game_{DateTime.Now.Ticks}_log.txt");
 
         // Opcional: Limpia el archivo de log anterior al iniciar
         if (File.Exists(logFilePath))

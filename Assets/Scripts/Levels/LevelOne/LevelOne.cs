@@ -42,7 +42,7 @@ public class LevelOne : Level
         switch (numberlevel)
         {
             case 1:
-                game = new Game(warehousemanual, 1 , 1 , OrderType.Picking);
+                game = new Game(warehousemanual, 1 , 1 , OrderType.Picking, "Tutorial Picking");
                 state = StateGame.ShowBienVenido;
                 if (timer != null)
                 {
@@ -50,7 +50,7 @@ public class LevelOne : Level
                 }
                 break;
             case 2:
-                game = new Game(warehousemanual, 1, 15, OrderType.Picking);
+                game = new Game(warehousemanual, 1, 15, OrderType.Picking, "Preparar un pedido");
                 showhelp = true;
                 state = StateGame.ShowTutorial2;
                 if (timer != null)
@@ -59,8 +59,8 @@ public class LevelOne : Level
                 }
                 break;
             case 3:
-                game = new Game(warehousemanual, 3, 6, OrderType.Picking);
-                showhelp = false;
+                game = new Game(warehousemanual, 3, 8, OrderType.Picking, "Multi pedidos");
+                showhelp = true;
                 state = StateGame.ShowTutorial3;
                 if (timer != null)
                 {
@@ -68,6 +68,7 @@ public class LevelOne : Level
                 }
                 break;
         }
+        GameManager.Instance.WriteLog($"Iniciar game: {game.Name}");
         tasks = new Queue<Task>();
         game.Orders.SelectMany(p => p.Tasks).OrderBy(t => t.LocationRef.aisle).ToList().ForEach(task => tasks.Enqueue(task));
         currentTask = tasks.Dequeue();
@@ -172,7 +173,7 @@ public class LevelOne : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
-                penalizacion -= 5;
+                penalizacion += 5;
              
             }
         }
@@ -182,7 +183,7 @@ public class LevelOne : Level
             showerror = true;
             infotext.SetActiveInfo(true);
             StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
-        
+            penalizacion += 5;
         }
       
 
