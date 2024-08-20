@@ -14,7 +14,7 @@ public class inforesultcontroller : infotextbase
     public void SetResult(int resultado, int tiempo, int fallos, int bonificacion)
     {
         numbonificacion.text = bonificacion.ToString();
-        numfallos.text = fallos.ToString();
+        numfallos.text = $"- {fallos.ToString()}";
         numresultado.text = resultado.ToString();
         numtiempo.text = tiempo.ToString();
         GameManager.Instance.WriteLog($"[SetResult] - Score: {resultado} - tiempo: {tiempo} - fallos: {fallos} - bonificacion: {bonificacion}");
