@@ -197,8 +197,9 @@ public class pickingcamera : MonoBehaviour
         {
             selectclient = 3;
         }
+
         // Tecla confirmar
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C) || Input.GetKey(KeyCode.Joystick1Button2))
         {
             if (CheckClientContainerQuantity())
             {
@@ -210,12 +211,12 @@ public class pickingcamera : MonoBehaviour
                     pickings[pedidopreparando - 1].cantidadperas, pickings[pedidopreparando - 1].cantidadmelocoton, pickings[pedidopreparando - 1].cantidadmanzanas, pickings[pedidopreparando - 1].cantidadfresas);
             }
         }
-        else if (Input.GetKeyDown(KeyCode.R))
+        else if (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.Joystick1Button3))
         {
             this.onResetPicking();
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Joystick1Button0))
         {
 
 

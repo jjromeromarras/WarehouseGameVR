@@ -12,6 +12,13 @@ public class camera : MonoBehaviour {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
+        float controllerX = Input.GetAxis("4th axis");
+        float controllerY = Input.GetAxis("5th axis");
+
+        // Combine mouse and controller inputs
+        mouseX = mouseX + controllerX;
+        mouseY = mouseY + controllerY;
+
         float cantidadX = mouseX * sensibilityX;
         float cantidadY = mouseY * sensibilityY;
 

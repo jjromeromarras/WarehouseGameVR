@@ -17,9 +17,13 @@ public class pnjwalker : MonoBehaviour
     private PNJRFState state;
     void Start()
     {
-          anim.SetBool("IsWalk", false);
-          anim.SetBool("IsPicking", false);
-          footstepSource.enabled = false;
+        if (anim != null)
+        {
+            anim.SetBool("IsWalk", false);
+            anim.SetBool("IsPicking", false);
+        }
+          if(footstepSource!=null)
+            footstepSource.enabled = false;
     }
 
     // Update is called once per frame
@@ -33,20 +37,26 @@ public class pnjwalker : MonoBehaviour
                     break;
                 }
             case PNJRFState.eNothing: {
-                    footstepSource.enabled = false;
-                    anim.SetBool("IsWalk", false);
-                    anim.SetBool("IsPicking", false);                                        
+                    if (footstepSource != null)
+                        footstepSource.enabled = false;
+                    if (anim != null)
+                    {
+                        anim.SetBool("IsWalk", false);
+                        anim.SetBool("IsPicking", false);
+                    }
                     break;
                 }
             case PNJRFState.eDoPicking:
                 {
-                    footstepSource.enabled = false;
+                    if (footstepSource != null)
+                        footstepSource.enabled = false;
                     DoPicking();
                     break;
                 }
             case PNJRFState.eRotateToPallet:
                 {
-                    footstepSource.enabled = false;
+                    if (footstepSource != null)
+                        footstepSource.enabled = false;
                     break;
                 }
         }
@@ -69,10 +79,14 @@ public class pnjwalker : MonoBehaviour
 
             if (distancia > margenError)
             {
-                footstepSource.enabled = true;
-                anim.SetBool("IsWalk", true);
-                anim.SetBool("IsPicking", false);
-                anim.Play("walking", 0);
+                if (footstepSource != null)
+                    footstepSource.enabled = true;
+                if (anim != null)
+                {
+                    anim.SetBool("IsWalk", true);
+                    anim.SetBool("IsPicking", false);
+                    anim.Play("walking", 0);
+                }
                 if (!agente.enabled)
                 {
                     agente.enabled = true;
@@ -81,8 +95,12 @@ public class pnjwalker : MonoBehaviour
             }
             else
             {
-                footstepSource.enabled = false;
-                anim.SetBool("IsWalk", false);
+                if (footstepSource != null)
+                    footstepSource.enabled = false;
+                if (anim != null)
+                {
+                    anim.SetBool("IsWalk", false);
+                }
                 agente.enabled = false;
                 if (orderwalkers[indexWaypointActual].ispicking)
                 {
@@ -126,16 +144,22 @@ public class pnjwalker : MonoBehaviour
 
     public void DoPicking()
     {
-        anim.SetBool("IsWalk", false);
-        anim.SetBool("IsPicking", true);
+        if (anim != null)
+        {
+            anim.SetBool("IsWalk", false);
+            anim.SetBool("IsPicking", true);
+        }
         state = PNJRFState.eWaiting;
         StartCoroutine(WaitPicking(10));
     }
     public IEnumerator WaitPicking(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-        anim.SetBool("IsWalk", false);
-        anim.SetBool("IsPicking", false);
+        if (anim != null)
+        {
+            anim.SetBool("IsWalk", false);
+            anim.SetBool("IsPicking", false);
+        }
         if (!orderwalkers[indexWaypointActual].isfinish)
         {
             state = PNJRFState.eMove;
