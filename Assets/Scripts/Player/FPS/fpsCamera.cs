@@ -37,6 +37,14 @@ public class fpsCamera : MonoBehaviour {
         float mouseX = Input.GetAxis(mouseXInputName) * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis(mouseYInputName) ;
 
+        // Movimiento de la cámara con el joystick derecho
+        float controllerX = Input.GetAxis("4th axis") * mouseSensitivity * Time.deltaTime;
+        float controllerY = Input.GetAxis("5th axis");
+
+        // Combine mouse and controller inputs
+        mouseX = mouseX + controllerX;
+        mouseY = mouseY + controllerY;
+
         limit += mouseY;
 
         if (limit > 90.0f)

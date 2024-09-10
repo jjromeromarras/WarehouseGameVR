@@ -15,8 +15,8 @@ public class exteriorCamera : MonoBehaviour
 
     private void Update()
     {
-        X += Input.GetAxis("Mouse X");
-        Y += Input.GetAxis("Mouse Y");
+        X += Input.GetAxis("Mouse X") + Input.GetAxis("4th axis");
+        Y += Input.GetAxis("Mouse Y") + Input.GetAxis("5th axis");
 
         //change the camera distance with the mouse scroll wheel
         if (Input.GetAxis("Mouse ScrollWheel") < 0)

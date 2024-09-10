@@ -102,7 +102,7 @@ public class GameManagerLevel1 : MonoBehaviour
     void Update()
     {
         paneluser.SetScore(new object[] { GameManager.Instance.player.Score });
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M) || Input.GetKeyDown(KeyCode.Joystick1Button7))
         {
             if (_state != GameState.Pause)
             {
@@ -119,7 +119,7 @@ public class GameManagerLevel1 : MonoBehaviour
             fpscamera.SetLock(_state == GameState.Pause);
             paneloptions.SetActive(_state == GameState.Pause);
         }
-        if (Input.GetKeyDown(KeyCode.C) && _state == GameState.Pause)
+        if ((Input.GetKeyDown(KeyCode.C) || (Input.GetKeyDown(KeyCode.Joystick1Button6))) && _state == GameState.Pause)
         {
 
             CloseLevel();
@@ -127,7 +127,7 @@ public class GameManagerLevel1 : MonoBehaviour
 
         if (_state == GameState.FinishTask)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && inforesult.writefulltext)
+            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button1)) && inforesult.writefulltext)
             {
                 inforesult.SetActiveInfo(false);
                 levels[currentGame].gameObject.SetActive(false);
@@ -154,7 +154,7 @@ public class GameManagerLevel1 : MonoBehaviour
         }
         if (_state == GameState.FinishLevel)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && infotext.writefulltext)
+            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button1)) && infotext.writefulltext)
             {
                 CloseLevel();
             }

@@ -57,7 +57,7 @@ public class fpsBody : MonoBehaviour {
                 anim.SetBool("IsRunning", false);
             }
 
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Joystick1Button0))
             {
                 footstepSource.enabled = false;
                 isScanning = true;

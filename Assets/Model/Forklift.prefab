@@ -214,6 +214,7 @@ GameObject:
   - component: {fileID: 8548019789838093339}
   - component: {fileID: 2565628729213364503}
   - component: {fileID: 6597507741921524511}
+  - component: {fileID: 6317687610940088621}
   m_Layer: 0
   m_Name: Forklift
   m_TagString: Untagged
@@ -376,6 +377,22 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!208 &6317687610940088621
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1325734630172526071}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 100
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 100
 --- !u!1 &1363450566345223330
 GameObject:
   m_ObjectHideFlags: 0
