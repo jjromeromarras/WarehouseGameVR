@@ -489,7 +489,10 @@ public class LevelOne : Level
                     {
                         showhelp = false;
                     }
-                    rfcontroller.SetPantallaTxt("Picking", new object[] { currentTask.parentOrder.Name });
+                    if (currentTask != null)
+                    {
+                        rfcontroller.SetPantallaTxt("Picking", new object[] { currentTask.parentOrder.Name });
+                    }
                     setLockPlayer(true);
                     state = StateGame.ShowClientContainer;
                 }

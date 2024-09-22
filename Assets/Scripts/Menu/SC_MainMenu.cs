@@ -23,16 +23,64 @@ public class SC_MainMenu : MonoBehaviour
     [SerializeField] UnityEngine.UI.Image ui_barra;
     [SerializeField] AudioClip menuMusic, bottonClip;
     [SerializeField] public LocalizedStringTable table_tooltips;
+    [SerializeField] GameObject[] selected;
     private bool changelanguage = false;   
     private int currentlevel = 1;
-   
-    
+    private int currentselect = 0;
+    private float cooldownTime = 0.2f; // Tiempo en segundos entre movimientos
+    private float nextMoveTime = 0f;
     private UnityEngine.AsyncOperation asyncLoad;
     #region Public Methods
 
     private void Start()
     {
         SoundManager.SharedInstance.PlayMusic(menuMusic);
+        //selected[0].SetActive(true);
+    }
+
+    private void Update()
+    {
+        //if(Input.GetKey(KeyCode.Joystick1Button0))
+        //{
+        //    switch(currentselect)
+        //    {
+        //        case 0:
+        //            ComenzarButton();
+        //            break;
+        //    }
+        //}
+
+        //if (Time.time >= nextMoveTime)
+        //{
+        //    float verticalInput = Input.GetAxis("Vertical");
+
+        //    // Detecta si hay algún movimiento vertical en el joystick
+        //    if (Mathf.Abs(verticalInput) > 0.1f) // Un pequeño umbral para evitar movimientos mínimos
+        //    {
+        //        // Mover hacia arriba
+        //        if (verticalInput < 0)
+        //        {
+        //            if (currentselect < selected.Length - 1) currentselect += 1;
+        //        }
+        //        // Mover hacia abajo
+        //        else
+        //        {
+        //            if (currentselect > 0) currentselect -= 1;
+        //        }
+
+        //        // Restablecer todas las opciones a no seleccionadas
+        //        for (int i = 0; i < selected.Length; i++)
+        //        {
+        //            selected[i].SetActive(false);
+        //        }
+
+        //        // Activar la opción seleccionada
+        //        selected[currentselect].SetActive(true);
+
+        //        // Establecer el próximo tiempo en el que se podrá mover la selección
+        //        nextMoveTime = Time.time + cooldownTime;
+        //    }
+        //}
     }
     public void PlayNowButton()
     {
@@ -178,7 +226,7 @@ public class SC_MainMenu : MonoBehaviour
 
     #region Private Methods
     private void SetLevel()
-    {
+    {        
         imagelevel.sprite = imageslevels[currentlevel - 1];
         var localizedstring = GenerateLocalizedStringInEditor("nivel"+currentlevel.ToString());
         textlevel.StringReference = localizedstring;

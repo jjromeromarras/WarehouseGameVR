@@ -16,6 +16,7 @@ public class GameManagerLevel1 : MonoBehaviour
     [SerializeField] private rfcontroller rfcontroller;
     [SerializeField] private fpsBody playerbody;
     [SerializeField] private fpsCamera fpscamera;
+    [SerializeField] private forklift forklift;
     [SerializeField] private pickingcamera pickingcamera;
     [SerializeField] private picking picking;
     [SerializeField] public int currentGame;
@@ -79,7 +80,14 @@ public class GameManagerLevel1 : MonoBehaviour
        
         }
 
-        for(int i = 0; i< levels.Length; i++)
+        if (forklift != null)
+        {
+            forklift.onScannerContainer += ScannerContainer;
+            forklift.onScannerLocation += ScannerLocation;
+
+        }
+
+        for (int i = 0; i< levels.Length; i++)
         {
             levels[i].onSetLockPlayer += SetLockPlayer;
             levels[i].onSetPickingLocation += SetPickingLocation;

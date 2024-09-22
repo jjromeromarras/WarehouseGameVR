@@ -3,6 +3,9 @@ using TMPro;
 using Assets.Scripts.Helper;
 using UnityEngine.AI;
 using System.Collections;
+using System;
+using UnityEngine.UI;
+using static PlasticPipe.PlasticProtocol.Client.ConnectionCreator.PlasticProtoSocketConnection;
 
 public class forklift : MonoBehaviour
 {
@@ -33,7 +36,17 @@ public class forklift : MonoBehaviour
     public GameObject cameraExteriorForklift;
     public GameObject FPS;
     public GameObject box;
-
+    public limitcamera minicamera;
+    public GameObject crossHair;
+    public event Action<string, string> onScannerContainer;
+    public event Action<string, string> onScannerLocation;
+    public AudioClip soundScanner;
+    public AudioSource backsound;
+    public AudioSource palassound;
+    public AudioSource vehicle;
+    public AudioListener audioListener;
+    public float resetTime;
+    
     [Header("VALUES")]
     public float torque;
     public float brakeTorque;
@@ -67,10 +80,14 @@ public class forklift : MonoBehaviour
     
     private float distanciaRecorrida = 0f;
     private float velocidad = 5f; // Velocidad de avance
-    private GameObject palletloadpos = null;
+    private GameObject palletloadpos = null;   
     private Vector3 positionorigpallet;
     private Quaternion rotacionorigpallet;
     private NavMeshAgent agente;
+
+    private float timer;
+    private Color currentColorCrossHair;
+    private bool isScanning;
 
     #endregion
     //when the player is close to the forklift
@@ -115,6 +132,66 @@ public class forklift : MonoBehaviour
                 rearR.brakeTorque = 0;
         }
     }
+
+    private void ScannerAtPoint(Color color)
+    {
+        if (crossHair != null)
+        {
+
+            Image[] images = crossHair.GetComponentsInChildren<Image>();
+            for (int i = 0; i < images.Length; i++)
+            {
+                images[i].color = color;
+            }
+            if (isScanning)
+            {
+
+
+                RaycastHit rayHit;
+                Ray currentRay = Camera.allCameras[0].ScreenPointToRay(crossHair.transform.position);
+                if (Physics.Raycast(currentRay, out rayHit))
+                {
+                    if ((rayHit.collider.tag == "Ubicacion" || rayHit.collider.tag == "dock") && rayHit.distance <= 8)
+                    {
+                        TextMeshPro ubicacion = null;
+                        try
+                        {
+                            ubicacion = rayHit.transform.GetChild(0).gameObject.GetComponents<TextMeshPro>()[0];
+                        }
+                        catch
+                        {
+                            ubicacion = rayHit.transform.parent.parent.GetChild(0).gameObject.GetComponents<TextMeshPro>()[0];
+                        }
+                        finally
+                        {
+                            if (ubicacion != null)
+                            {
+                                this.onScannerLocation(ubicacion.text, rayHit.collider.tag);
+                            }
+
+
+                        }
+                    }
+                    else
+                    {
+                        if ((rayHit.collider.tag == "PlacaContainer" || rayHit.collider.tag == "ContainerClient") && rayHit.distance <= 8)
+                        {
+                            var container = rayHit.transform.GetChild(1).GetComponentInChildren<TextMeshPro>();
+
+                            if (container != null)
+                            {
+                                this.onScannerContainer(container.text, rayHit.collider.tag);
+
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
     private void Awake()
     {
         state = ForkLiftState.eMove;
@@ -124,13 +201,17 @@ public class forklift : MonoBehaviour
     {
         //ignore that
         Application.targetFrameRate = 60;
-
+        vehicle.enabled = false;
         //aply the center of mass
         rb.centerOfMass = new Vector3(
             rb.centerOfMass.x,
             centerOfMass.position.y,
             rb.centerOfMass.z
         );
+
+        currentColorCrossHair = Color.white;
+        isScanning = false;
+        timer = resetTime;
     }
 
     void Update()
@@ -138,16 +219,22 @@ public class forklift : MonoBehaviour
         currentSpeed = rb.velocity.magnitude;
         if (!isPnj)
         {
+
+            bool palas = false;
             //if can enter and press F key and is not in
-            if (canEnter == true && Input.GetKeyDown(KeyCode.F) && enter == false)
+            if (canEnter == true && (Input.GetKeyDown(KeyCode.F) || Input.GetKey(KeyCode.Joystick1Button0)) && enter == false)
             {
+                
                 //then enter the forklift
                 FPS.SetActive(false);
+                minicamera.player = this.gameObject;
                 cameraInteriorForklift.SetActive(true);
                 cameraExteriorForklift.SetActive(false);
                 canEnterText.SetActive(false);
                 enter = true;
-                inForkliftMenu.SetActive(true);
+                //inForkliftMenu.SetActive(true);
+                vehicle.enabled = true;                
+                audioListener.enabled = true;
             }
 
             //if is not enter, execute again the update method
@@ -157,14 +244,16 @@ public class forklift : MonoBehaviour
            
 
             if (Input.GetAxis("Vertical") != 0)
-            {
+            {              
                 if (Input.GetAxis("Vertical") > 0)
                 {                  
                     currentGear = 1;
+                    backsound.enabled = false;
                 }
                 else
                 {
-                    currentGear = -1;                   
+                    currentGear = -1;
+                    backsound.enabled = true;
                 }
                 frontL.brakeTorque = 0;
                 frontR.brakeTorque = 0;
@@ -194,6 +283,7 @@ public class forklift : MonoBehaviour
                 frontR.brakeTorque = brakeTorque;
                 rearL.brakeTorque = brakeTorque;
                 rearR.brakeTorque = brakeTorque;
+                backsound.enabled = false;
             }
 
             //make the wheels turn
@@ -202,14 +292,18 @@ public class forklift : MonoBehaviour
             steeringWheel.transform.localEulerAngles = new Vector3(53f, 0f, rearL.steerAngle * 6);
 
             //up the loader
-            if (Input.GetKey(upLoaderKey) && loader.position.y < maxPositionY)
+            if ((Input.GetKey(upLoaderKey) || Input.GetKey(KeyCode.Joystick1Button4)) && loader.position.y < maxPositionY)
             {
+                palassound.enabled = true;
+                palas = true;
                 loader.Translate(new Vector3(0f, 1f, 0f) * Time.deltaTime);
             }
 
             //down the loader
-            if (Input.GetKey(downLoaderKey) && loader.position.y > 0)
+            if ((Input.GetKey(downLoaderKey) || Input.GetKey(KeyCode.Joystick1Button5)) && loader.position.y > 0)
             {
+                palassound.enabled = true;
+                palas = true;
                 loader.Translate(new Vector3(0f, -1f, 0f) * Time.deltaTime);
             }
 
@@ -217,33 +311,49 @@ public class forklift : MonoBehaviour
             UpdateWheelPoses();
 
             //if press Z key
-            if (Input.GetKeyDown(KeyCode.Z))
+            if (Input.GetKeyDown(KeyCode.Z) || Input.GetKey(KeyCode.Joystick1Button3))
             {
                 //exit the forklift
-                inForkliftMenu.SetActive(false);
+                //inForkliftMenu.SetActive(false);
                 enter = false;
                 FPS.transform.position = exitPosition.position;
                 FPS.SetActive(true);
                 cameraInteriorForklift.SetActive(false);
                 cameraExteriorForklift.SetActive(false);
                 canEnterText.SetActive(false);
+                minicamera.player = FPS;
+                vehicle.enabled = false;
+                audioListener.enabled = false;
+                backsound.enabled = false;
+                currentGear = 0;
+                frontL.brakeTorque = brakeTorque;
+                frontR.brakeTorque = brakeTorque;
+                rearL.brakeTorque = brakeTorque;
+                rearR.brakeTorque = brakeTorque;
             }
+            
 
-            if (Input.GetKeyDown(upGearKey))
-            {
-                if (currentGear < 1)
+            if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Joystick1Button0))
+            {                
+                isScanning = true;
+                timer -= Time.deltaTime;
+                if (timer < 0f)
                 {
-                    currentGear++;
+                    SoundManager.SharedInstance.PlaySound(soundScanner);
+                    if (currentColorCrossHair == Color.white) currentColorCrossHair = Color.red; else currentColorCrossHair = Color.white;
+                    this.ScannerAtPoint(currentColorCrossHair);
+                    timer = resetTime;
                 }
             }
-
-            if (Input.GetKeyDown(downGearKey))
+            else
             {
-                if (currentGear > -1)
-                {
-                    currentGear--;
-                }
-            }          
+                currentColorCrossHair = Color.white;
+                timer = resetTime;
+                isScanning = false;
+                this.ScannerAtPoint(currentColorCrossHair);
+            }
+            if(!palas)
+                palassound.enabled = false;
         }
         else
         {
@@ -511,6 +621,7 @@ public class forklift : MonoBehaviour
 
     private void UpdatePNJ()
     {
+        vehicle.enabled = true;
         switch (state)
         {
             case ForkLiftState.eMove:
