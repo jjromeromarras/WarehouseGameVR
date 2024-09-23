@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Single_detailed_truck/3dobjects/Materials/trailer-metal_chromed.mat.meta
 guid: 31f17fa2e81691146b6a8ffa334b3446
+========
+guid: 0fc1b1b9b2d808048986fee4baf8df00
+>>>>>>>> 88f36fec6fd4e068796de0119a8d33bfcae4791b:Assets/Single_detailed_truck/3dobjects/Materials/trailer-alu.mat.meta
 NativeFormatImporter:
   mainObjectFileID: -1
   userData: 

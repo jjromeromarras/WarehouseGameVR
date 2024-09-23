@@ -1,8 +1,15 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Enviroment/enviroment/Office building/Material lamps evelator/Lamp A.mat.meta
 guid: 925b8fd9e0528aa439f35261c5d12cf8
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
+========
+guid: 50c1dc6d125b75f4db7c4436bdb2231b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 22100000
+>>>>>>>> 88f36fec6fd4e068796de0119a8d33bfcae4791b:Assets/Kandooz/Hands/Gloves/Animator/Gloves.overrideController.meta
   userData: 
   assetBundleName: 
   assetBundleVariant: 

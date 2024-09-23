@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Kandooz/KVR/Animations/Custom/Businesswoman_4Closed.ThumbUP.anim.meta
 guid: ffef98e138741024d97e259de898df6b
+========
+guid: a89c1a53b08537f4081973764c151c02
+>>>>>>>> 88f36fec6fd4e068796de0119a8d33bfcae4791b:Assets/Kandooz/KVR/Animations/Closed.anim.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0

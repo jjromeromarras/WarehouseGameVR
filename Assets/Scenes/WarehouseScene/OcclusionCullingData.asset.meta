@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scenes/WarehouseScene/OcclusionCullingData.asset.meta
 guid: d7c7ce83b8f8b6b43af91f959dd70fa5
+========
+guid: 264b7ec2c8f25b443ade204ec72703cf
+>>>>>>>> 88f36fec6fd4e068796de0119a8d33bfcae4791b:Assets/Scenes/Level_1/OcclusionCullingData.asset.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 36300000

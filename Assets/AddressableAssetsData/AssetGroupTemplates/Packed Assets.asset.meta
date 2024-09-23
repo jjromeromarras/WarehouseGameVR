@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/AddressableAssetsData/AssetGroupTemplates/Packed Assets.asset.meta
 guid: bd1e559ad57935e458ff99f00b134857
+========
+guid: eefea1e12ed34d14eaf574326a5fc99c
+>>>>>>>> 88f36fec6fd4e068796de0119a8d33bfcae4791b:Assets/AddressableAssetsData/AddressableAssetSettings.asset.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 11400000
