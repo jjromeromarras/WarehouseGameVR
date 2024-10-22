@@ -8,15 +8,32 @@ public class Level : MonoBehaviour
     [SerializeField] public timer timer;
     [SerializeField] public AudioClip scannerOK, scannerError;
     [SerializeField] public int numberlevel;
+    [SerializeField] public bool tutorial;
+    public event Action<string, string, shelf, string, string, string, int> onSetPickingLocation;
     public int bonificacion;
     public int penalizacion;
-    public Game game;
+    public bool showhelp;
     public event Action<bool> onSetLockPlayer;
-    public event Action<string, string, shelf, string, string, string, int> onSetPickingLocation;
     public event Action<int, int, int> onFinishTask;
+    public bool waitreading;
+    public bool showerror;
+    public Game game;
 
+    public void InitLevel()
+    {
+        bonificacion = 0;
+        penalizacion = 0;
+        showhelp = tutorial ? GameManager.Instance.showayuda : false;
 
+        waitreading = false;
+        showerror = false;
 
+        if (infotext != null)
+        {
+            infotext.onFinishInfoText += FinishInfoText;
+            infotext.SetActiveInfo(true);
+        }
+    }
 
     public virtual void OnSetLocationScanner(string location, string tag)
     {
@@ -68,6 +85,24 @@ public class Level : MonoBehaviour
         timer.SetTimerOn(!value);
     }
 
+    public void showTexto(string key)
+    {
+        if (!waitreading)
+        {
+            if (showhelp)
+            {
+                timer.SetTimerOn(false);
+                infotext.SetActiveInfo(true);
+                waitreading = true;
+                StartCoroutine(infotext.SetMessageKey(key, 2f));
+            }
+            else
+            {
+                NextStep();
+            }
+        }
+    }
+
     public void setFinishLevel()
     {
         if(onFinishTask != null)
@@ -81,6 +116,22 @@ public class Level : MonoBehaviour
         {
             onSetPickingLocation(stock, container, location, contclient1, contclient2, contclient3, pedido);
         }
-       
+
+    }
+    public virtual void NextStep() { }
+
+    public void FinishInfoText()
+    {
+        waitreading = false;
+        if (showerror)
+        {
+            showerror = false;
+            infotext.SetActiveInfo(false);
+            setLockPlayer(false);            
+        }
+        else
+        {
+            NextStep();
+        }
     }
 }

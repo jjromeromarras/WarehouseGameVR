@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class GamepadCursor : MonoBehaviour
 {
@@ -57,9 +58,36 @@ public class GamepadCursor : MonoBehaviour
                 if (button != null)
                 {
                     // Invoca el evento onClick del botón si fue encontrado
-                    button.onClick.Invoke();
-                    Debug.Log("Botón presionado: " + button.name);
+                    button.onClick.Invoke();          
                     return; // Sale después de invocar el botón
+                }
+                else
+                {
+                    // Buscamos
+                    Toggle toggle = result.gameObject.GetComponentInParent<Toggle>();
+                    if (toggle != null) 
+                    {
+                        toggle.isOn = !toggle.isOn;
+                        toggle.onValueChanged.Invoke(toggle.isOn);
+                        return;
+                    }
+                    else
+                    {
+                        TMP_Dropdown dropdown = result.gameObject.GetComponent<TMP_Dropdown>();
+
+                        if (dropdown != null)
+                        {
+                            // Cambia el índice de selección del dropdown
+                            int newIndex = (dropdown.value + 1) % dropdown.options.Count; // Cambia al siguiente elemento
+                            dropdown.value = newIndex;
+
+                            // Invoca el evento onValueChanged
+                            dropdown.onValueChanged.Invoke(newIndex);
+
+                            Debug.Log("Dropdown actualizado: " + dropdown.name + " | Nuevo valor seleccionado: " + dropdown.options[newIndex].text);
+                            return; // Salir después de seleccionar el dropdown
+                        }
+                    }
                 }
             }
         }

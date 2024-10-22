@@ -85,6 +85,7 @@ public class SC_MainMenu : MonoBehaviour
     public void PlayNowButton()
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
+        GameManager.Instance.minlevel = currentlevel;   
         StartCoroutine(LoadAsyncScene()); //call to begin loading scene
        
     }
@@ -104,7 +105,7 @@ public class SC_MainMenu : MonoBehaviour
         panelconsentimiento.SetActive(false);
         ui_barra.fillAmount = 0;
         yield return new WaitForSeconds(1f);
-        asyncLoad = SceneManager.LoadSceneAsync("Level_"+currentlevel.ToString());   
+        asyncLoad = SceneManager.LoadSceneAsync("Warehouse");   
         asyncLoad.allowSceneActivation = false;
         float progress = 0f;
         //wait until the asynchronous scene fully loads
@@ -196,6 +197,8 @@ public class SC_MainMenu : MonoBehaviour
         
     }
 
+    
+
     public void Changemap(bool value)
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
@@ -206,7 +209,7 @@ public class SC_MainMenu : MonoBehaviour
     public void CerrarLevels()
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
-        panellevels.SetActive(false );
+        panelconsentimiento.SetActive(false);
         mainmenu.SetActive(true);
     }
 
@@ -233,8 +236,8 @@ public class SC_MainMenu : MonoBehaviour
 
         localizedstring = GenerateLocalizedStringInEditor("level" + currentlevel.ToString());
         txttitulolevel.StringReference = localizedstring;
-        imagelock.SetActive(currentlevel != 1);
-        bottoncomenzar.SetActive(currentlevel == 1);
+        imagelock.SetActive(currentlevel != 1 && currentlevel != 4);
+        bottoncomenzar.SetActive(currentlevel == 1 || currentlevel == 4);
     }
 
     private LocalizedString GenerateLocalizedStringInEditor(string key)

@@ -5,7 +5,7 @@ using UnityEngine.AI;
 using System.Collections;
 using System;
 using UnityEngine.UI;
-using static PlasticPipe.PlasticProtocol.Client.ConnectionCreator.PlasticProtoSocketConnection;
+
 
 public class forklift : MonoBehaviour
 {
@@ -201,7 +201,10 @@ public class forklift : MonoBehaviour
     {
         //ignore that
         Application.targetFrameRate = 60;
-        vehicle.enabled = false;
+        if (vehicle != null)
+        {
+            vehicle.enabled = false;
+        }
         //aply the center of mass
         rb.centerOfMass = new Vector3(
             rb.centerOfMass.x,
@@ -234,7 +237,7 @@ public class forklift : MonoBehaviour
                 enter = true;
                 //inForkliftMenu.SetActive(true);
                 vehicle.enabled = true;                
-                audioListener.enabled = true;
+                //audioListener.enabled = true;
             }
 
             //if is not enter, execute again the update method

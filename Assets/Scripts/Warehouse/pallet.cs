@@ -22,26 +22,7 @@ public class pallet : MonoBehaviour
         SSC1.text = ssc;
         SSC2.text = ssc;
     }
-
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    if (other.CompareTag("Player"))
-    //    {
-    //        //it can not enter
     
-    //        caninteractue = false;
-    //    }
-    //}
-
-    // private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.CompareTag("Player"))
-    //    {
-    //        //it can enter
-     
-    //        caninteractue = true;
-    //    }
-    //}
 
     void Update()
     {
