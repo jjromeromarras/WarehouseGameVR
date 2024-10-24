@@ -313,6 +313,14 @@ MonoBehaviour:
   cameraExteriorForklift: {fileID: 6319335000638756650}
   FPS: {fileID: 0}
   box: {fileID: 9116467086724835711}
+  minicamera: {fileID: 0}
+  crossHair: {fileID: 0}
+  soundScanner: {fileID: 0}
+  backsound: {fileID: 0}
+  palassound: {fileID: 0}
+  vehicle: {fileID: 0}
+  audioListener: {fileID: 0}
+  resetTime: 0
   torque: 200
   brakeTorque: 100
   maxSteerAngle: 32
