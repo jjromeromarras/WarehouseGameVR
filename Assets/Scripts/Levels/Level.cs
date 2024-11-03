@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class Level : MonoBehaviour
@@ -6,6 +7,7 @@ public class Level : MonoBehaviour
     [SerializeField] public rfcontroller rfcontroller;   
     [SerializeField] public infotextcontroller infotext;
     [SerializeField] public timer timer;
+    [SerializeField] public nivelText txtNivel;
     [SerializeField] public AudioClip scannerOK, scannerError;
     [SerializeField] public int numberlevel;
     [SerializeField] public bool tutorial;

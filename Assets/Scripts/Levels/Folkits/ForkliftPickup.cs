@@ -4,13 +4,18 @@ using UnityEngine;
 public class ForkliftPickup : MonoBehaviour
 {
     [SerializeField] public Transform loader;
-    [SerializeField] public Transform pulmonRecepciones;
+ 
 
-    private bool isCarryingPallet = false;  // Verifica si ya tienes una paleta recogida
-    private GameObject palletobj = null;
-    private bool isUnloadLoader = false;
-    private bool isOnPulmon = false;
+    public bool isCarryingPallet = false;  // Verifica si ya tienes una paleta recogida
+    public GameObject palletobj = null;
+    public bool isUnloadLoader = false;
+    public bool isOnDestiny = false;
     public event Action<string> onUnloadPallet;
+    public event Action<string> loadPallet;
+    public string destiny = "R01";
+    public int minYloader = 0;
+    public int maxYloader = 0;
+    public bool hiddenpallet = true;
 
     // Cuando las palas de la carretilla entran en contacto con la paleta
     private void OnTriggerEnter(Collider other)
@@ -20,17 +25,17 @@ public class ForkliftPickup : MonoBehaviour
             // Detectamos que hemos recogido la paleta
             palletobj = other.gameObject;
             isCarryingPallet = true;
-
+            Console.WriteLine("Detectada paleta: " + palletobj.GetComponent<pallet>().ssc);
+            loadPallet(palletobj.GetComponent<pallet>().ssc);
             // Hacer que la paleta se "pegue" a las palas
             //palletobj.transform.SetParent(transform);
             //palletobj.GetComponent<Rigidbody>().isKinematic = true; // Detener la física de la paleta
             palletobj.GetComponent<pallet>().SetSelected(false);
-            Debug.Log("Paleta recogida");
         }
 
-        if (isCarryingPallet && other.CompareTag("pulmonrecepciones"))
+        if (isCarryingPallet && other.CompareTag(destiny))
         {
-            isOnPulmon = true;
+            isOnDestiny = true;
             // Comprobar si las palas están bajadas
             
         }
@@ -39,16 +44,16 @@ public class ForkliftPickup : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("pulmonrecepciones"))
+        if (other.CompareTag(destiny))
         {
-            isOnPulmon = false;
+            isOnDestiny = false;
         }
     }
     private bool AreForksLowered()
     {
         // Aquí puedes incluir la lógica para verificar si las palas están bajadas.
         // Por ejemplo, comprueba la altura de las palas en relación a la posición de la carretilla.
-        return loader.transform.position.y <= 0; // Asegúrate de ajustar esto a tu modelo
+        return loader.transform.position.y >= minYloader && loader.transform.position.y <= maxYloader; // Asegúrate de ajustar esto a tu modelo
     }
     // Si necesitas liberar la paleta, por ejemplo al bajarla en el punto de entrega
     public void ReleasePallet()
@@ -59,11 +64,14 @@ public class ForkliftPickup : MonoBehaviour
             //palletobj.GetComponent<Rigidbody>().isKinematic = false;  // Restaurar la física
             isCarryingPallet = false;
             onUnloadPallet(palletobj.GetComponent<pallet>().ssc);
-            palletobj.SetActive(false);
+            if (hiddenpallet)
+            {
+                palletobj.SetActive(false);
+            }
             palletobj = null;
-            isOnPulmon=false;
+            isOnDestiny=false;
             isUnloadLoader=false;
-            Debug.Log("Paleta liberada");
+            
         }
     }
 
@@ -72,14 +80,13 @@ public class ForkliftPickup : MonoBehaviour
         if (isCarryingPallet)
         {
             // Verificamos si estamos dentro del pulmon
-            if (isOnPulmon && !isUnloadLoader)
+            if (isOnDestiny && !isUnloadLoader)
             {
                 // Estamos dentro del pulmon y no hemos descargado
                 if (AreForksLowered())
                 {
                     isUnloadLoader = true;
-                    ReleasePallet();
-                    Debug.Log("Preparándose para depositar la paleta en el pulmón de recepciones");
+                    ReleasePallet();                   
                 }
                 else
                 {

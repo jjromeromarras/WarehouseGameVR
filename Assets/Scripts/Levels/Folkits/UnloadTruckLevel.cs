@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.FilePathAttribute;
+
 
 public class UnloadTruckLevel : Level
 {
@@ -10,6 +10,7 @@ public class UnloadTruckLevel : Level
     #region Fields
     [SerializeField] private pallet[] pallets;
     [SerializeField] private StageTruck pulmon;
+    [SerializeField] private GameObject selectForklift;
     [SerializeField] private ForkliftPickup forkliftPickup;
     [SerializeField] private AudioClip pickingOK, pickingFail;
 
@@ -44,14 +45,20 @@ public class UnloadTruckLevel : Level
         state = StateGame.ShowBienVenido;
         if (timer != null)
         {
-            timer.SetTimeLeft(300f);
+            timer.SetTimeLeft(900f);
         }
         forkliftPickup.onUnloadPallet += onUnloadPallet;
-
+        forkliftPickup.loadPallet += onloadPallet;
+        forkliftPickup.destiny = "R01";
 
         GameManager.Instance.WriteLog($"Iniciar game: UnloadTruckLevel");
         currentTask = tasks.Dequeue();
         rfcontroller.SetPantallaTxt("UnloadTruckTask", new object[] { "M2", currentTask.ContainerRef.ssc, "R 01", pallets.Length.ToString(), pallets.Length.ToString() });
+        if (txtNivel != null)
+        {
+            txtNivel.SetPantallaTxt("niveldescargarcamion", new object[] { });
+        }
+        GameManager.Instance.WriteLog($"[UnloadTruckTask] - Next Task: Pallet: {currentTask.ContainerRef.ssc}");
 
     }
 
@@ -124,6 +131,7 @@ public class UnloadTruckLevel : Level
                     currentTask.ContainerRef.gameObject.SetActive(true);
                     currentTask.ContainerRef.SetSelected(true);
                     rfcontroller.SetPantallaTxt("UnloadTruckTask", new object[] { "M2", currentTask.ContainerRef.ssc, "R 01", tasks.Count.ToString(), pallets.Length.ToString() });
+                    GameManager.Instance.WriteLog($"[UnloadTruckTask] - Next Task: Pallet: {currentTask.ContainerRef.ssc}");
 
                 }
                 break;
@@ -134,7 +142,7 @@ public class UnloadTruckLevel : Level
                     state = StateGame.LoadContainer;
                     currentTask.ContainerRef.gameObject.SetActive(true);
                     currentTask.ContainerRef.SetSelected(true);
-                    pulmon.SetSelected(true);
+                    selectForklift.SetActive(true);
                 }
                 break;
             case StateGame.ShowErrorUnloadContainer:
@@ -154,11 +162,21 @@ public class UnloadTruckLevel : Level
     #endregion
 
     #region Private
+    private void onloadPallet(string container)
+    {
+        if (isfirstContainer)
+        {
+            pulmon.SetSelected(true);
+        }
+    }
     private void onUnloadPallet(string container)
     {
         if (container == currentTask.Container)
         {
+            GameManager.Instance.WriteLog($"[UnloadTruckTask] - onUnloadPallet: {container} OK");
+
             bonificacion += 5;
+            GameManager.Instance.player.Score += 5;
             SoundManager.SharedInstance.PlaySound(pickingOK);
             if (isfirstContainer)
             {
@@ -173,6 +191,8 @@ public class UnloadTruckLevel : Level
                     currentTask.ContainerRef.gameObject.SetActive(true);
                     currentTask.ContainerRef.SetSelected(true);
                     rfcontroller.SetPantallaTxt("UnloadTruckTask", new object[] { "M2", currentTask.ContainerRef.ssc, "STG01", tasks.Count+1, pallets.Length });
+                    GameManager.Instance.WriteLog($"[UnloadTruckTask] - Next Task: Pallet: {currentTask.ContainerRef.ssc}");
+
                 }
                 else
                 {
@@ -185,6 +205,8 @@ public class UnloadTruckLevel : Level
             state = StateGame.ShowErrorUnloadContainer;
             SoundManager.SharedInstance.PlaySound(pickingFail);
             penalizacion += 10;
+            GameManager.Instance.player.Score -= 10;
+            GameManager.Instance.WriteLog($"[UnloadTruckTask] - onUnloadPallet: {container} ERROR");
         }
     }
     #endregion

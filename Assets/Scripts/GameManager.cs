@@ -10,7 +10,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] public bool showayuda;
     [SerializeField] public bool showminimap;
     [SerializeField] public bool penalización;
+    [SerializeField] public bool mandoxbox;
     [SerializeField] public int minlevel;
+    [SerializeField] public int maxlevel;
 
 
     public Player player;
@@ -29,6 +31,7 @@ public class GameManager : MonoBehaviour
             this.showayuda = true;
             this.showminimap = true;
             this.penalización = true;
+            this.mandoxbox = true;
             DontDestroyOnLoad(this.gameObject);
         }
         else
@@ -42,6 +45,14 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene("MainMenu");
+        yield return null;
+    }
+
+    public IEnumerator ResetLevel()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene("Warehouse");
         yield return null;
     }
 

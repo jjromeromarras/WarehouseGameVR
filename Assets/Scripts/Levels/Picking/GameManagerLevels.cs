@@ -371,7 +371,7 @@ public class GameManagerLevels : MonoBehaviour
         rfmenu.SetActive(false);
         playerbody.setLock(true);
         fpscamera.SetLock(true);
-        GameManager.Instance.player.Score += (bonificacion + time - fallos);
+        GameManager.Instance.player.Score += time;
         inforesult.SetResult((int)GameManager.Instance.player.Score, time, fallos, bonificacion);
         infotext.SetActiveInfo(false);
         _state = GameState.FinishTask;
@@ -387,8 +387,15 @@ public class GameManagerLevels : MonoBehaviour
         paneloptions.SetActive(false);
     }
 
+    public void RestartLevel()
+    {
+        GameManager.Instance.WriteLog($"[RestartLevel] - Game 1: {levels[currentGame].game.Name}");
+        GameManager.Instance.player.Score -= 500;
+        StartCoroutine(GameManager.Instance.ResetLevel());
+    }
     public void CloseLevel()
     {
+        GameManager.Instance.WriteLog($"[CloseLevel] - Game 1: {levels[currentGame].game.Name}");  
         StartCoroutine(GameManager.Instance.BackMenu());
     }
     #endregion

@@ -63,6 +63,10 @@ public class PickingLevel : Level
         tasks = new Queue<Task>();
         (game as GamePicking).Orders.SelectMany(p => p.Tasks).OrderBy(t => t.LocationRef.aisle).ToList().ForEach(task => tasks.Enqueue(task));
         currentTask = tasks.Dequeue();
+        if (txtNivel != null)
+        {
+            txtNivel.SetPantallaTxt("level1", new object[] { });
+        }
     }
 
     public void Update()
@@ -152,6 +156,7 @@ public class PickingLevel : Level
                 timer.SetTimerOn(false);
                 GameManager.Instance.player.Data[0].TotalTime += timer.TimeLeft;
                 bonificacion += 10;
+                GameManager.Instance.player.Score += 10;
                 currentTask.parentOrder.ContainerClient = string.Empty;
                 if (!GetTask())
                 {
@@ -167,7 +172,8 @@ public class PickingLevel : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
                 penalizacion += 5;
-             
+                GameManager.Instance.player.Score -= 5;
+
             }
         }
         else if (!showerror && !waitreading)
@@ -177,6 +183,7 @@ public class PickingLevel : Level
             infotext.SetActiveInfo(true);
             StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { dock }));
             penalizacion += 5;
+            GameManager.Instance.player.Score -= 5;
         }
       
 
@@ -198,6 +205,7 @@ public class PickingLevel : Level
                         rfcontroller.SetPantallaTxt("EnterContainer", new object[] { picking.Stock, picking.Container,
                         currentTask.parentOrder.ContainerClient, picking.Quantity});
                         bonificacion += 5;
+                        GameManager.Instance.player.Score += 5;
                         GameManager.Instance.player.Data[0].Aciertos += 1;
                     }
                     else
@@ -209,6 +217,7 @@ public class PickingLevel : Level
                             infotext.SetActiveInfo(true);
                             StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
                             penalizacion += 5;
+                            GameManager.Instance.player.Score -= 5;
                             GameManager.Instance.player.Data[0].Errors += 1;
                         }
 
@@ -225,6 +234,7 @@ public class PickingLevel : Level
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { location }));
                     penalizacion += 5;
+                    GameManager.Instance.player.Score -= 5;
                     GameManager.Instance.player.Data[0].Errors += 1;
                 }
 
@@ -243,6 +253,7 @@ public class PickingLevel : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { location }));
                 penalizacion += 5;
+                GameManager.Instance.player.Score -= 5;
                 GameManager.Instance.player.Data[0].Errors += 1;
             }
 
@@ -272,6 +283,7 @@ public class PickingLevel : Level
                         picking.Stock, currentTask.parentOrder.ContainerClient});
                 }
                 bonificacion += 5;
+                GameManager.Instance.player.Score += 5;
                 GameManager.Instance.player.Data[0].Aciertos += 1;
             }
             else
@@ -283,6 +295,7 @@ public class PickingLevel : Level
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContainerCliente", 2f, new object[] { container }));
                     penalizacion += 5;
+                    GameManager.Instance.player.Score -= 5;
                     GameManager.Instance.player.Data[0].Errors += 1;
                 }
 
@@ -301,6 +314,7 @@ public class PickingLevel : Level
                     setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, (game as GamePicking).Orders[0].ContainerClient,
                         (game as GamePicking).Orders.Count > 1 ? (game as GamePicking).Orders[1].ContainerClient : string.Empty, (game as GamePicking).Orders.Count > 2 ? (game as GamePicking).Orders[2].ContainerClient : string.Empty, currentTask.parentOrder.Level);
                     bonificacion += 5;
+                    GameManager.Instance.player.Score += 5;
                     GameManager.Instance.player.Data[0].Aciertos+= 1;
                 }
                 else
@@ -312,6 +326,7 @@ public class PickingLevel : Level
                         infotext.SetActiveInfo(true);
                         StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedor", 2f, new object[] { container }));
                         penalizacion += 5;
+                        GameManager.Instance.player.Score -= 5;
                         GameManager.Instance.player.Data[0].Errors += 1;
                     }
 
@@ -328,6 +343,7 @@ public class PickingLevel : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirUbicacion", 2f, new object[] { container }));
                 penalizacion += 5;
+                GameManager.Instance.player.Score -= 5;
                 GameManager.Instance.player.Data[0].Errors += 1;
             }
 
@@ -355,6 +371,7 @@ public class PickingLevel : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("containerpickingerror", 2f, new object[] { container }));
                 penalizacion += 5;
+                GameManager.Instance.player.Score -= 5;
                 GameManager.Instance.player.Data[0].Errors += 1;
                 return false;
             }
@@ -394,6 +411,7 @@ public class PickingLevel : Level
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("errorpickingproduct", 2f, new object[] { total, picking.Stock }));
                     penalizacion += 5;
+                    GameManager.Instance.player.Score -= 5;
                     GameManager.Instance.player.Data[0].Errors += 1;
                     return false;
                 }
@@ -404,6 +422,7 @@ public class PickingLevel : Level
                     NextStep();
                     // Picking correcto
                     bonificacion += 10;
+                    GameManager.Instance.player.Score += 10;
                     GameManager.Instance.player.Data[0].Aciertos += 1;
                     return true;
                 }
@@ -414,6 +433,7 @@ public class PickingLevel : Level
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errorpickingquantity", 2f, new object[] { total, picking.Quantity }));
                 penalizacion += 5;
+                GameManager.Instance.player.Score -= 5;
                 GameManager.Instance.player.Data[0].Errors += 1;
                 return false;
             }
@@ -426,6 +446,7 @@ public class PickingLevel : Level
         if (currentTask is PickingTask picking)
         {
             penalizacion += 5;
+            GameManager.Instance.player.Score -= 5;
             GameManager.Instance.player.Data[0].Errors += 1;
             setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, currentTask.parentOrder.ContainerClient,
                 (game as GamePicking).Orders.Count > 1 ? (game as GamePicking).Orders[1].ContainerClient: string.Empty, (game as GamePicking).Orders.Count > 2 ? (game as GamePicking).Orders[2].ContainerClient: string.Empty,

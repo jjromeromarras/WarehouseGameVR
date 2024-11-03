@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
+using UnityEngine.Localization.Settings;
 
 public class infotextbase : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class infotextbase : MonoBehaviour
     [SerializeField] public LocalizeStringEvent localize;
     [SerializeField] public GameObject infopanel;
     [SerializeField] public TextMeshProUGUI textinfo;
+    [SerializeField] public TextMeshProUGUI textcontinuar;
     [SerializeField] public LocalizedStringTable table_tooltips;
     public event Action onFinishInfoText;
 
@@ -59,6 +61,46 @@ public class infotextbase : MonoBehaviour
     {
         infopanel.SetActive(value);
     }
+    
+    public void SetContinueMessage()
+    {
+        if(GameManager.Instance != null)
+        {
+            var tecla = "B";
+            if (!GameManager.Instance.mandoxbox)
+            {                
+                // Mando Xbox
+                if (LocalizationSettings.Instance.GetSelectedLocale().LocaleName.Contains("es"))
+                {
+                    tecla = "espacio";
+                } else if (LocalizationSettings.Instance.GetSelectedLocale().LocaleName.Contains("en"))
+                {
+                    tecla = "space";
+                }
+                else
+                {
+                    tecla = "espace";
+                }
+            }
+
+            if(textcontinuar!= null)
+            {
+                if (LocalizationSettings.Instance.GetSelectedLocale().LocaleName.Contains("(es)"))
+                {
+                    textcontinuar.text = $"Pulsar {tecla} para continuar.";
+                }
+                else if (LocalizationSettings.Instance.GetSelectedLocale().LocaleName.Contains("(en)"))
+                {
+                    textcontinuar.text = $"Press {tecla} to continue.";
+                }
+                else
+                {
+                    textcontinuar.text = $"Pulsar {tecla} pour continuer.";
+                }
+
+            }
+        }
+    }
 
     public IEnumerator SetMessage(string msg, float timeToWaitAfecterText)
     {
@@ -82,6 +124,7 @@ public class infotextbase : MonoBehaviour
             }
             writefulltext = true;
             isWriting = false;
+            SetContinueMessage();
             yield return new WaitForSeconds(timeToWaitAfecterText);
 
         }

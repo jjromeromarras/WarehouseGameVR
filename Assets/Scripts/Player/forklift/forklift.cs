@@ -14,6 +14,7 @@ public class forklift : MonoBehaviour
     public TextMeshProUGUI speedText;
     public GameObject canEnterText;
     public GameObject inForkliftMenu;
+    [SerializeField] private GameObject selectForklift;
 
     [Header("WHEEL COLLIDERS")]
     public WheelCollider frontR;
@@ -230,6 +231,7 @@ public class forklift : MonoBehaviour
                 
                 //then enter the forklift
                 FPS.SetActive(false);
+                selectForklift.SetActive(false);
                 minicamera.player = this.gameObject;
                 cameraInteriorForklift.SetActive(true);
                 cameraExteriorForklift.SetActive(false);
