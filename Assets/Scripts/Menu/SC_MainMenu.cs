@@ -27,12 +27,13 @@ public class SC_MainMenu : MonoBehaviour
     private bool changelanguage = false;   
     private int currentlevel = 1;
     private UnityEngine.AsyncOperation asyncLoad;
+
     #region Public Methods
 
     private void Start()
     {
         //SoundManager.SharedInstance.PlayMusic(menuMusic);
-        //selected[0].SetActive(true);
+        selected[0].SetActive(true);
     }
 
     

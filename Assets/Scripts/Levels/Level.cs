@@ -12,6 +12,7 @@ public class Level : MonoBehaviour
     [SerializeField] public int numberlevel;
     [SerializeField] public bool tutorial;
     public event Action<string, string, shelf, string, string, string, int> onSetPickingLocation;
+    public event Action onSetReceptionLocation;
     public int bonificacion;
     public int penalizacion;
     public bool showhelp;
@@ -77,7 +78,10 @@ public class Level : MonoBehaviour
     {
 
     }
+    public virtual void onFinishErrorMsg()
+    {
 
+    }
     public void setLockPlayer(bool value)
     {
         if (onSetLockPlayer != null)
@@ -120,6 +124,15 @@ public class Level : MonoBehaviour
         }
 
     }
+
+    public void setOnReceptionLocation()
+    {
+        if (onSetReceptionLocation != null)
+        {
+            onSetReceptionLocation();
+        }
+
+    }
     public virtual void NextStep() { }
 
     public void FinishInfoText()
@@ -129,7 +142,8 @@ public class Level : MonoBehaviour
         {
             showerror = false;
             infotext.SetActiveInfo(false);
-            setLockPlayer(false);            
+            setLockPlayer(false);
+            onFinishErrorMsg();
         }
         else
         {

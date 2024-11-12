@@ -124,7 +124,7 @@ public class fpsBody : MonoBehaviour {
                     }
                     else
                     {
-                        if ((rayHit.collider.tag == "PlacaContainer" || rayHit.collider.tag == "ContainerClient") && rayHit.distance <= 4)
+                        if ((rayHit.collider.tag == "PlacaContainer" || rayHit.collider.tag == "ContainerClient" || rayHit.collider.tag == "receptionpallet") && rayHit.distance <= 4)
                         {
                             var container = rayHit.transform.GetChild(1).GetComponentInChildren<TextMeshPro>();
 

@@ -36,7 +36,8 @@
         FinishTask,
         FinishLevel,
         Dialog,
-        Pause
+        Pause,
+        Reception
     }
 
     public enum Stock
@@ -53,7 +54,8 @@
     public enum OrderType
     {
         Shipping,
-        Picking
+        Picking,
+        Reception
     }
 
     public enum TaskStatus

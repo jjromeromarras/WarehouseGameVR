@@ -18,7 +18,9 @@ public class GameManagerLevels : MonoBehaviour
     [SerializeField] private fpsCamera fpscamera;
     [SerializeField] private forklift forklift;
     [SerializeField] private pickingcamera pickingcamera;
+    [SerializeField] private ReceptionCamera receptioncamera;
     [SerializeField] private picking picking;
+    [SerializeField] private ReceptionScene reception;
     [SerializeField] public int currentGame;
     [SerializeField] public panelusercontroller paneluser;   
     [SerializeField] private Level[] levels;
@@ -86,19 +88,23 @@ public class GameManagerLevels : MonoBehaviour
             forklift.onScannerLocation += ScannerLocation;
 
         }
-
         for (int i = 0; i< levels.Length; i++)
         {
-            if (i != GameManager.Instance.minlevel - 1)
+            if (GameManager.Instance != null)
             {
-                levels[i].gameObject.SetActive(false);
-            }
-            else
-            {
-                levels[i].gameObject.SetActive(true);
+
+                if (i != GameManager.Instance.minlevel - 1)
+                {
+                    levels[i].gameObject.SetActive(false);
+                }
+                else
+                {
+                    levels[i].gameObject.SetActive(true);
+                }
             }
             levels[i].onSetLockPlayer += SetLockPlayer;
             levels[i].onSetPickingLocation += SetPickingLocation;
+            levels[i].onSetReceptionLocation += SetReceptionLocation;
             levels[i].onFinishTask += FinishTask;
 
         }
@@ -107,17 +113,27 @@ public class GameManagerLevels : MonoBehaviour
         {       
             pickingcamera.onCheckPicking += onCheckPicking;
             pickingcamera.onResetPicking += onResetPicking;
-            pickingcamera.onErrorPicking += onErrorPicking;
+            pickingcamera.onErrorPicking += onErrorPicking;  
             pickingcamera.onCheckContainerPicking += onCheckContainerPicking;
             pickingcamera.onErrorContainerClient += onErrorContainerClient;
         }
-         
+
+        if (receptioncamera != null)
+        {
+            receptioncamera.onCheckReception += onCheckReception;
+            receptioncamera.onResetReception += onResetReception;
+            receptioncamera.onCheckItem += onCheckItem;
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        paneluser.SetScore(new object[] { GameManager.Instance.player.Score });
+        if (GameManager.Instance != null)
+        {
+            paneluser.SetScore(new object[] { GameManager.Instance.player.Score });
+        }
         if (Input.GetKeyDown(KeyCode.M) || Input.GetKeyDown(KeyCode.Joystick1Button7))
         {
             if (_state != GameState.Pause)
@@ -183,6 +199,20 @@ public class GameManagerLevels : MonoBehaviour
         GameManager.Instance.WriteLog($"[ScannerContainer] - container: {container} - tag: {tag}");
         // Comprobar si el contenedor es correcto
         levels[currentGame].OnSetContainerScanner(container, tag);
+    }
+
+    private void SetReceptionLocation()
+    {
+        infopicking.SetActive(true);
+        playerbody.gameObject.SetActive(false);
+        minimap.SetActive(false);
+        cross.SetActive(false);
+        for (int i = 0; i < pnjs.Length; i++)
+        {
+            pnjs[i].StopPNJ();
+        }
+        warehouse.SetActive(false);
+        _state = GameState.Reception;
     }
 
     private void SetPickingLocation(string stock, string containersscc, shelf shelf, string contclient1, string contclient2, string contclient3, int pedido)
@@ -302,7 +332,6 @@ public class GameManagerLevels : MonoBehaviour
         if (result)
         {
             GameManager.Instance.WriteLog($"[onCheckPicking] - Picking OK");
-
             SoundManager.SharedInstance.PlaySound(pickingOK);
             picking.gameObject.SetActive(false);
             warehouse.SetActive(true);
@@ -325,12 +354,79 @@ public class GameManagerLevels : MonoBehaviour
         }
     }
 
+    private void onCheckItem(bool value)
+    {
+        GameManager.Instance.WriteLog($"[onCheckItem] - value: {value}");
+        var result = (levels[currentGame] as ReceptionLevel).CheckItem(value);
+        if (result)
+        {
+            GameManager.Instance.WriteLog($"[onCheckItem] - Reception OK");
+            receptioncamera.ResetScene();
+            SoundManager.SharedInstance.PlaySound(pickingOK);
+            reception.gameObject.SetActive(false);
+            warehouse.SetActive(true);
+            for (int i = 0; i < pnjs.Length; i++)
+            {
+                pnjs[i].ResumePNJ();
+            }
+
+            playerbody.gameObject.SetActive(true);
+            cross.SetActive(true);
+            minimap.SetActive(GameManager.Instance.showminimap);
+            infopicking.SetActive(false);
+            SetLockPlayer(false);
+            _state = GameState.Traveller;
+        }
+
+
+    }
+    private void onCheckReception(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
+    {
+        GameManager.Instance.WriteLog($"[onCheckReception] - cantplatano: {cantplatano} - cantuvas: {cantuvas} " +
+            $"- cantpiña: {cantpiña} - cantmelocoton: {cantmelocoton} - cantmanzana: {cantmanzana} - cantfresa: {cantfresa}");
+
+        var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);
+        if (result)
+        {
+            GameManager.Instance.WriteLog($"[onCheckPicking] - Reception OK");
+            receptioncamera.ResetScene();
+            SoundManager.SharedInstance.PlaySound(pickingOK);
+            reception.gameObject.SetActive(false);
+            warehouse.SetActive(true);
+            for (int i = 0; i < pnjs.Length; i++)
+            {
+                pnjs[i].ResumePNJ();
+            }
+
+            playerbody.gameObject.SetActive(true);
+            cross.SetActive(true);
+            minimap.SetActive(GameManager.Instance.showminimap);
+            infopicking.SetActive(false);
+            SetLockPlayer(false);
+            _state = GameState.Traveller;
+        }
+        else
+        {
+            GameManager.Instance.WriteLog($"[onCheckPicking] - Picking Fail");
+            SoundManager.SharedInstance.PlaySound(pickingFail);
+        }
+    }
+
     private void onResetPicking()
     {
-        GameManager.Instance.WriteLog($"[onResetTask]");
+        GameManager.Instance.WriteLog($"[onResetPicking]");
         SoundManager.SharedInstance.PlaySound(pickingFail); 
         levels[currentGame].onResetTask();
         pickingcamera.ResetScene();
+
+    }
+
+    private void onResetReception()
+    {
+        GameManager.Instance.WriteLog($"[onResetReception]");
+        SoundManager.SharedInstance.PlaySound(pickingFail);
+        levels[currentGame].onResetTask();
+        receptioncamera.ResetScene();
 
     }
 
@@ -340,6 +436,7 @@ public class GameManagerLevels : MonoBehaviour
         levels[currentGame].onErrorPicking();
         SoundManager.SharedInstance.PlaySound(pickingFail);
     }
+
 
     private void ScannerLocation(string location, string tag)
     {

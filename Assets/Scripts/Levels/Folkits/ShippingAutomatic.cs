@@ -21,9 +21,6 @@ public class ShippingAutomatic : Level
     private Queue<Task> tasks;
     private Task currentTask;
     private StateGame state;
-    private bool isFirstStage = true;
-    private bool isFirstShelf = true;
-    private bool isFirstDock = true;
     private shippingpallet contps1, contps2, contps3, contps4;
     private UnityEngine.Vector3 positionorigpallet;
     private Quaternion rotacionorigpallet;

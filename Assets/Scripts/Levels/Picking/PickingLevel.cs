@@ -620,28 +620,28 @@ public class PickingLevel : Level
     }
 
     #endregion
-
-}
-
     internal enum StateGame
-{
-    ShowBienVenido,
-    ShowTutorial1,
-    ShowTutorial2, 
-    ShowTutorial3,
-    ShowClientContainer,
-    ShowIntroducirContainerCliente,
-    ShowScannerContainer,
-    ScannerContainerClient,
-    ShowLocationPicking,
-    ShowContainerPicking,
-    ScannerLocation,
-    ScannerContainer,
-    ShowIntroducirArticulo,
-    PickingQuantity,
-    ShowDockConfirmation,
-    ScannerDock,
-    WaitingReading,
-    ShowFinishLevel,
-    FinishLevel
+    {
+        ShowBienVenido,
+        ShowTutorial1,
+        ShowTutorial2,
+        ShowTutorial3,
+        ShowClientContainer,
+        ShowIntroducirContainerCliente,
+        ShowScannerContainer,
+        ScannerContainerClient,
+        ShowLocationPicking,
+        ShowContainerPicking,
+        ScannerLocation,
+        ScannerContainer,
+        ShowIntroducirArticulo,
+        PickingQuantity,
+        ShowDockConfirmation,
+        ScannerDock,
+        WaitingReading,
+        ShowFinishLevel,
+        FinishLevel
+    }
 }
+
+ 

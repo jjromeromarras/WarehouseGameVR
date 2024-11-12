@@ -10,7 +10,7 @@ public class picking : MonoBehaviour
     {
         if(containers != null && containers.Count>container)
         {
-            containers[container].SetStock(stock, cantidad, ssc);
+            containers[container].SetStock(stock, cantidad, ssc, false, false);
         }
     }
 
