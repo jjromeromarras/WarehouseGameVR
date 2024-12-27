@@ -12,11 +12,12 @@ public class GamePicking: Game
 {
    
     public List<Order> Orders { get; set; }
-
+    public List<Task> AllTask { get; set; }
 
     public GamePicking(GameObject warehouse, int numorder, int numtareasmax, OrderType type, string name): base(name, string.Empty)
     {
         Orders = new List<Order>();
+        AllTask = new List<Task>();
 
         for (int i = 0; i < numorder; i++)
         {
@@ -34,50 +35,53 @@ public class GamePicking: Game
             order.Name = GenerateRandomName();
             var shelforder = warehouse.GetComponentsInChildren<shelf>();
             
-            foreach (var shel in shelforder)
+            while(order.Tasks.Count != numtareasmax)
             {
-                if (Random.Range(0, 10) > 6)
+                foreach (var shel in shelforder)
                 {
-                    Task task = type == OrderType.Picking ?  new PickingTask(): new Task();
-                    task.parentOrder = order;
-                    var numcontainer = Random.Range(1, 7);                    
-                    task.LocationRef = shel;
-
-                    var container = shel.transform.GetChild(numcontainer).GetComponent<pallet>();
-                    if (container != null)
+                    if (Random.Range(0, 10) > 6)
                     {
-                        if (container.gameObject.transform.position.y > 2)
+                        Task task = type == OrderType.Picking ? new PickingTask() : new Task();
+                        task.parentOrder = order;
+                        var numcontainer = Random.Range(1, 7);
+                        task.LocationRef = shel;
+
+                        var container = shel.transform.GetChild(numcontainer).GetComponent<pallet>();
+                        if (container != null)
                         {
-                            task.Location = (shel as shelf).level2.text;
-                        }
-                        else
-                        {
-                            task.Location = (shel as shelf).level1.text;
+                            if (container.gameObject.transform.position.y > 2)
+                            {
+                                task.Location = (shel as shelf).level2.text;
+                            }
+                            else
+                            {
+                                task.Location = (shel as shelf).level1.text;
+                            }
+
+                            task.Container = container.ssc.ToString();
+                            task.ContainerRef = container;
+                            if (type == OrderType.Picking && task is PickingTask picking)
+                            {
+                                picking.Quantity = Random.Range(1, 11);
+                                picking.Stock = Enum.GetValues(typeof(Stock)).GetValue(Random.Range(0, 7)).ToString();
+                            }
+                            order.Tasks.Add(task);
+                            if (order.Tasks.Count == numtareasmax)
+                            {
+                                task.isLast = true;
+                                break;
+                            }
                         }
 
-                        task.Container = container.ssc.ToString();
-                        task.ContainerRef = container;
-                        if (type == OrderType.Picking && task is PickingTask picking)
-                        {
-                            picking.Quantity = Random.Range(1, 11);
-                            picking.Stock = Enum.GetValues(typeof(Stock)).GetValue(Random.Range(0, 7)).ToString();
-                        }
-                        order.Tasks.Add(task);
-                        if (order.Tasks.Count == numtareasmax)
-                        {
-                            task.isLast = true;
-                            break;
-                        }
                     }
-
-
                 }
             }
-            order.Tasks = order.Tasks.OrderBy(x => x.LocationRef.aisle).ThenBy(p=>p.LocationRef.logicalx).ToList();
+            AllTask = AllTask.Concat(order.Tasks).ToList();                
             Orders.Add(order);
             GameManager.Instance.WriteLog($"Create Game: numorder: {numorder} - numtareasmax: {numtareasmax} - ordertype: {type.ToString()}");
 
         }
+        AllTask = AllTask.OrderBy(x => x.LocationRef.aisle).ThenBy(p => p.LocationRef.logicalx).ToList();
 
     }
 

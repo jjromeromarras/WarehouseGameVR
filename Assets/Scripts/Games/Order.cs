@@ -1,6 +1,7 @@
 using Assets.Scripts.Helper;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class Order
 {
@@ -10,7 +11,7 @@ public class Order
     public List<Task> Tasks { get; set; }
     public OrderType Type { get; set; }
     public string Dock {  get; set; }
-
+    public GameObject DockRef { get; set; }
     public string ContainerClient { get; set; }
 
     public Order()

@@ -41,7 +41,7 @@ public class PickingLevel : Level
                 }
                 break;
             case 2:
-                game = new GamePicking(warehousemanual, 1, 15, OrderType.Picking, "Preparar un pedido");
+                game = new GamePicking(warehousemanual, 1, 10, OrderType.Picking, "Preparar un pedido");
                 showhelp = true;
                 state = StateGame.ShowTutorial2;
                 if (timer != null)
@@ -61,7 +61,7 @@ public class PickingLevel : Level
         }
         GameManager.Instance.WriteLog($"Iniciar game: {game.Name}");
         tasks = new Queue<Task>();
-        (game as GamePicking).Orders.SelectMany(p => p.Tasks).OrderBy(t => t.LocationRef.aisle).ToList().ForEach(task => tasks.Enqueue(task));
+        (game as GamePicking).AllTask.ForEach(task => tasks.Enqueue(task));
         currentTask = tasks.Dequeue();
         if (txtNivel != null)
         {
@@ -448,9 +448,15 @@ public class PickingLevel : Level
             penalizacion += 5;
             GameManager.Instance.player.Score -= 5;
             GameManager.Instance.player.Data[0].Errors += 1;
-            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, currentTask.parentOrder.ContainerClient,
-                (game as GamePicking).Orders.Count > 1 ? (game as GamePicking).Orders[1].ContainerClient: string.Empty, (game as GamePicking).Orders.Count > 2 ? (game as GamePicking).Orders[2].ContainerClient: string.Empty,
-                currentTask.parentOrder.Level);
+            var container1 = currentTask.parentOrder.ContainerClient != null ? currentTask.parentOrder.ContainerClient : string.Empty;
+            var container2 = string.Empty;
+            var container3 = string.Empty;
+            if ((game as GamePicking).Orders.Count > 1)
+                container2 = (game as GamePicking).Orders[1].ContainerClient != null ? (game as GamePicking).Orders[1].ContainerClient : string.Empty;
+            if ((game as GamePicking).Orders.Count > 2)
+                container3 = (game as GamePicking).Orders[2].ContainerClient != null ? (game as GamePicking).Orders[1].ContainerClient : string.Empty;
+
+            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, container1,container2,container3, currentTask.parentOrder.Level);
         }
     }
 
@@ -581,13 +587,9 @@ public class PickingLevel : Level
     {
         infotext.SetActiveInfo(false);
         currentTask.ContainerRef.SetSelected(false);
-        if (currentTask.isLast)
+        if (!GetTask())
         {
             state = StateGame.ShowDockConfirmation;
-        }
-        else
-        {
-            GetTask();
         }
     }
 

@@ -23,7 +23,7 @@ public class ReceptionCamera : MonoBehaviour
 
     public event Action<int, int, int, int, int, int, int> onCheckReception;
     public event Action<bool> onCheckItem;
-    public event Action onResetReception;
+   
     private bool enableActions;
     private StateGame state;
     private boxType boxType;
@@ -41,7 +41,7 @@ public class ReceptionCamera : MonoBehaviour
         time = resetTime;
         ResetScene();
         state = StateGame.EnterItem;
-        enableActions = true;
+        enableActions = false;
     }
 
     // Update is called once per frame
@@ -194,12 +194,7 @@ public class ReceptionCamera : MonoBehaviour
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.Joystick1Button3))
-                {
-                    enableActions = false;
-                    this.onResetReception();
-                }
-
+               
                 if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Joystick1Button0))
                 {
 

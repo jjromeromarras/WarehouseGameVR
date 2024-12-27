@@ -10,7 +10,7 @@ public class GameReception : Game
 {
     public List<Order> Orders { get; set; }
 
-    public GameReception(ReceptionData[] data, int numorder, string name) : base(name, string.Empty)
+    public GameReception(ReceptionData[] data, int numorder, int nummaxpallet, string name) : base(name, string.Empty)
     {
         Orders = new List<Order>();
 
@@ -20,6 +20,7 @@ public class GameReception : Game
             order.Type = OrderType.Reception;
             order.Level = i + 1;
             order.Dock = data[i].origen.name;
+            order.DockRef = data[i].selectorigen;
             order.Name = GenerateRandomName();
             var pallets = data[i].palletas;
 
@@ -35,7 +36,8 @@ public class GameReception : Game
                 task.Stock = palet.stock;
                 task.isFake = range <= 2;
                 order.Tasks.Add(task);
-                if (order.Tasks.Count == pallets.Length)
+                palet.pallet.gameObject.SetActive(true);    
+                if (order.Tasks.Count == nummaxpallet)
                 {
                     task.isLast = true;
                     break;

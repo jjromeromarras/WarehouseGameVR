@@ -5,7 +5,7 @@ public class ReceptionScene: MonoBehaviour
     [SerializeField] public containerpicking stock;
     [SerializeField] public GameObject pallet;
     public float rotationSpeed = 100f; // Velocidad de rotación ajustable
-    private bool isRotating = false; // Controla si el contenedor está en modo de rotación
+  
 
     private void Update()
     {

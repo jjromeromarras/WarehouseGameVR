@@ -15,4 +15,8 @@ public class infotextcontroller : infotextbase
         yield return SetMessage(textinfo.text, timeToWaitAfecterText);
     }
 
+    public IEnumerator SetMessageText(string text, float timeToWaitAfecterText, object[] arguments = null)
+    {
+        yield return SetMessage(text, timeToWaitAfecterText);
+    }
 }

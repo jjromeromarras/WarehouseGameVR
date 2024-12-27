@@ -13,11 +13,12 @@ public class ReceptionLevel : Level
     private StateGame state;
     private ReceptionTask currentTask;
     private Queue<ReceptionTask> tasks;
+    private bool isFirt;
     // Start is called before the first frame update
     void Start()
     {
         InitLevel();
-        
+        isFirt = true;
         if (rfcontroller != null)
         {
             rfcontroller.SetTitle("TareasAutomaticas");
@@ -25,8 +26,9 @@ public class ReceptionLevel : Level
         switch (numberlevel)
         {
             case 1:
-                game = new GameReception(data, 1, "Tutorial Reception");
-                state = StateGame.ShowBienVenido;
+                game = new GameReception(data, 1, 3, "Tutorial Reception");                
+                state = StateGame.ShowReceptionInformada;
+
                 if (timer != null)
                 {
                     timer.SetTimeLeft(300f);
@@ -37,6 +39,9 @@ public class ReceptionLevel : Level
         tasks = new Queue<ReceptionTask>();
         (game as GameReception).Orders.SelectMany(p => p.Tasks).ToList().ForEach(task => tasks.Enqueue(task as ReceptionTask));
         currentTask = tasks.Dequeue();
+        if(numberlevel == 1){
+            currentTask.parentOrder.DockRef.gameObject.SetActive(true);
+        }
         if (txtNivel != null)
         {
             txtNivel.SetPantallaTxt("Receplevel1", new object[] { });
@@ -69,12 +74,32 @@ public class ReceptionLevel : Level
                     showTexto("PrimerInventario");
                     break;
                 }
+            case StateGame.ShowReceptionInformada:
+                {
+                    showTexto("showrecepcioninformada");
+                    break;
+                }
+            case StateGame.ShowConfirmStockContainerRecep:
+                {
+                    showTexto("showconfirmstockcontainerrecp");
+                    break;
+                }
+            case StateGame.ShowKeyConfirmStockRecep:
+                {
+                    showTexto("showkeyconfirmstockrecep");
+                    break;
+                }
+            case StateGame.ShowConfirmCantidadRecep:
+                {
+                    showTexto("showconfirmcantidadrecep");
+                    break;
+                }
             case StateGame.ShowFinishLevel:
                 {
                     timer.SetTimerOn(false);
                     infotext.SetActiveInfo(true);
                     waitreading = true;
-                    StartCoroutine(infotext.SetMessageKey("FinalizarReception", 2f));                 
+                    StartCoroutine(infotext.SetMessageKey("nivelcompletado", 2f));
                     break;
                 }
         }
@@ -88,10 +113,19 @@ public class ReceptionLevel : Level
             SoundManager.SharedInstance.PlaySound(scannerOK);
             bonificacion += 10;
             GameManager.Instance.player.Score += 10;
-            state = StateGame.EnterQuantity;
+            if (isFirt)
+            {
+                state = StateGame.ShowConfirmCantidadRecep;
+                receptionCamera.setenableActions(false);
+            } 
+            else
+            {
+                receptionCamera.setenableActions(true);
+                state = StateGame.EnterQuantity;
+            }
             rfcontroller.SetPantallaTxt("EnterCantidadRecep", new object[] { currentTask.parentOrder.Name, currentTask.Container, currentTask.Stock, currentTask.Quantity });
             receptionCamera.setStateQuantity();
-            receptionCamera.setenableActions(true);
+            
             return false;
         }
         else if (!check && currentTask.isFake)
@@ -171,30 +205,57 @@ public class ReceptionLevel : Level
         
     }
 
-   
-
+  
     public override void NextStep()
     {
         switch (state)
         {
             case StateGame.ShowBienVenido:
                 {
+                    receptionCamera.setenableActions(false);
                     setLockPlayer(true);
                     state = StateGame.ShowTutorial1;
                     break;
                 }
 
+            case StateGame.ShowReceptionInformada:
+                {
+                    receptionCamera.setenableActions(false);
+                    setLockPlayer(true);
+                    state = StateGame.ShowTutorial1;
+                }
+                break;
+
             case StateGame.ShowTutorial1:
                 {
                     if (currentTask != null)
                     {
-                        rfcontroller.SetPantallaTxt("Reception", new object[] { currentTask.parentOrder.Name, currentTask.Location });
+                        rfcontroller.SetPantallaTxt("Reception", new object[] { currentTask.parentOrder.Name, currentTask.Location });                        
                     }
                     setLockPlayer(false);
                     infotext.SetActiveInfo(false);
                     state = StateGame.EnterStage;
+                    break;
                 }
-                break;
+            case StateGame.ShowConfirmStockContainerRecep:
+                {                    
+                    state = StateGame.ShowKeyConfirmStockRecep;
+                    break;
+                }
+            case StateGame.ShowKeyConfirmStockRecep:
+                {
+                    receptionCamera.setenableActions(true);
+                    infotext.SetActiveInfo(false);
+                    state = StateGame.EnterItem;
+                    break;
+                }
+            case StateGame.ShowConfirmCantidadRecep:
+                {
+                    receptionCamera.setenableActions(true);
+                    infotext.SetActiveInfo(false);
+                    state = StateGame.EnterQuantity;
+                    break;
+                }
             case StateGame.EnterQuantity:
                 {
                     setLockPlayer(false);
@@ -213,15 +274,15 @@ public class ReceptionLevel : Level
 
     private void NexTask()
     {
-        infotext.SetActiveInfo(false);    
-        if (currentTask.isLast)
+        isFirt = false;
+        infotext.SetActiveInfo(false);
+        if (!GetTask())
         {
-            state = StateGame.ShowFinishLevel;
+            timer.SetTimerOn(false);
+            state = StateGame.FinishLevel;
+            this.setFinishLevel();
         }
-        else
-        {
-            GetTask();
-        }
+        
     }
     private bool GetTask()
     {
@@ -247,12 +308,13 @@ public class ReceptionLevel : Level
             {
                 if (location == currentTask.parentOrder.Dock)
                 {
+                    currentTask.parentOrder.DockRef.gameObject.SetActive(false);
                     SoundManager.SharedInstance.PlaySound(scannerOK);
                     bonificacion += 10;
                     GameManager.Instance.player.Score += 10;
                     state = StateGame.EnterContainer;
                     rfcontroller.SetPantallaTxt("EnterContainerRecep", new object[] { currentTask.parentOrder.Name, currentTask.Container });
-                    receptionCamera.setenableActions(true);
+                
                 }
                 else
                 {
@@ -288,7 +350,16 @@ public class ReceptionLevel : Level
                 if (pallet != null && pallet.ssc == container)
                 {
                     SoundManager.SharedInstance.PlaySound(scannerOK);
-                    state = StateGame.EnterItem;
+                    if (isFirt)
+                    {
+                        receptionCamera.setenableActions(false);
+                        state = StateGame.ShowConfirmStockContainerRecep;
+                    }
+                    else
+                    {
+                        receptionCamera.setenableActions(true);
+                        state = StateGame.EnterItem;
+                    }
                     receptionCamera.setStateItem();
                     rfcontroller.SetPantallaTxt("EnterArticuloRecep", new object[] { currentTask.parentOrder.Name, container, currentTask.Stock});
                     receptionpallet.gameObject.SetActive(true);
@@ -298,7 +369,7 @@ public class ReceptionLevel : Level
                     receptionpallet.stock.SetStock(currentTask.Stock , currentTask.Quantity, container, true, currentTask.isFake);
                     bonificacion += 5;
                     GameManager.Instance.player.Score += 5;
-                    receptionCamera.setenableActions(true);
+                    
                 }
                 else
                 {
@@ -352,6 +423,10 @@ public class ReceptionLevel : Level
         EnterItem,
         EnterQuantity,
         ShowFinishLevel,
+        ShowReceptionInformada,
+        ShowConfirmStockContainerRecep,
+        ShowKeyConfirmStockRecep,
+        ShowConfirmCantidadRecep,
         FinishLevel
     }
 

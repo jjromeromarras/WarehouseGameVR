@@ -37,38 +37,39 @@ public class GameManagerLevels : MonoBehaviour
     [SerializeField] private Button btnpicking;
     private GameState _state;
     private GameState _backstate;
-    
-    
+
+
     private void Awake()
     {
+        
         Cursor.lockState = CursorLockMode.Locked;
         _state = GameState.Traveller;
-        if(warehouse != null)
+        if (warehouse != null)
         {
             warehouse.SetActive(true);
         }
 
-        if(minimap != null)
+        if (minimap != null)
         {
-           minimap.SetActive(GameManager.Instance.showminimap);
+            minimap.SetActive(GameManager.Instance.showminimap);
         }
 
-        if(cross != null)
+        if (cross != null)
         {
             cross.SetActive(true);
         }
-        if(infopicking != null)
+        if (infopicking != null)
         {
             infopicking.SetActive(false);
         }
 
-        if(picking != null)
+        if (picking != null)
         {
-            picking.gameObject.SetActive(false);    
+            picking.gameObject.SetActive(false);
         }
 
         currentGame = GameManager.Instance.minlevel - 1;
-
+             
     }
     void Start()
     {        
@@ -120,8 +121,7 @@ public class GameManagerLevels : MonoBehaviour
 
         if (receptioncamera != null)
         {
-            receptioncamera.onCheckReception += onCheckReception;
-            receptioncamera.onResetReception += onResetReception;
+            receptioncamera.onCheckReception += onCheckReception;        
             receptioncamera.onCheckItem += onCheckItem;
         }
 
@@ -163,7 +163,7 @@ public class GameManagerLevels : MonoBehaviour
             {
                 inforesult.SetActiveInfo(false);
                 levels[currentGame].gameObject.SetActive(false);
-                if (currentGame < 2)
+                if (currentGame < GameManager.Instance.maxlevel)
                 {
                     currentGame++;
                     minimap.SetActive(GameManager.Instance.showminimap);
@@ -176,8 +176,8 @@ public class GameManagerLevels : MonoBehaviour
                 else
                 {
                     GameManager.Instance.WriteLog($"[FinishTask] - Level: {GameManager.Instance.player.Level}");
-                    if (GameManager.Instance.player.Level < 2)
-                        GameManager.Instance.player.Level = 2;
+                    //if (GameManager.Instance.player.Level < 2)
+                    //    GameManager.Instance.player.Level = 2;
                     _state = GameState.FinishLevel;
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("RetoCompletado", 2f, new object[] { }));
@@ -327,7 +327,7 @@ public class GameManagerLevels : MonoBehaviour
     {
         GameManager.Instance.WriteLog($"[onCheckPicking] - cantplatano: {cantplatano} - cantuvas: {cantuvas} " +
             $"- cantpiña: {cantpiña} - cantmelocoton: {cantmelocoton} - cantmanzana: {cantmanzana} - cantfresa: {cantfresa}");
-
+        
         var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);        
         if (result)
         {
@@ -357,6 +357,7 @@ public class GameManagerLevels : MonoBehaviour
     private void onCheckItem(bool value)
     {
         GameManager.Instance.WriteLog($"[onCheckItem] - value: {value}");
+        _state = GameState.Traveller;
         var result = (levels[currentGame] as ReceptionLevel).CheckItem(value);
         if (result)
         {
@@ -375,7 +376,11 @@ public class GameManagerLevels : MonoBehaviour
             minimap.SetActive(GameManager.Instance.showminimap);
             infopicking.SetActive(false);
             SetLockPlayer(false);
-            _state = GameState.Traveller;
+
+        }
+        else
+        {
+            _state = GameState.Reception;
         }
 
 
@@ -384,7 +389,7 @@ public class GameManagerLevels : MonoBehaviour
     {
         GameManager.Instance.WriteLog($"[onCheckReception] - cantplatano: {cantplatano} - cantuvas: {cantuvas} " +
             $"- cantpiña: {cantpiña} - cantmelocoton: {cantmelocoton} - cantmanzana: {cantmanzana} - cantfresa: {cantfresa}");
-
+        _state = GameState.Traveller;
         var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);
         if (result)
         {
@@ -403,10 +408,11 @@ public class GameManagerLevels : MonoBehaviour
             minimap.SetActive(GameManager.Instance.showminimap);
             infopicking.SetActive(false);
             SetLockPlayer(false);
-            _state = GameState.Traveller;
+            
         }
         else
         {
+            _state = GameState.Reception;
             GameManager.Instance.WriteLog($"[onCheckPicking] - Picking Fail");
             SoundManager.SharedInstance.PlaySound(pickingFail);
         }

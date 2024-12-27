@@ -19,32 +19,38 @@ public class infotextbase : MonoBehaviour
 
     public bool writefulltext = false;
     public bool isWriting = false;
+    public bool isFinish = false;
+    public bool executeFinish = true;
 
     // Start is called before the first frame update
     void Start()
     {
         this.WriteInfoText(string.Empty);
         isWriting = false;
+        executeFinish = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button1))
+        if (executeFinish)
         {
-            isWriting = false;
-            if (!writefulltext)
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button1))
             {
-                writefulltext = true;    
+                isWriting = false;
+                if (!writefulltext)
+                {
+                    writefulltext = true;
+                }
             }
-            else
+            else if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.Joystick1Button1))
             {
-                //SetActiveInfo(false);
-                // this.WriteInfoText(string.Empty);
-                if (onFinishInfoText != null)
+                isFinish = true;
+                if (onFinishInfoText != null && executeFinish)
                 {
                     onFinishInfoText();
                 }
+
             }
         }
     }
@@ -64,24 +70,23 @@ public class infotextbase : MonoBehaviour
     
     public void SetContinueMessage()
     {
-        if(GameManager.Instance != null)
+        if(GameManager.Instance != null && executeFinish)
         {
             var tecla = "B";
-            if (!GameManager.Instance.mandoxbox)
-            {                
+                         
                 // Mando Xbox
                 if (LocalizationSettings.Instance.GetSelectedLocale().LocaleName.Contains("es"))
                 {
-                    tecla = "espacio";
+                    tecla = "(B) or espacio";
                 } else if (LocalizationSettings.Instance.GetSelectedLocale().LocaleName.Contains("en"))
                 {
-                    tecla = "space";
+                    tecla = "(B) or space";
                 }
                 else
                 {
-                    tecla = "espace";
+                    tecla = "(B) or espace";
                 }
-            }
+            
 
             if(textcontinuar!= null)
             {
@@ -99,6 +104,9 @@ public class infotextbase : MonoBehaviour
                 }
 
             }
+        } else
+        {
+            textcontinuar.text = string.Empty ; 
         }
     }
 
@@ -107,7 +115,7 @@ public class infotextbase : MonoBehaviour
 
         if (textinfo != null)
         {
-
+            isFinish = false;
             textinfo.text = "";
             writefulltext = false;
             isWriting = true;
@@ -124,6 +132,7 @@ public class infotextbase : MonoBehaviour
             }
             writefulltext = true;
             isWriting = false;
+            isFinish = true;
             SetContinueMessage();
             yield return new WaitForSeconds(timeToWaitAfecterText);
 

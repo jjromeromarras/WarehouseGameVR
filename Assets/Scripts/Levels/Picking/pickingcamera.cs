@@ -46,7 +46,7 @@ public class pickingcamera : MonoBehaviour
     private float time;
     private float resetTime = 0.2f;
     public int selectclient = 1;
-
+    private bool enableActions;
 
     // Update is called once per frame
     private void Start()
@@ -54,6 +54,7 @@ public class pickingcamera : MonoBehaviour
         camara = Camera.main; // Obtener la cámara principal
         time = resetTime;
         ResetScene();
+        enableActions = true;
     }
 
     void Update()
@@ -183,136 +184,138 @@ public class pickingcamera : MonoBehaviour
                 cajaSeleccionada = null;
             }
         }
-
-        if (Input.GetKey(KeyCode.Joystick1Button4))
+        if (enableActions)
         {
-            if (selectclient < 3) selectclient += 1;
-        }
-        if (Input.GetKey(KeyCode.Joystick1Button5))
-        {
-            if (selectclient != 1) selectclient -= 1;
-        }
-        // Teclado
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            selectclient = 1;
-        }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            selectclient = 2;
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            selectclient = 3;
-        }
-
-        // Tecla confirmar
-        if (Input.GetKeyDown(KeyCode.C) || Input.GetKey(KeyCode.Joystick1Button2))
-        {
-            if (CheckClientContainerQuantity())
+            if (Input.GetKey(KeyCode.Joystick1Button4))
             {
-                this.onErrorPicking();
+                if (selectclient < 3) selectclient += 1;
             }
-            else
+            if (Input.GetKey(KeyCode.Joystick1Button5))
             {
-                this.onCheckPicking(pickings[pedidopreparando - 1].cantidadplatano, pickings[pedidopreparando - 1].cantidaduvas, pickings[pedidopreparando - 1].cantidadpiñas,
-                    pickings[pedidopreparando - 1].cantidadperas, pickings[pedidopreparando - 1].cantidadmelocoton, pickings[pedidopreparando - 1].cantidadmanzanas, pickings[pedidopreparando - 1].cantidadfresas);
+                if (selectclient != 1) selectclient -= 1;
             }
-        }
-        else if (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.Joystick1Button3))
-        {
-            this.onResetPicking();
-        }
-
-        if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Joystick1Button0))
-        {
-
-
-            time -= Time.deltaTime;
-            if (time < 0f)
+            // Teclado
+            if (Input.GetKeyDown(KeyCode.F1))
             {
-                if (selectclient > 0)
+                selectclient = 1;
+            }
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                selectclient = 2;
+            }
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                selectclient = 3;
+            }
+
+            // Tecla confirmar
+            if (Input.GetKeyDown(KeyCode.C) || Input.GetKey(KeyCode.Joystick1Button2))
+            {
+                if (CheckClientContainerQuantity())
                 {
-                    if (cajaSeleccionada != null)
-                    {
-                        string sscc = string.Empty;
-                        try
-                        {
-                            sscc = cajaSeleccionada.parent.parent.GetComponentsInChildren<TextMeshPro>()[0].text;
-                        }
-                        catch
-                        {
-                            sscc = string.Empty;
-                        }
-
-                        if (onCheckContainerPicking.Invoke(sscc))
-                        {
-
-                            SoundManager.SharedInstance.PlaySound(clipPicking);
-                            cajaSeleccionada.gameObject.SetActive(false);
-                            cajaSeleccionada = null;
-                            switch (boxType)
-                            {
-                                case boxType.piña:
-                                    {
-
-                                        pickings[selectclient - 1].cantidadpiñas += 1;
-                                        txtpiñas.text = pickings[selectclient - 1].cantidadpiñas.ToString();
-                                        break;
-                                    }
-                                case boxType.melocoton:
-                                    {
-                                        pickings[selectclient - 1].cantidadmelocoton += 1;
-                                        txtmelocoton.text = pickings[selectclient - 1].cantidadmelocoton.ToString();
-                                        break;
-                                    }
-                                case boxType.platano:
-                                    {
-                                        pickings[selectclient - 1].cantidadplatano += 1;
-                                        txtplatano.text = pickings[selectclient - 1].cantidadplatano.ToString();
-                                        break;
-                                    }
-                                case boxType.fresa:
-                                    {
-                                        pickings[selectclient - 1].cantidadfresas += 1;
-                                        txtfresas.text = pickings[selectclient - 1].cantidadfresas.ToString();
-                                        break;
-                                    }
-                                case boxType.peras:
-                                    {
-                                        pickings[selectclient - 1].cantidadperas += 1;
-                                        txtperas.text = pickings[selectclient - 1].cantidadperas.ToString();
-                                        break;
-                                    }
-                                case boxType.manzanas:
-                                    {
-                                        pickings[selectclient - 1].cantidadmanzanas += 1;
-
-                                        break;
-                                    }
-                                case boxType.uvas:
-                                    {
-                                        pickings[selectclient - 1].cantidaduvas += 1;
-
-                                        break;
-                                    }
-                            }
-                        }
-                    }
-
+                    this.onErrorPicking();
                 }
                 else
                 {
-                    onErrorContainerClient();
+                    this.onCheckPicking(pickings[pedidopreparando - 1].cantidadplatano, pickings[pedidopreparando - 1].cantidaduvas, pickings[pedidopreparando - 1].cantidadpiñas,
+                        pickings[pedidopreparando - 1].cantidadperas, pickings[pedidopreparando - 1].cantidadmelocoton, pickings[pedidopreparando - 1].cantidadmanzanas, pickings[pedidopreparando - 1].cantidadfresas);
                 }
-
-                time = resetTime;
+            }
+            else if (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.Joystick1Button3))
+            {
+                this.onResetPicking();
             }
 
-        }
-        else
-        {
-            time = resetTime;
+            if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Joystick1Button0))
+            {
+
+
+                time -= Time.deltaTime;
+                if (time < 0f)
+                {
+                    if (selectclient > 0)
+                    {
+                        if (cajaSeleccionada != null)
+                        {
+                            string sscc = string.Empty;
+                            try
+                            {
+                                sscc = cajaSeleccionada.parent.parent.GetComponentsInChildren<TextMeshPro>()[0].text;
+                            }
+                            catch
+                            {
+                                sscc = string.Empty;
+                            }
+
+                            if (onCheckContainerPicking.Invoke(sscc))
+                            {
+
+                                SoundManager.SharedInstance.PlaySound(clipPicking);
+                                cajaSeleccionada.gameObject.SetActive(false);
+                                cajaSeleccionada = null;
+                                switch (boxType)
+                                {
+                                    case boxType.piña:
+                                        {
+
+                                            pickings[selectclient - 1].cantidadpiñas += 1;
+                                            txtpiñas.text = pickings[selectclient - 1].cantidadpiñas.ToString();
+                                            break;
+                                        }
+                                    case boxType.melocoton:
+                                        {
+                                            pickings[selectclient - 1].cantidadmelocoton += 1;
+                                            txtmelocoton.text = pickings[selectclient - 1].cantidadmelocoton.ToString();
+                                            break;
+                                        }
+                                    case boxType.platano:
+                                        {
+                                            pickings[selectclient - 1].cantidadplatano += 1;
+                                            txtplatano.text = pickings[selectclient - 1].cantidadplatano.ToString();
+                                            break;
+                                        }
+                                    case boxType.fresa:
+                                        {
+                                            pickings[selectclient - 1].cantidadfresas += 1;
+                                            txtfresas.text = pickings[selectclient - 1].cantidadfresas.ToString();
+                                            break;
+                                        }
+                                    case boxType.peras:
+                                        {
+                                            pickings[selectclient - 1].cantidadperas += 1;
+                                            txtperas.text = pickings[selectclient - 1].cantidadperas.ToString();
+                                            break;
+                                        }
+                                    case boxType.manzanas:
+                                        {
+                                            pickings[selectclient - 1].cantidadmanzanas += 1;
+
+                                            break;
+                                        }
+                                    case boxType.uvas:
+                                        {
+                                            pickings[selectclient - 1].cantidaduvas += 1;
+
+                                            break;
+                                        }
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        onErrorContainerClient();
+                    }
+
+                    time = resetTime;
+                }
+
+            }
+            else
+            {
+                time = resetTime;
+            }
         }
         imgclient1.color = Color.black;
         imgclient2.color = Color.black;
@@ -327,6 +330,7 @@ public class pickingcamera : MonoBehaviour
             case 3:
                 imgclient3.color = Color.blue; break;
         }
+
         ShowPickings();
     }
     private bool CheckClientContainerQuantity()
