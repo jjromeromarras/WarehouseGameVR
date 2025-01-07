@@ -874,7 +874,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &155433909
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9212,8 +9212,10 @@ MonoBehaviour:
   mandoxbox: 0
   minlevel: 0
   maxlevel: 0
+  enableIA: 1
   wait4IAResponse: 0
   IAResponse: 
+  IAmodel: Nous Hermes 2 Mistral DPO
   localize: 0
 --- !u!4 &1489883357
 Transform:

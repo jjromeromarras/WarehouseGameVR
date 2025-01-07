@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 
 public class ReceptionLevel : Level
@@ -56,42 +54,42 @@ public class ReceptionLevel : Level
         {
             case StateGame.ShowBienVenido:
                 {
-                    showTexto("PrimerBienvenida");
+                    showTextoKey("PrimerBienvenida");
                     break;
                 }
             case StateGame.ShowTutorial1:
                 {
-                    showTexto("Tutorial1Recep");
+                    showTextoKey("Tutorial1Recep");
                     break;
                 }
             case StateGame.ShowTutorialInvenCont:
                 {
-                    showTexto("TutorialInveCont");
+                    showTextoKey("TutorialInveCont");
                     break;
                 }
             case StateGame.ShowPrimerIventario:
                 {
-                    showTexto("PrimerInventario");
+                    showTextoKey("PrimerInventario");
                     break;
                 }
             case StateGame.ShowReceptionInformada:
                 {
-                    showTexto("showrecepcioninformada");
+                    showTextoKey("showrecepcioninformada");
                     break;
                 }
             case StateGame.ShowConfirmStockContainerRecep:
                 {
-                    showTexto("showconfirmstockcontainerrecp");
+                    showTextoKey("showconfirmstockcontainerrecp");
                     break;
                 }
             case StateGame.ShowKeyConfirmStockRecep:
                 {
-                    showTexto("showkeyconfirmstockrecep");
+                    showTextoKey("showkeyconfirmstockrecep");
                     break;
                 }
             case StateGame.ShowConfirmCantidadRecep:
                 {
-                    showTexto("showconfirmcantidadrecep");
+                    showTextoKey("showconfirmcantidadrecep");
                     break;
                 }
             case StateGame.ShowFinishLevel:

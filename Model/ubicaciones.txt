@@ -1,0 +1,53 @@
+### **Gestión de Ubicación en Easy WMS**  
+
+En Easy WMS, la gestión de ubicación permite optimizar el proceso de almacenaje de stock y contenedores, aplicando estrategias predefinidas o dejando ciertas decisiones a los operarios según las necesidades del almacén.  
+
+---
+
+### **Estrategias de Ubicación y Llenado de Canales**  
+1. **Estrategias de Ubicación**  
+   - Se aplican a todo tipo de ubicaciones.  
+   - Permiten definir criterios para seleccionar la ubicación más óptima para cada contenedor o stock.  
+   - Varias estrategias pueden coexistir, ordenadas por un número de secuencia:  
+     - Si una estrategia no cumple los criterios, el sistema intenta con la siguiente.  
+
+2. **Estrategias de Llenado de Canales**  
+   - Exclusivas para ubicaciones con varias profundidades, como APS, compactas, *pushback*, y dinámicas.  
+   - Easy WMS controla la profundidad a la que se encuentra cada contenedor.  
+
+---
+
+### **Ubicación en Almacén Manual**  
+- Diseñada para operarios que realizan el proceso de ubicación bajo demanda.  
+- Opciones disponibles:  
+  1. **Stock Suelto**: Ubicar directamente en el equipamiento.  
+  2. **Stock en Contenedor**: Ubicar el contenido del contenedor cargado en el equipamiento.  
+  3. **Contenedor Completo**: Ubicar el contenedor tal como está en el equipamiento.  
+
+---
+
+### **Ubicación de Contenedores**  
+#### **1. Ubicación Guiada de un Contenedor**  
+- Proceso automatizado para almacenes que recepcionan:  
+  - Contenedores *monorreferencia* o *multirreferencia*.  
+  - Contenedores cliente conformados tras un proceso de picking.  
+- El sistema selecciona la ubicación óptima basándose en:  
+  - Estrategias configuradas.  
+  - Restricciones físicas (tipo, altura, peso).  
+
+#### **2. Ubicación Manual de un Contenedor**  
+- El operario puede seleccionar la ubicación cuando:  
+  - No se propone ninguna ubicación.  
+  - Desea cambiar la ubicación propuesta.  
+- Validaciones realizadas por el sistema:  
+  - Restricciones de mezcla (artículo, tipo, atributos logísticos).  
+  - Peso máximo permitido para la ubicación.  
+  - Compatibilidad del tipo de contenedor con la ubicación.  
+
+---
+
+### **Ventajas de Easy WMS en la Gestión de Ubicaciones**  
+- Automatiza la selección de ubicaciones, reduciendo errores.  
+- Permite flexibilidad con opciones manuales y guiadas.  
+- Optimiza el espacio del almacén mediante estrategias configurables.  
+- Asegura que las restricciones físicas y logísticas se cumplan en cada ubicación.

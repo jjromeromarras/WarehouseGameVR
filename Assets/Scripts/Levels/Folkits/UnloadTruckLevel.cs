@@ -69,32 +69,32 @@ public class UnloadTruckLevel : Level
         {
             case StateGame.ShowBienVenido:
                 {
-                    showTexto("BienvenidaForklift");
+                    showTextoKey("BienvenidaForklift");
                     break;
                 }
             case StateGame.ShowTutorial1:
                 {
-                    showTexto("Tutorial1UnloadTruck");
+                    showTextoKey("Tutorial1UnloadTruck");
                     break;
                 }
             case StateGame.ShowTutorial2:
                 {
-                    showTexto("Tutorial2UnloadTruck");
+                    showTextoKey("Tutorial2UnloadTruck");
                     break;
                 }
             case StateGame.ShowFinishTutorial:
                 {
-                    showTexto("FinishTutorialUnloadTruck");
+                    showTextoKey("FinishTutorialUnloadTruck");
                     break;
                 }
             case StateGame.ShowFirstContainer:
                 {
-                    showTexto("FirstContainerUnload");
+                    showTextoKey("FirstContainerUnload");
                     break;
                 }
             case StateGame.ShowErrorUnloadContainer:
                 {
-                    showTexto("ErrorContainerUnload");
+                    showTextoKey("ErrorContainerUnload");
                     break;
                 }
         }

@@ -1,0 +1,32 @@
+**Easy WMS: Modelado del Almacén y sus Elementos**  
+
+Easy WMS organiza el layout de una instalación a partir de varios elementos clave:  
+
+### 1. **Organización y Almacén (Site)**  
+- Representa un recinto cerrado que puede incluir otros recintos conectados.  
+- Comparte información común (artículos, clientes, proveedores, etc.) y permite movimientos de stock entre ellos.  
+- Una organización puede tener múltiples almacenes si estos están físicamente separados.  
+
+### 2. **Zonas**  
+- **Zonas de Almacenamiento**: Agrupan ubicaciones para aplicar reglas específicas, generalmente basadas en la rotación de artículos.  
+- **Zonas de Trabajo**: Agrupan ubicaciones según el tipo de equipamiento usado y las tareas asignadas (e.g., carretillas preparadoras o elevadoras).  
+
+### 3. **Ubicaciones**  
+- **Virtuales**: Automáticas, con capacidad infinita y exclusivas para contenedores. Ejemplos:  
+  - *ASN*: Preavisos de descarga.  
+  - *Lost&Found*: Contenedores perdidos temporalmente.  
+  - *Mov*: Contenedores en tránsito automático.  
+- **Físicas**: Configuradas manualmente considerando capacidad y lógica de ubicación/extracción. Incluyen racks convencionales y almacenamiento manual.  
+
+### 4. **Equipamientos**  
+- **Manuales**: Operados con terminales RF, como transpaletas y carretillas.  
+- **Automáticos**: Sistemas automatizados, como transelevadores.  
+
+### 5. **Pasillos**  
+- **Manuales**: Circulación de operarios.  
+- **Automáticos**: Usados por transelevadores y configurados con EasyS.  
+
+### 6. **Estaciones**  
+Definen puntos de inicio/fin de movimiento en el almacén. Es crucial optimizar su número para garantizar un flujo eficiente y evitar retrasos.  
+
+Este modelo permite a Easy WMS configurar y gestionar eficientemente el almacén, adaptando reglas y estrategias según las necesidades operativas.

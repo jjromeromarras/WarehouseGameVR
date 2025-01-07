@@ -1,0 +1,30 @@
+**Tipos de Recepciones en Easy WMS**  
+
+Easy WMS ofrece diferentes modalidades de recepción para gestionar la entrada de stock en el almacén:  
+
+### A) **Recepciones en Muelle**  
+- Recibe stock de proveedores, devoluciones o traspasos entre almacenes.  
+- Los operarios registran el stock y los contenedores mediante terminales de radiofrecuencia.  
+
+### B) **Recepción de Proveedor**  
+- Admite mezcla de artículos de diferentes propietarios y tipos (siempre que sean compatibles).  
+- Se recepcionan contenedores o stock suelto en el suelo (*pulmón*) o directamente en equipamiento.  
+- Permite registrar atributos logísticos y el estado del stock.  
+- Configurable desde el terminal para crear o cerrar recepciones.  
+- Admite contenedores etiquetados o sin etiqueta.  
+
+### C) **Recepción Ciega**  
+- Diseñada para stock no esperado.  
+- Se recepciona en el suelo (*pulmón*) o en equipamiento para ubicación directa.  
+- Captura atributos logísticos y el estado del stock.  
+- Admite contenedores con o sin etiqueta.  
+- El alta del stock se comunica al ERP mediante un mensaje REF.  
+
+### D) **Devoluciones**  
+- Gestiona el stock devuelto por clientes.  
+- Se puede recibir como suelto o en contenedores (etiquetados o no).  
+- Permite registrar atributos logísticos y el estado del stock.  
+- No valida fechas de caducidad para evitar rechazos durante el traslado.  
+- El tratamiento del stock devuelto dependerá de la gestión interna del almacén.  
+
+Estas opciones permiten a Easy WMS adaptar la recepción a diferentes escenarios logísticos, garantizando flexibilidad y eficiencia en la gestión del inventario entrante.

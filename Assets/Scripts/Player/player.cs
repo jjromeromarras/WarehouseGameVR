@@ -3,6 +3,7 @@ using System.Collections.Generic;
 public class Player
 {
     public long Score { get; set; }
+    public bool Survery { get; set; }
     public Dictionary<int, datalevels> Data { get; set; }
     public int Level { get; set; }
     public PlayerClassification playerClassification { get; set; }
@@ -15,6 +16,7 @@ public class Player
         Data[2] = new datalevels();
         Data[3] = new datalevels();
         Data[4] = new datalevels();
+        Survery = false;
     }
 
 }

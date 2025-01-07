@@ -116,7 +116,7 @@ public class infotextbase : MonoBehaviour
         if (textinfo != null)
         {
             isFinish = false;
-            textinfo.text = "";
+            textinfo.text = " ";
             writefulltext = false;
             isWriting = true;
             foreach (var item in msg)

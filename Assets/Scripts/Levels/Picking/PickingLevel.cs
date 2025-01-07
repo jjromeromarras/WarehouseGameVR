@@ -1,4 +1,5 @@
 using Assets.Scripts.Helper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ public class PickingLevel : Level
     [SerializeField] private GameObject warehousemanual;
     [SerializeField] private pallet[] clientsPallets;   
     [SerializeField] private bool variospedidos;
-   
+    public IARetosPicking retoia;
 
     private Task currentTask; 
     private Queue<Task> tasks;
@@ -30,43 +31,60 @@ public class PickingLevel : Level
         {
             rfcontroller.SetTitle("TareasAutomaticas");
         }
-        switch (numberlevel)
+
+        if (!GameManager.Instance.UsedIA || numberlevel == 1)
         {
-            case 1:
-                game = new GamePicking(warehousemanual, 1 , 1 , OrderType.Picking, "Tutorial Picking");
-                state = StateGame.ShowBienVenido;
-                if (timer != null)
-                {
-                    timer.SetTimeLeft(300f);
-                }
-                break;
-            case 2:
-                game = new GamePicking(warehousemanual, 1, 10, OrderType.Picking, "Preparar un pedido");
-                showhelp = true;
-                state = StateGame.ShowTutorial2;
-                if (timer != null)
-                {
-                    timer.SetTimeLeft(900f);
-                }
-                break;
-            case 3:
-                game = new GamePicking(warehousemanual, 3, 8, OrderType.Picking, "Multi pedidos");
-                showhelp = true;
-                state = StateGame.ShowTutorial3;
-                if (timer != null)
-                {
-                    timer.SetTimeLeft(1800f);
-                }
-                break;
-        }
-        GameManager.Instance.WriteLog($"Iniciar game: {game.Name}");
-        tasks = new Queue<Task>();
-        (game as GamePicking).AllTask.ForEach(task => tasks.Enqueue(task));
-        currentTask = tasks.Dequeue();
-        if (txtNivel != null)
+            // El nivel 1 siempre es tutorial del juego
+            switch (numberlevel)
+            {
+                case 1:
+                    game = new GamePicking(warehousemanual, 1, 1, OrderType.Picking, "Tutorial Picking");
+                    state = StateGame.ShowBienVenido;
+                    if (timer != null)
+                    {
+                        timer.SetTimeLeft(300f);
+                    }
+                    break;
+                case 2:
+                    game = new GamePicking(warehousemanual, 1, 10, OrderType.Picking, "Preparar un pedido");
+                    showhelp = true;
+                    state = StateGame.ShowTutorial2;
+                    if (timer != null)
+                    {
+                        timer.SetTimeLeft(900f);
+                    }
+                    break;
+                case 3:
+                    game = new GamePicking(warehousemanual, 3, 8, OrderType.Picking, "Multi pedidos");
+                    showhelp = true;
+                    state = StateGame.ShowTutorial3;
+                    if (timer != null)
+                    {
+                        timer.SetTimeLeft(1800f);
+                    }
+                    break;
+            }
+            GameManager.Instance.WriteLog($"Iniciar game: {game.Name}");
+            tasks = new Queue<Task>();
+            (game as GamePicking).AllTask.ForEach(task => tasks.Enqueue(task));
+            currentTask = tasks.Dequeue();
+            if (txtNivel != null)
+            {
+                txtNivel.SetPantallaTxt("level1", new object[] { });
+            }
+        } 
+        else
         {
-            txtNivel.SetPantallaTxt("level1", new object[] { });
+            // En este punto estamos trabajando la IA no estamos en el tutorial
+            // Le pedimos a la IA que nos de el siguiente reto a realizar
+            string prompt = $"El jugador se dispone a realizar los retos de preparación de pedidos. Su nivel general es {GameManager.Instance.player.playerClassification.GetLevel4Category("General")}." +
+                $"Y el nivel en la categoria de Preparación de Pedidos es {GameManager.Instance.player.playerClassification.GetLevel4Category("PreparacionPedidos")}." +
+                $"Sabiendo cual es su nivel necesito que me indiques cual seria el siguiente a realizar para alcanzar el siguiente nivel." +
+                $"La estructura de la respuesta es\r\n{{\r\n  \"Ordenes\": valor,     //Indica el Número de órdenes a realizar. Valor entre 1 a 3.   \t \r\n  \"Tareas\": valor,        //indica el Número de tareas. Valor puede ser entre 1 y 20. \t\r\n  \"Multireferencia\": valor, \t//es true (sí) o false (no), según incluyan contenedores multireferencia. Si es True mas dificil es el reto, solo adapto para el nivel experto.\r\n  \"Nivel\": valor, \t//es el Nivel de dificultad. Puede ser Principiante, Medio, Avanzado, Experto según dificultad del reto.\t\t\r\n  \"Tiempo\": valor, \t//es el Tiempo en minutos que debería el jugador de completar el reto en función del nivel, ordenes y número de tareas. Tiempo máximo para un reto de nivel experto 30 minutos.\r\n  \"Fallos\": valor, \t// es un entero que indica el Número máximo de fallos permitidos. Cuando mas fallos menor dificultad.\r\n  \"Explicacion\": valor // Cadena de texto con la explicación para mostrarsela al jugador del reto a realizar.\r\n}}\r\nA mayor número de ordenes, tareas multireferencias y menor fallos mayor nivel de dificultad. \r\nNecesito un reto para el siguiente nivel que el jugador necesite para llegar alcanzar el nivel experto (el cual seria el ultimo reto),\r\nRespondeme solamente con la estructura indicada para el primer reto.";
+            GameManager.Instance.SendIAMsg(prompt);
+            state = StateGame.WaitingIAReto;
         }
+        
     }
 
     public void Update()
@@ -75,61 +93,61 @@ public class PickingLevel : Level
         {
             case StateGame.ShowBienVenido:
                 {
-                    showTexto("PrimerBienvenida");
+                    showTextoKey("PrimerBienvenida");
                     break;
                 }
             case StateGame.ShowTutorial1:
                 {
-                    showTexto("Reto1Tutorial1");
+                    showTextoKey("Reto1Tutorial1");
                     break;
                 }
             case StateGame.ShowTutorial2:
                 {
-                    showTexto("Reto1Level2");
+                    showTextoKey("Reto1Level2");
                     break;
                 }
             case StateGame.ShowTutorial3:
                 {
-                    showTexto("Reto2Level3");
+                    showTextoKey("Reto2Level3");
                     break;
                 }
             case StateGame.ShowClientContainer:
                 {
-                    showTexto("ContainerCliente");
+                    showTextoKey("ContainerCliente");
                 }
                 break;
             case StateGame.ShowIntroducirContainerCliente:
                 {
                     setLockPlayer(true);
-                    showTexto("IntroducirContainerCliente");
+                    showTextoKey("IntroducirContainerCliente");
                 }
                 break;
             case StateGame.ShowScannerContainer:
                 {
                     setLockPlayer(true);
-                    showTexto("ScannerContainer");
+                    showTextoKey("ScannerContainer");
                 }
                 break;
             case StateGame.ShowLocationPicking:
                 {
                     setLockPlayer(true);
-                    showTexto("IntroducirUbicacion");
+                    showTextoKey("IntroducirUbicacion");
                     break;
                 }
             case StateGame.ShowContainerPicking:
                 {
                     setLockPlayer(true);
-                    showTexto("IntroducirContenedor");
+                    showTextoKey("IntroducirContenedor");
                     break;
                 }
             case StateGame.ShowIntroducirArticulo:
                 {                    
-                    showTexto("IntroducirArticulo");
+                    showTextoKey("IntroducirArticulo");
                     break;
                 }           
             case StateGame.ShowDockConfirmation:
                 {
-                    showTexto("confirmdock");
+                    showTextoKey("confirmdock");
                     break;
                 }
             case StateGame.ShowFinishLevel:
@@ -138,6 +156,37 @@ public class PickingLevel : Level
                     infotext.SetActiveInfo(true);
                     waitreading = true;
                     StartCoroutine(infotext.SetMessageKey("nivelcompletado", 2f));                    
+                    break;
+                }
+            case StateGame.ShowMsgIA:
+                {
+                    showMsg(retoia.Explicacion);
+                    break;
+                }
+            case StateGame.WaitingIAReto:
+                {
+                    if (!GameManager.Instance.wait4IAResponse)
+                    {
+                        retoia = JsonConvert.DeserializeObject<IARetosPicking>(GameManager.Instance.IAResponse);
+                        if (retoia != null)
+                        {
+                            game = new GamePicking(warehousemanual, retoia.Ordenes, retoia.Tareas, OrderType.Picking, $"Reto IA:{retoia.Nivel}");
+                            if (timer != null)
+                            {
+                                timer.SetTimeLeft(retoia.Tiempo * 60);
+                            }
+                            showhelp = false;
+                            GameManager.Instance.WriteLog($"Iniciar game: {game.Name}");
+                            tasks = new Queue<Task>();
+                            (game as GamePicking).AllTask.ForEach(task => tasks.Enqueue(task));
+                            currentTask = tasks.Dequeue();
+                            if (txtNivel != null)
+                            {
+                                txtNivel.SetPantallaTxt("level1", new object[] { });
+                            }
+                            state = StateGame.ShowMsgIA;
+                        }
+                    }
                     break;
                 }
 
@@ -487,7 +536,8 @@ public class PickingLevel : Level
             case StateGame.ShowTutorial1:
             case StateGame.ShowTutorial2:
             case StateGame.ShowTutorial3:
-                {
+            case StateGame.ShowMsgIA:
+            {
                     if (state != StateGame.ShowTutorial1)
                     {
                         showhelp = false;
@@ -642,8 +692,13 @@ public class PickingLevel : Level
         ScannerDock,
         WaitingReading,
         ShowFinishLevel,
-        FinishLevel
+        FinishLevel,
+        WaitingIAReto,
+        ShowMsgIA,
+            
     }
+
+
 }
 
  

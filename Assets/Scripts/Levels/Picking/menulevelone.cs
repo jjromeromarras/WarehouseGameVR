@@ -53,7 +53,7 @@ public class menulevelone : MonoBehaviour
     public void ChangeAyuda(bool value)
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
-        GameManager.Instance.showayuda = value;
+        GameManager.Instance.UsedIA = value;
 
     }
 

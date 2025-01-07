@@ -48,7 +48,10 @@ public class PlayerClassification
         // Clasificar el nivel general
         overallLevel = GetOverallLevel(totalPoints);
     }
-    
+    public LevelCategory GetLevel4Category(string categoryName)
+    {
+        return playerResponses[categoryName].level;
+    }
     public void setCategoriaPregunta1(string categoryName, int value)
     {
         playerResponses[categoryName].pregunta1 = value;
@@ -84,4 +87,5 @@ public class PlayerClassification
         Avanzado,
         Experto
     }
+    
 }

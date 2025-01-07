@@ -26,7 +26,7 @@ public class Level : MonoBehaviour
     {
         bonificacion = 0;
         penalizacion = 0;
-        showhelp = tutorial ? GameManager.Instance.showayuda : false;
+        showhelp = tutorial ? GameManager.Instance.UsedIA : false;
 
         waitreading = false;
         showerror = false;
@@ -91,7 +91,7 @@ public class Level : MonoBehaviour
         timer.SetTimerOn(!value);
     }
 
-    public void showTexto(string key)
+    public void showTextoKey(string key)
     {
         if (!waitreading)
         {
@@ -106,6 +106,17 @@ public class Level : MonoBehaviour
             {
                 NextStep();
             }
+        }
+    }
+
+    public void showMsg(string msg)
+    {
+        if (!waitreading)
+        {
+            timer.SetTimerOn(false);
+            infotext.SetActiveInfo(true);
+            waitreading = true;
+            StartCoroutine(infotext.SetMessageText(msg, 2f));
         }
     }
 

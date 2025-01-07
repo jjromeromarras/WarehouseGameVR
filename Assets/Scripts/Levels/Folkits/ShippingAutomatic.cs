@@ -1,8 +1,5 @@
-using Codice.Client.BaseCommands.Merge;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -147,17 +144,17 @@ public class ShippingAutomatic : Level
         {
             case StateGame.ShowBienVenido:
                 {
-                    showTexto("BienvenidaAutomaticTruck");
+                    showTextoKey("BienvenidaAutomaticTruck");
                     break;
                 }
             case StateGame.ObjetivoAutomatic:
                 {
-                    showTexto("ObjetivoAutomaticTruck");
+                    showTextoKey("ObjetivoAutomaticTruck");
                     break;
                 }
             case StateGame.ShowErrorUnloadContainer:
                 {
-                    showTexto("ErrorContainerUnload");
+                    showTextoKey("ErrorContainerUnload");
                     break;
                 }
         }

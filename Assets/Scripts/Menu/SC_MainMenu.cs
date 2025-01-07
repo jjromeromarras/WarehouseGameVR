@@ -31,8 +31,6 @@ public class SC_MainMenu : MonoBehaviour
     private UnityEngine.AsyncOperation asyncLoad;
     public bool waitreading;
     private StateGame state;
-    private float time;
-    private float resetTime = 0.2f;
     private bool enableactions = false;
 
     #region Public Methods
@@ -40,9 +38,16 @@ public class SC_MainMenu : MonoBehaviour
     private void Start()
     {
         //SoundManager.SharedInstance.PlayMusic(menuMusic);
-
-        selected[0].SetActive(true);
-        state = StateGame.ShowInicio;
+        //selected[0].SetActive(true);
+        if (GameManager.Instance != null && !GameManager.Instance.player.Survery)
+        {
+            state = StateGame.ShowOptions;
+            Options();
+        } else
+        {
+            infotext.gameObject.SetActive(false);
+            state = StateGame.ShowMenu;
+        }
         if (infotext != null)
         {
             infotext.onFinishInfoText += FinishInfoText;
@@ -58,111 +63,138 @@ public class SC_MainMenu : MonoBehaviour
     }
     public void NextStep()
     {
-        if (!changelanguage)
-        {
-            switch (state)
-            {
-                case StateGame.ShowBienVenido:
-                    {
-                        showTextoKey("showencuesta");
-                        state = StateGame.ShowEncuesta;
-                        enableactions = false;
-                        break;
-                    }
-                case StateGame.ShowEncuesta:
-                    {
-                        showTextoKey("encuestageneral1");
-                        state = StateGame.ShowEncuestageneral1;
-                        infotext.executeFinish = false;
-                        enableactions = true;
-                        break;
-                    }
-                case StateGame.ShowEncuestageneral1:
-                    {
-                        showTextoKey("encuestageneral2");
-                        enableactions = true;
-                        state = StateGame.ShowEncuestageneral2;
-                        break;
-                    }
-                case StateGame.ShowEncuestageneral2:
-                    {
-                        showTextoKey("encuestarecep1");
-                        enableactions = true;
-                        state = StateGame.ShowEncuestaRecep1;
-                        break;
-                    }
-                case StateGame.ShowEncuestaRecep1:
-                    {
-                        showTextoKey("encuestarecep2");
-                        enableactions = true;
-                        state = StateGame.ShowEncuestaRecep2;
-                        break;
-                    }
-                case StateGame.ShowEncuestaRecep2:
-                    {
-                        showTextoKey("encuestapicking1");
-                        enableactions = true;
-                        state = StateGame.ShowEncuestaPicking1;
-                        break;
-                    }
-                case StateGame.ShowEncuestaPicking1:
-                    {
-                        showTextoKey("encuestapicking2");
-                        state = StateGame.ShowEncuestaPicking2;
-                        enableactions = true;
-                        break;
-                    }
-                case StateGame.ShowEncuestaPicking2:
-                    {
-                        showTextoKey("encuestaubicacion1");
-                        state = StateGame.ShowEncuestaUbicacion1;
-                        enableactions = true;
-                        break;
-                    }
-                case StateGame.ShowEncuestaUbicacion1:
-                    {
-                        showTextoKey("encuestaubicacion2");
-                        state = StateGame.ShowEncuestaUbicacion2;
-                        enableactions = true;
-                        break;
-                    }
-                case StateGame.ShowEncuestaUbicacion2:
-                    {
-                        showTextoKey("encuestacarretilla1");
-                        state = StateGame.ShowEncuestaCarretilla1;
-                        enableactions = true;
-                        break;
-                    }
-                case StateGame.ShowEncuestaCarretilla1:
-                    {
-                        showTextoKey("encuestacarretilla2");
-                        state = StateGame.ShowEncuestaCarretilla2;
-                        enableactions = true;
-                        break;
-                    }
-                case StateGame.ShowEncuestaCarretilla2:
-                    {
 
-                        GameManager.Instance.player.playerClassification.ClassifyPlayer();
-                        string prompt = $"A continuación te indico los resultados de las preguntas realizada al jugador y el nivel para cada categoría:";
-                        foreach (var categoria in GameManager.Instance.player.playerClassification.playerResponses)
-                        {
-                            prompt += $"{categoria.Key}={categoria.Value.level.ToString()},";
-                        }
-                        prompt += $"el nivel global del jugador {GameManager.Instance.player.playerClassification.overallLevel}. Con estos datos necesitos que recomiendes al jugador que categorías debería enfocarse primero." +
-                            $"La repuesta debe ser una frase de máximo 3 líneas. Escribe la respuesta como le estuvieras hablando al jugador. Si su nivel global bajo lo ideal sería recomendarle que siga el entrenamiento general. Y necesito que este en el idioma:{GameManager.Instance.GetLanguage()} ";
-                        GameManager.Instance.SendIAMsg(prompt);
-                        showTextoKey("finalencuesta");
-                        state = StateGame.ShowFinalEncuesta;
-                        enableactions = true;
-                        break;
+        switch (state)
+        {
+            case StateGame.ShowBienVenido:
+                {
+                    showTextoKey("showencuesta");
+                    state = StateGame.ShowEncuesta;
+                    enableactions = false;
+                    break;
+                }
+            case StateGame.ShowEncuesta:
+                {
+                    infotext.textcontinuar.gameObject.SetActive(false);
+                    showTextoKey("encuestageneral1");
+                    state = StateGame.ShowEncuestageneral1;
+                    infotext.executeFinish = false;
+                    enableactions = true;
+                    if (GameManager.Instance.UsedIA)
+                    {
+                        GameManager.Instance.InitialIA();
                     }
-                case StateGame.ShowRecomendacion:
+                    break;
+                }
+            case StateGame.ShowEncuestageneral1:
+                {
+                    showTextoKey("encuestageneral2");
+                    enableactions = true;
+                    state = StateGame.ShowEncuestageneral2;
+                    break;
+                }
+            case StateGame.ShowEncuestageneral2:
+                {
+                    showTextoKey("encuestarecep1");
+                    enableactions = true;
+                    state = StateGame.ShowEncuestaRecep1;
+                    break;
+                }
+            case StateGame.ShowEncuestaRecep1:
+                {
+                    showTextoKey("encuestarecep2");
+                    enableactions = true;
+                    state = StateGame.ShowEncuestaRecep2;
+                    break;
+                }
+            case StateGame.ShowEncuestaRecep2:
+                {
+                    showTextoKey("encuestapicking1");
+                    enableactions = true;
+                    state = StateGame.ShowEncuestaPicking1;
+                    break;
+                }
+            case StateGame.ShowEncuestaPicking1:
+                {
+                    showTextoKey("encuestapicking2");
+                    state = StateGame.ShowEncuestaPicking2;
+                    enableactions = true;
+                    break;
+                }
+            case StateGame.ShowEncuestaPicking2:
+                {
+                    showTextoKey("encuestaubicacion1");
+                    state = StateGame.ShowEncuestaUbicacion1;
+                    enableactions = true;
+                    break;
+                }
+            case StateGame.ShowEncuestaUbicacion1:
+                {
+                    showTextoKey("encuestaubicacion2");
+                    state = StateGame.ShowEncuestaUbicacion2;
+                    enableactions = true;
+                    break;
+                }
+            case StateGame.ShowEncuestaUbicacion2:
+                {
+                    showTextoKey("encuestacarretilla1");
+                    state = StateGame.ShowEncuestaCarretilla1;
+                    enableactions = true;
+                    break;
+                }
+            case StateGame.ShowEncuestaCarretilla1:
+                {
+                    showTextoKey("encuestacarretilla2");
+                    state = StateGame.ShowEncuestaCarretilla2;
+                    enableactions = true;
+                    break;
+                }
+            case StateGame.ShowEncuestaCarretilla2:
+                {
+                    //if (GameManager.Instance.UsedIA)
+                    //{
+                    //    GameManager.Instance.player.playerClassification.ClassifyPlayer();
+                    //    string prompt = $"A continuación te indico los resultados de las preguntas realizada al jugador y el nivel para cada categoría:";
+                    //    foreach (var categoria in GameManager.Instance.player.playerClassification.playerResponses)
+                    //    {
+                    //        prompt += $"{categoria.Key}={categoria.Value.level.ToString()},";
+                    //    }
+                    //    prompt += $"el nivel global del jugador {GameManager.Instance.player.playerClassification.overallLevel}. Con estos datos necesitos que recomiendes al jugador que categorías debería enfocarse primero." +
+                    //        $"La repuesta debe ser una frase de máximo 3 líneas. Escribe la respuesta como le estuvieras hablando al jugador. Si su nivel global bajo lo ideal sería recomendarle que siga el entrenamiento general. Y necesito que este en el idioma:{GameManager.Instance.GetLanguage()} ";
+                    //    GameManager.Instance.SendIAMsg(prompt);
+                    //}
+                    showTextoKey("finalencuesta");
+                    infotext.textcontinuar.gameObject.SetActive(true);
+                    infotext.executeFinish = true;
+                    //if (GameManager.Instance.UsedIA)
+                    //{
+                    //    state = StateGame.ShowRecomendacion;
+                    //    infotext.executeFinish = false;
+                    //    enableactions = false;
+                    //}
+                    //else
+                    //{
+                        state = StateGame.ShowMenu;
+                        enableactions = true;
+                    //}
+                    break;
+                }
+            //case StateGame.ShowFinalEncuesta:
+            //    enableactions = false;
+            //    infotext.textcontinuar.gameObject.SetActive(true);
+            //    showTextoKey("procesarencuesta");
+            //    state = StateGame.ShowMenu;
+            //    infotext.executeFinish = false;
+                
+            //    break;
+            case StateGame.ShowMenu:
+                {
                     infotext.SetActiveInfo(false);
                     break;
+                }
 
-            }
         }
+
     }
 
 
@@ -186,34 +218,41 @@ public class SC_MainMenu : MonoBehaviour
             showTextoKey("PrimerBienvenida");
         }
 
-        if (state == StateGame.ShowFinalEncuesta)
+        if (state == StateGame.ShowFinalEncuesta && (Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.Joystick1Button1)))
         {
-            if (!GameManager.Instance.wait4IAResponse)
-            {
-                waitreading = false;
-                showMsg(GameManager.Instance.IAResponse);
-                state = StateGame.ShowRecomendacion;
-                infotext.executeFinish = true;
-            }
-
+            FinishInfoText();
         }
+
+        //if (state == StateGame.ShowRecomendacion)
+        //{
+        //    if (!GameManager.Instance.wait4IAResponse)
+        //    {
+        //        waitreading = false;
+        //        infotext.executeFinish = true;
+        //        infotext.textcontinuar.gameObject.SetActive(true);
+        //        showMsg(GameManager.Instance.IAResponse);
+        //        state = StateGame.ShowMenu;
+        //    }
+
+        //}
         if (infotext.isFinish && state != StateGame.ShowBienVenido && state != StateGame.ShowEncuesta && enableactions)
         {
-            var points = 0;
+            var penalizacion = 0;
             bool respuestaencuesta = false;
 
             if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Joystick1Button2))
             {
-                points = 2;
+                penalizacion = 0;
                 respuestaencuesta = true;
             }
             else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.Joystick1Button0))
             {
-                points = 1;
+                penalizacion = 1;
                 respuestaencuesta = true;
             }
             else if (Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.Joystick1Button1))
             {
+                penalizacion = 2;
                 respuestaencuesta = true;
             }
             if (respuestaencuesta)
@@ -223,68 +262,67 @@ public class SC_MainMenu : MonoBehaviour
                 {
                     case StateGame.ShowEncuestageneral1:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("General", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("General", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestageneral2:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("General", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("General", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaRecep1:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("RecepcionMateriales", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("RecepcionMateriales", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaRecep2:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("RecepcionMateriales", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("RecepcionMateriales", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaPicking1:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("PreparacionPedidos", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("PreparacionPedidos", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaPicking2:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("PreparacionPedidos", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("PreparacionPedidos", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaUbicacion1:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("UbicacionMateriales", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("UbicacionMateriales", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaUbicacion2:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("UbicacionMateriales", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("UbicacionMateriales", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaCarretilla1:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("ManejoCarretillas", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta1("ManejoCarretillas", penalizacion);
                             FinishInfoText();
                             break;
                         }
                     case StateGame.ShowEncuestaCarretilla2:
                         {
-                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("ManejoCarretillas", points);
+                            GameManager.Instance.player.playerClassification.setCategoriaPregunta2("ManejoCarretillas", penalizacion);
                             FinishInfoText();
                             break;
                         }
 
                 }
             }
-
 
         }
     }
@@ -421,6 +459,7 @@ public class SC_MainMenu : MonoBehaviour
         SoundManager.SharedInstance.PlaySound(bottonClip);
         mainmenu.SetActive(false);
         paneloptions.SetActive(true);
+
     }
 
     public void ExistOption()
@@ -428,6 +467,12 @@ public class SC_MainMenu : MonoBehaviour
         SoundManager.SharedInstance.PlaySound(bottonClip);
         mainmenu.SetActive(true);
         paneloptions.SetActive(false);
+        if (!GameManager.Instance.player.Survery)
+        {
+            state = StateGame.ShowBienVenido;
+            infotext.SetActiveInfo(true);
+            NextStep();
+        }
     }
 
     public void ChangePenalizacion(bool value)
@@ -445,7 +490,7 @@ public class SC_MainMenu : MonoBehaviour
     public void ChangeAyuda(bool value)
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
-        GameManager.Instance.showayuda = value;
+        GameManager.Instance.UsedIA = value;
 
     }
 
@@ -502,6 +547,7 @@ public class SC_MainMenu : MonoBehaviour
 
     internal enum StateGame
     {
+        ShowOptions,
         ShowInicio,
         ShowBienVenido,
         ShowEncuesta,
@@ -517,6 +563,8 @@ public class SC_MainMenu : MonoBehaviour
         ShowEncuestaCarretilla2,
         ShowFinalEncuesta,
         ShowRecomendacion,
+        ShowIAResult,
+        ShowMenu,
 
     }
 }
