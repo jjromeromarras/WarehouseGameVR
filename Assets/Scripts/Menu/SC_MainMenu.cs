@@ -39,7 +39,7 @@ public class SC_MainMenu : MonoBehaviour
     {
         //SoundManager.SharedInstance.PlayMusic(menuMusic);
         //selected[0].SetActive(true);
-        if (GameManager.Instance != null && !GameManager.Instance.player.Survery)
+        if (GameManager.Instance != null && !GameManager.Instance.player.Survery && !GameManager.Instance.debug)
         {
             state = StateGame.ShowOptions;
             Options();
@@ -47,12 +47,15 @@ public class SC_MainMenu : MonoBehaviour
         {
             infotext.gameObject.SetActive(false);
             state = StateGame.ShowMenu;
+            if (GameManager.Instance.debug)
+                GameManager.Instance.InitialIA();
         }
         if (infotext != null)
         {
             infotext.onFinishInfoText += FinishInfoText;
         }
 
+        
 
     }
 
@@ -166,6 +169,7 @@ public class SC_MainMenu : MonoBehaviour
                     showTextoKey("finalencuesta");
                     infotext.textcontinuar.gameObject.SetActive(true);
                     infotext.executeFinish = true;
+                    GameManager.Instance.player.Survery = true;
                     //if (GameManager.Instance.UsedIA)
                     //{
                     //    state = StateGame.ShowRecomendacion;

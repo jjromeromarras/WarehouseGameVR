@@ -10,7 +10,7 @@ public class GameReception : Game
 {
     public List<Order> Orders { get; set; }
 
-    public GameReception(ReceptionData[] data, int numorder, int nummaxpallet, string name) : base(name, string.Empty)
+    public GameReception(ReceptionData[] data, int numorder, int nummaxpallet, string name, int numerrors) : base(name, string.Empty, numerrors)
     {
         Orders = new List<Order>();
 

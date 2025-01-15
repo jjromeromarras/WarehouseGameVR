@@ -7,4 +7,7 @@ public class IARetosPicking
     public int Tiempo { get; set; }
     public int Fallos { get; set; }
     public string Explicacion { get; set; }
+
+    public bool Ayuda { get; set; }
+    public bool MiniMapa { get; set; }
 }

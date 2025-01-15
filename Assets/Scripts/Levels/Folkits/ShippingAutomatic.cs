@@ -27,7 +27,7 @@ public class ShippingAutomatic : Level
     void Start()
     {
         InitLevel();
-        game = new Game("ShippingAutomatic", "ShippingAutomatic");
+        game = new Game("ShippingAutomatic", "ShippingAutomatic", 5);
      
         tasks = new Queue<Task>();
         List<shippingpallet> allPallets = new List<shippingpallet>();
@@ -171,9 +171,7 @@ public class ShippingAutomatic : Level
             forkliftPickup.isOnDestiny = false;
             forkliftPickup.isUnloadLoader = false;
             forkliftPickup.palletobj = null;
-            penalizacion += 10;
-            GameManager.Instance.player.Score -= 10;
-
+            AddPenalty(10);
         }
     }
 
@@ -237,8 +235,7 @@ public class ShippingAutomatic : Level
         if (container == currentTask.Container)
         {
             GameManager.Instance.WriteLog($"[ShippingAutomatic] - onUnloadPallet: {container} OK");
-            bonificacion += 5;
-            GameManager.Instance.player.Score += 5;
+            AddBonificacion(5);
             (currentTask.ContainerRef as shippingpallet).finishtask = true;
             SoundManager.SharedInstance.PlaySound(pickingOK);
             if (tasks.Count > 0)
@@ -310,8 +307,7 @@ public class ShippingAutomatic : Level
         {
             state = StateGame.ShowErrorUnloadContainer;
             SoundManager.SharedInstance.PlaySound(pickingFail);
-            penalizacion += 10;
-            GameManager.Instance.player.Score -= 10;
+            AddPenalty(10);
             GameManager.Instance.WriteLog($"[ShippingAutomatic] - onUnloadPallet: {container} ERROR");
         }
     }

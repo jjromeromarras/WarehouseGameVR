@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEditor.PlayerSettings;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] public int minlevel;
     [SerializeField] public int maxlevel;
     [SerializeField] public bool enableIA;
+    [SerializeField] public bool debug;
 
     public IA iagame;
     public Player player;

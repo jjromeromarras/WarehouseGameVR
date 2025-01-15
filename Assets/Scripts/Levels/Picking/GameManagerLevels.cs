@@ -22,7 +22,7 @@ public class GameManagerLevels : MonoBehaviour
     [SerializeField] private picking picking;
     [SerializeField] private ReceptionScene reception;
     [SerializeField] public int currentGame;
-    [SerializeField] public panelusercontroller paneluser;   
+    [SerializeField] public panelusercontroller paneluser;
     [SerializeField] private Level[] levels;
     [SerializeField] private GameObject minimap;
     [SerializeField] private GameObject cross;
@@ -41,7 +41,7 @@ public class GameManagerLevels : MonoBehaviour
 
     private void Awake()
     {
-        
+
         Cursor.lockState = CursorLockMode.Locked;
         _state = GameState.Traveller;
         if (warehouse != null)
@@ -69,10 +69,10 @@ public class GameManagerLevels : MonoBehaviour
         }
 
         currentGame = GameManager.Instance.minlevel - 1;
-             
+
     }
     void Start()
-    {        
+    {
         rfmenu.SetActive(true);
         SetLockPlayer(true);
         SoundManager.SharedInstance.PlayMusic(warehouseAmbient);
@@ -80,7 +80,7 @@ public class GameManagerLevels : MonoBehaviour
         {
             playerbody.onScannerContainer += ScannerContainer;
             playerbody.onScannerLocation += ScannerLocation;
-       
+
         }
 
         if (forklift != null)
@@ -89,7 +89,7 @@ public class GameManagerLevels : MonoBehaviour
             forklift.onScannerLocation += ScannerLocation;
 
         }
-        for (int i = 0; i< levels.Length; i++)
+        for (int i = 0; i < levels.Length; i++)
         {
             if (GameManager.Instance != null)
             {
@@ -109,19 +109,19 @@ public class GameManagerLevels : MonoBehaviour
             levels[i].onFinishTask += FinishTask;
 
         }
-       
-        if(pickingcamera != null)
-        {       
+
+        if (pickingcamera != null)
+        {
             pickingcamera.onCheckPicking += onCheckPicking;
             pickingcamera.onResetPicking += onResetPicking;
-            pickingcamera.onErrorPicking += onErrorPicking;  
+            pickingcamera.onErrorPicking += onErrorPicking;
             pickingcamera.onCheckContainerPicking += onCheckContainerPicking;
             pickingcamera.onErrorContainerClient += onErrorContainerClient;
         }
 
         if (receptioncamera != null)
         {
-            receptioncamera.onCheckReception += onCheckReception;        
+            receptioncamera.onCheckReception += onCheckReception;
             receptioncamera.onCheckItem += onCheckItem;
         }
 
@@ -175,13 +175,14 @@ public class GameManagerLevels : MonoBehaviour
                 }
                 else
                 {
-                    GameManager.Instance.WriteLog($"[FinishTask] - Level: {GameManager.Instance.player.Level}");
+                    GameManager.Instance.WriteLog($"[FinishLevel] - Level: {GameManager.Instance.player.Level}");
                     //if (GameManager.Instance.player.Level < 2)
                     //    GameManager.Instance.player.Level = 2;
                     _state = GameState.FinishLevel;
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("RetoCompletado", 2f, new object[] { }));
                 }
+
             }
         }
         if (_state == GameState.FinishLevel)
@@ -217,11 +218,11 @@ public class GameManagerLevels : MonoBehaviour
 
     private void SetPickingLocation(string stock, string containersscc, shelf shelf, string contclient1, string contclient2, string contclient3, int pedido)
     {
-       
+
         pickingcamera.pedidopreparando = pedido;
-        pickingcamera.contclient1 = "F1:"+contclient1;
-        pickingcamera.contclient2 = "F2:"+contclient2;
-        pickingcamera.contclient3 = "F3:"+contclient3;
+        pickingcamera.contclient1 = "F1:" + contclient1;
+        pickingcamera.contclient2 = "F2:" + contclient2;
+        pickingcamera.contclient3 = "F3:" + contclient3;
         pickingcamera.selectclient = 1;
         pickingcamera.ResetScene();
         picking.gameObject.SetActive(true);
@@ -229,7 +230,7 @@ public class GameManagerLevels : MonoBehaviour
         playerbody.gameObject.SetActive(false);
         minimap.SetActive(false);
         cross.SetActive(false);
-        for(int i=0; i<pnjs.Length; i++)
+        for (int i = 0; i < pnjs.Length; i++)
         {
             pnjs[i].StopPNJ();
         }
@@ -237,7 +238,7 @@ public class GameManagerLevels : MonoBehaviour
 
         _state = GameState.Picking;
         List<pallet> containers = new List<pallet>();
-        for (int i=0; i<6; i++)
+        for (int i = 0; i < 6; i++)
         {
             var container = shelf.transform.GetChild(i).GetComponent<pallet>();
             if (container != null)
@@ -297,17 +298,19 @@ public class GameManagerLevels : MonoBehaviour
                         picking.setContainer(5, stockpallet, 12, item.ssc);
                     }
                 }
-            } else
+            }
+            else
             {
                 item.gameObject.SetActive(false);
             }
         }
-       
+
     }
     private bool onCheckContainerPicking(string container)
     {
         var result = levels[currentGame].CheckContainerPicking(container);
-        if(!result) {
+        if (!result)
+        {
             GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container} Fail");
             SoundManager.SharedInstance.PlaySound(pickingFail);
         }
@@ -327,8 +330,8 @@ public class GameManagerLevels : MonoBehaviour
     {
         GameManager.Instance.WriteLog($"[onCheckPicking] - cantplatano: {cantplatano} - cantuvas: {cantuvas} " +
             $"- cantpiña: {cantpiña} - cantmelocoton: {cantmelocoton} - cantmanzana: {cantmanzana} - cantfresa: {cantfresa}");
-        
-        var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);        
+
+        var result = levels[currentGame].CheckPicking(cantplatano, cantuvas, cantpiña, cantperas, cantmelocoton, cantmanzana, cantfresa);
         if (result)
         {
             GameManager.Instance.WriteLog($"[onCheckPicking] - Picking OK");
@@ -408,7 +411,7 @@ public class GameManagerLevels : MonoBehaviour
             minimap.SetActive(GameManager.Instance.showminimap);
             infopicking.SetActive(false);
             SetLockPlayer(false);
-            
+
         }
         else
         {
@@ -421,7 +424,7 @@ public class GameManagerLevels : MonoBehaviour
     private void onResetPicking()
     {
         GameManager.Instance.WriteLog($"[onResetPicking]");
-        SoundManager.SharedInstance.PlaySound(pickingFail); 
+        SoundManager.SharedInstance.PlaySound(pickingFail);
         levels[currentGame].onResetTask();
         pickingcamera.ResetScene();
 
@@ -465,7 +468,7 @@ public class GameManagerLevels : MonoBehaviour
 
     private IEnumerator ActiveFinish(int time, int bonificacion, int fallos)
     {
-        GameManager.Instance.WriteLog($"[ActiveFinish] - Game 1: {levels[currentGame].game.Name}");
+
 
         SoundManager.SharedInstance.PlaySound(pickingOK);
         inforesult.SetActiveInfo(true);
@@ -475,7 +478,10 @@ public class GameManagerLevels : MonoBehaviour
         playerbody.setLock(true);
         fpscamera.SetLock(true);
         GameManager.Instance.player.Score += time;
+        GameManager.Instance.player.Data[GameManager.Instance.player.Data.Count - 1].FinalPoints = GameManager.Instance.player.Score;
         inforesult.SetResult((int)GameManager.Instance.player.Score, time, fallos, bonificacion);
+        GameManager.Instance.WriteLog(GameManager.Instance.player.Data[GameManager.Instance.player.Data.Count - 1].ToString());
+        GameManager.Instance.WriteLog($"[ActiveFinish] - Game 1: {levels[currentGame].game.Name}");
         infotext.SetActiveInfo(false);
         _state = GameState.FinishTask;
         yield return inforesult.SetMessageKey(2f, new object[] { });
@@ -498,7 +504,7 @@ public class GameManagerLevels : MonoBehaviour
     }
     public void CloseLevel()
     {
-        GameManager.Instance.WriteLog($"[CloseLevel] - Game 1: {levels[currentGame].game.Name}");  
+        GameManager.Instance.WriteLog($"[CloseLevel] - Game 1: {levels[currentGame].game.Name}");
         StartCoroutine(GameManager.Instance.BackMenu());
     }
     #endregion

@@ -8,6 +8,7 @@ public class Level : MonoBehaviour
     [SerializeField] public infotextcontroller infotext;
     [SerializeField] public timer timer;
     [SerializeField] public nivelText txtNivel;
+    [SerializeField] public TextMeshProUGUI txtErrores;
     [SerializeField] public AudioClip scannerOK, scannerError;
     [SerializeField] public int numberlevel;
     [SerializeField] public bool tutorial;
@@ -21,12 +22,12 @@ public class Level : MonoBehaviour
     public bool waitreading;
     public bool showerror;
     public Game game;
-
+    public int currentData;
     public void InitLevel()
     {
         bonificacion = 0;
         penalizacion = 0;
-        showhelp = tutorial ? GameManager.Instance.UsedIA : false;
+        showhelp = tutorial;
 
         waitreading = false;
         showerror = false;
@@ -36,6 +37,11 @@ public class Level : MonoBehaviour
             infotext.onFinishInfoText += FinishInfoText;
             infotext.SetActiveInfo(true);
         }
+        GameManager.Instance.player.Data.Add(GameManager.Instance.player.Data.Count, new datalevels());
+        currentData = GameManager.Instance.player.Data.Count-1;
+        GameManager.Instance.player.Data[currentData].InitialPoints = GameManager.Instance.player.Score;
+        settxtErrors(0);
+
     }
 
     public virtual void OnSetLocationScanner(string location, string tag)
@@ -160,5 +166,28 @@ public class Level : MonoBehaviour
         {
             NextStep();
         }
+    }
+
+    public void settxtErrors(int errores)
+    {
+        if (txtErrores != null)
+        {
+            txtErrores.text = errores.ToString();
+        }
+    }
+
+    public void AddPenalty(int penalty)
+    {
+        penalizacion += penalty;
+        GameManager.Instance.player.Score -= penalty;
+        GameManager.Instance.player.Data[currentData].Errors += 1;
+        settxtErrors(GameManager.Instance.player.Data[currentData].Errors);
+    }
+
+    public void AddBonificacion(int bonus)
+    {
+        bonificacion += bonus;
+        GameManager.Instance.player.Score += bonus;
+        GameManager.Instance.player.Data[currentData].Aciertos += 1;
     }
 }

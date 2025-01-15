@@ -972,8 +972,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -44, y: -51}
-  m_SizeDelta: {x: 496.1336, y: 67.3808}
+  m_AnchoredPosition: {x: -8, y: -72}
+  m_SizeDelta: {x: 484.9372, y: 150.5551}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &177016211
 MonoBehaviour:
@@ -995,7 +995,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Warehouse Game Simulator
+  m_text: WarehouseGame Training Framework
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
@@ -1059,7 +1059,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -315.6982, y: 0, z: -579.40906, w: 0}
+  m_margin: {x: -707.5771, y: 0, z: -739.35974, w: 44.78618}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -9206,7 +9206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01d5deed2bd7114419371f15713a104c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showayuda: 0
+  UsedIA: 0
   showminimap: 0
   "penalizaci\xF3n": 0
   mandoxbox: 0
@@ -9215,7 +9215,13 @@ MonoBehaviour:
   enableIA: 1
   wait4IAResponse: 0
   IAResponse: 
-  IAmodel: Nous Hermes 2 Mistral DPO
+  IAmodels:
+  - ChatGPT-3.5 Turbo
+  - ChatGPT-4
+  - Nous Hermes 2 Mistral DPO
+  - Llama 3.2 3B Instruct
+  - GPT4All Falcon
+  IAmodelIndx: 0
   localize: 0
 --- !u!4 &1489883357
 Transform:
@@ -13095,7 +13101,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2026069138
 RectTransform:
   m_ObjectHideFlags: 0

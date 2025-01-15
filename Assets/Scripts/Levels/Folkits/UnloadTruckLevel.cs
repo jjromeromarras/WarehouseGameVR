@@ -25,7 +25,7 @@ public class UnloadTruckLevel : Level
     void Start()
     {
         InitLevel();
-        game = new Game("UnloadTruckLevel", "UnloadTruckLevel");
+        game = new Game("UnloadTruckLevel", "UnloadTruckLevel", 5);
         isfirstContainer = true;
         tasks = new Queue<Task>();
 
@@ -174,9 +174,7 @@ public class UnloadTruckLevel : Level
         if (container == currentTask.Container)
         {
             GameManager.Instance.WriteLog($"[UnloadTruckTask] - onUnloadPallet: {container} OK");
-
-            bonificacion += 5;
-            GameManager.Instance.player.Score += 5;
+            AddBonificacion(5);
             SoundManager.SharedInstance.PlaySound(pickingOK);
             if (isfirstContainer)
             {
@@ -204,8 +202,7 @@ public class UnloadTruckLevel : Level
         {
             state = StateGame.ShowErrorUnloadContainer;
             SoundManager.SharedInstance.PlaySound(pickingFail);
-            penalizacion += 10;
-            GameManager.Instance.player.Score -= 10;
+            AddPenalty(10);
             GameManager.Instance.WriteLog($"[UnloadTruckTask] - onUnloadPallet: {container} ERROR");
         }
     }

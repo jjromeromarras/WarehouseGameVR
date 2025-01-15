@@ -10,12 +10,7 @@ public class Player
     public Player()
     {
         playerClassification = new PlayerClassification();
-        Data = new Dictionary<int, datalevels>();
-        Data[0] = new datalevels();
-        Data[1] = new datalevels();
-        Data[2] = new datalevels();
-        Data[3] = new datalevels();
-        Data[4] = new datalevels();
+        Data = new Dictionary<int, datalevels>();       
         Survery = false;
     }
 

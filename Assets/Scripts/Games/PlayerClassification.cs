@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,11 @@ public class PlayerClassification
         public int pregunta1;
         public int pregunta2;
         public LevelCategory level;
+
+        public CategoryScore()
+        {
+            level = LevelCategory.Principiante;
+        }
     }
 
     // Diccionario de respuestas del jugador (las claves son las preguntas)
@@ -51,6 +57,11 @@ public class PlayerClassification
     public LevelCategory GetLevel4Category(string categoryName)
     {
         return playerResponses[categoryName].level;
+    }
+
+    public LevelCategory SetLevel4Category(string categoryName, string level)
+    {
+        return playerResponses[categoryName].level = (LevelCategory)Enum.Parse(typeof(LevelCategory), level);
     }
     public void setCategoriaPregunta1(string categoryName, int value)
     {

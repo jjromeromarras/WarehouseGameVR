@@ -14,7 +14,7 @@ public class GamePicking: Game
     public List<Order> Orders { get; set; }
     public List<Task> AllTask { get; set; }
 
-    public GamePicking(GameObject warehouse, int numorder, int numtareasmax, OrderType type, string name): base(name, string.Empty)
+    public GamePicking(GameObject warehouse, int numorder, int numtareasmax, OrderType type, string name, int numerrors): base(name, string.Empty, numerrors)
     {
         Orders = new List<Order>();
         AllTask = new List<Task>();

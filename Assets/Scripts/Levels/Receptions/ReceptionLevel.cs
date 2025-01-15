@@ -24,7 +24,7 @@ public class ReceptionLevel : Level
         switch (numberlevel)
         {
             case 1:
-                game = new GameReception(data, 1, 3, "Tutorial Reception");                
+                game = new GameReception(data, 1, 3, "Tutorial Reception", 10);                
                 state = StateGame.ShowReceptionInformada;
 
                 if (timer != null)
@@ -109,8 +109,7 @@ public class ReceptionLevel : Level
         if (check && !currentTask.isFake)
         {
             SoundManager.SharedInstance.PlaySound(scannerOK);
-            bonificacion += 10;
-            GameManager.Instance.player.Score += 10;
+            AddBonificacion(10);
             if (isFirt)
             {
                 state = StateGame.ShowConfirmCantidadRecep;
@@ -129,8 +128,7 @@ public class ReceptionLevel : Level
         else if (!check && currentTask.isFake)
         {
             SoundManager.SharedInstance.PlaySound(scannerOK);
-            bonificacion += 10;
-            GameManager.Instance.player.Score += 10;
+            AddBonificacion(10);
             receptionCamera.setenableActions(true);
             setLockPlayer(false);
             NexTask();
@@ -142,20 +140,18 @@ public class ReceptionLevel : Level
             showerror = true;
             infotext.SetActiveInfo(true);
             StartCoroutine(infotext.SetMessageKey("ErrorReceptionItem", 2f, new object[] { }));
-            penalizacion += 5;
-            GameManager.Instance.player.Score -= 5;
+            AddPenalty(5);
             return false;
         }
     }
     public override void onResetTask()
     {
-       
-            penalizacion += 5;
-            GameManager.Instance.player.Score -= 5;      
-            //setPickingLocation(currentTask.Stock, currentTask.Container, currentTask.LocationRef, currentTask.parentOrder.ContainerClient,
-            //    (game as GamePicking).Orders.Count > 1 ? (game as GamePicking).Orders[1].ContainerClient : string.Empty, (game as GamePicking).Orders.Count > 2 ? (game as GamePicking).Orders[2].ContainerClient : string.Empty,
-            //    currentTask.parentOrder.Level);
-        
+
+        AddPenalty(5);
+        //setPickingLocation(currentTask.Stock, currentTask.Container, currentTask.LocationRef, currentTask.parentOrder.ContainerClient,
+        //    (game as GamePicking).Orders.Count > 1 ? (game as GamePicking).Orders[1].ContainerClient : string.Empty, (game as GamePicking).Orders.Count > 2 ? (game as GamePicking).Orders[2].ContainerClient : string.Empty,
+        //    currentTask.parentOrder.Level);
+
     }
     public override bool CheckPicking(int cantplatano, int cantuvas, int cantpiña, int cantperas, int cantmelocoton, int cantmanzana, int cantfresa)
     {
@@ -163,32 +159,30 @@ public class ReceptionLevel : Level
             var total = cantfresa + cantplatano + cantperas + cantmelocoton + cantmanzana + cantuvas + cantpiña;
             if (total == currentTask.Quantity)
             {
-                if ((currentTask.Stock == "piña" && cantpiña != total) ||
-                     (currentTask.Stock == "melocton" && cantmelocoton != total) ||
-                     (currentTask.Stock == "platano" && cantplatano != total) ||
-                     (currentTask.Stock == "fresa" && cantfresa != total) ||
-                     (currentTask.Stock == "peras" && cantperas != total) ||
-                     (currentTask.Stock == "manzanas" && cantmanzana != total) ||
-                     (currentTask.Stock == "uvas" && cantuvas != total))
-                {
-                    SoundManager.SharedInstance.PlaySound(scannerError);
-                    infotext.SetActiveInfo(true);
-                    StartCoroutine(infotext.SetMessageKey("errorreceptionproduct", 2f, new object[] { currentTask.Stock }));
-                    penalizacion += 5;
-                    GameManager.Instance.player.Score -= 5;
-                    return false;
-                }
-                else
-                {
-                    SoundManager.SharedInstance.PlaySound(scannerOK);
-                    infotext.SetActiveInfo(true);
-                    setLockPlayer(true);
-                    NextStep();
-                    // Reception correcto
-                    bonificacion += 10;
-                    GameManager.Instance.player.Score += 10;
-                    return true;
-                }
+            if ((currentTask.Stock == "piña" && cantpiña != total) ||
+                 (currentTask.Stock == "melocton" && cantmelocoton != total) ||
+                 (currentTask.Stock == "platano" && cantplatano != total) ||
+                 (currentTask.Stock == "fresa" && cantfresa != total) ||
+                 (currentTask.Stock == "peras" && cantperas != total) ||
+                 (currentTask.Stock == "manzanas" && cantmanzana != total) ||
+                 (currentTask.Stock == "uvas" && cantuvas != total))
+            {
+                SoundManager.SharedInstance.PlaySound(scannerError);
+                infotext.SetActiveInfo(true);
+                StartCoroutine(infotext.SetMessageKey("errorreceptionproduct", 2f, new object[] { currentTask.Stock }));
+                AddPenalty(5);
+                return false;
+            }
+            else
+            {
+                SoundManager.SharedInstance.PlaySound(scannerOK);
+                infotext.SetActiveInfo(true);
+                setLockPlayer(true);
+                NextStep();
+                // Reception correcto
+                AddBonificacion(10);
+                return true;
+            }
             }
             else
             {
@@ -196,9 +190,9 @@ public class ReceptionLevel : Level
                 SoundManager.SharedInstance.PlaySound(scannerError);
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errorreceptionquantity", 2f, new object[] { currentTask.Quantity }));
-                penalizacion += 5;
-                GameManager.Instance.player.Score -= 5;   
-                return false;
+            AddPenalty(5);
+
+            return false;
             }
         
     }
@@ -308,8 +302,7 @@ public class ReceptionLevel : Level
                 {
                     currentTask.parentOrder.DockRef.gameObject.SetActive(false);
                     SoundManager.SharedInstance.PlaySound(scannerOK);
-                    bonificacion += 10;
-                    GameManager.Instance.player.Score += 10;
+                    AddBonificacion(10);
                     state = StateGame.EnterContainer;
                     rfcontroller.SetPantallaTxt("EnterContainerRecep", new object[] { currentTask.parentOrder.Name, currentTask.Container });
                 
@@ -320,8 +313,8 @@ public class ReceptionLevel : Level
                     showerror = true;
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { location }));
-                    penalizacion += 5;
-                    GameManager.Instance.player.Score -= 5;
+                    AddPenalty(5);
+
 
                 }
             }
@@ -331,8 +324,8 @@ public class ReceptionLevel : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errordockscanner", 2f, new object[] { location }));
-                penalizacion += 5;
-                GameManager.Instance.player.Score -= 5;
+                AddPenalty(5);
+
             }
 
         }
@@ -365,9 +358,8 @@ public class ReceptionLevel : Level
                     pncliente.gameObject.SetActive(false);
                     receptionpallet.stock.SetSSCC(container);
                     receptionpallet.stock.SetStock(currentTask.Stock , currentTask.Quantity, container, true, currentTask.isFake);
-                    bonificacion += 5;
-                    GameManager.Instance.player.Score += 5;
-                    
+                    AddBonificacion(5);
+
                 }
                 else
                 {
@@ -377,8 +369,8 @@ public class ReceptionLevel : Level
                         showerror = true;
                         infotext.SetActiveInfo(true);
                         StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedorInve", 2f, new object[] { container }));
-                        penalizacion += 5;
-                        GameManager.Instance.player.Score -= 5;
+                        AddPenalty(5);
+
                     }
                 }
             }
@@ -390,8 +382,8 @@ public class ReceptionLevel : Level
                     showerror = true;
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedorInve", 2f, new object[] { container }));
-                    penalizacion += 5;
-                    GameManager.Instance.player.Score -= 5;                    
+                    AddPenalty(5);
+
                 }
             }
         }
@@ -403,8 +395,8 @@ public class ReceptionLevel : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("ErrorIntroducirContenedorInve", 2f, new object[] { container }));
-                penalizacion += 5;
-                GameManager.Instance.player.Score -= 5;
+                AddPenalty(5);
+
             }
         }
 
