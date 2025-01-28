@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -39,12 +41,22 @@ public class GameManager : MonoBehaviour
 
     public void InitialIA()
     {
-        IAmodelIndx = 5;
+       
 
         string prompt = $"En este proyecto, los jugadores asumen el rol de operarios de almacén y deben superar diversos retos relacionados con tareas logísticas. Tu función será guiar a los jugadores a lo largo de estos retos y diseñar un entrenamiento personalizado para cada uno de ellos." +
             $"Te proporcionaré la siguiente información clave: Clasificación del nivel inicial de los jugadores y descripción de los retos" +
             $"Retos disponibles: 1. Preparación de pedidos. 2. Recepción de materiales. 3. Ubicación de materiales. 4. Manejo de carretillas Analizar los datos proporcionados al completar cada reto (fallos, aciertos y tiempo total).\r\nUtilizar esta información para ajustar los parámetros de los retos futuros y optimizar la curva de aprendizaje del jugador. No necesito respuesta, solamente un \"Si\"";
-        this.iagame.Chat("DeepSeek", prompt, (response) =>
+        this.iagame.ChatDeepSeek(prompt, (chatResponse) =>
+        {
+            if (chatResponse != null) {
+                // usage
+                Console.WriteLine("use token:" + chatResponse?.Usage?.TotalTokens);
+                // result
+                Console.WriteLine(chatResponse?.Choices.FirstOrDefault()?.Message?.content);
+            }
+        });
+        
+        this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
             {
                 if (!string.IsNullOrEmpty(response))
                 {
