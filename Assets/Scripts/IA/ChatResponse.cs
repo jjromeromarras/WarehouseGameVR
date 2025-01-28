@@ -6,20 +6,14 @@ using System.Text.Json.Serialization;
 public class ChatResponse
 {
    
-    public string Id { get; set; } = default!;
+    public string id { get; set; } = default!;
   
-    public List<Choice> Choices { get; set; }
+    public List<Choice> choices { get; set; }
     
+    public long created { get; set; }
 
-    public long Created { get; set; }
-   
-    public string Model { get; set; } = default!;
+    public string model { get; set; }
 
-    [Newtonsoft.Json.JsonProperty("system_fingerprint")]
-    public string SystemFingerprint { get; set; }
-
-   
+    [Newtonsoft.Json.JsonProperty("object")]
     public string Object { get; set; } = default!;
-    
-    public Usage Usage { get; set; }
 }

@@ -7,16 +7,7 @@ public class Choice
 {
     [Newtonsoft.Json.JsonProperty("finish_reason")]
     public string FinishReason { get; set; }
-    public int Index { get; set; }
-    public Message Message { get; set; }
+    public int index { get; set; }
+    public MessageDeep message { get; set; }
   
-    public Logprobs Logprobs { get; set; }
-
-   
-    public Message Delta { get; set; }
-
-    /// <summary>
-    /// for completion 
-    /// </summary>
-    public string Text { get; set; } = string.Empty;
 }

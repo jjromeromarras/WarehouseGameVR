@@ -85,24 +85,25 @@ public partial class IA
 
     }
 
-    public void ChatDeepSeek(string prompttxt, Action<ChatResponse> callback)
+    public void ChatDeepSeek(string prompttxt, Action<string> callback)
     {
+        var serverpromp = $"Eres un asistente en formación logística. Esta diseñado para " +
+            $"poder personalizar el entrenamiento de cualquier operario del almacén. Tus conocimientos" +
+            $"en lo logisticas son profundos. Entiendes los procesos de preparación de pedidos, recepción," +
+            $"ubicación de material o manejo de carretillas. Además eres un experto en gamificación a fin de poder" +
+            $"diseñar los entrenamiento mas atractivos y personalizados. Tu labor es ayudar a personalizar" +
+            $"el entranamiento de los operarios del almacén.";
 
         var request = new ChatRequest
         {
-            Messages = new System.Collections.Generic.List<MessageDeep>() {
-                MessageDeep.NewSystemMessage("You are a language translator"),
-                MessageDeep.NewUserMessage("Please translate 'They are scared! ' into English!")
+            messages = new System.Collections.Generic.List<MessageDeep>() {
+                MessageDeep.NewSystemMessage(serverpromp),
+                MessageDeep.NewUserMessage(prompttxt)
             },
-            ResponseFormat = new ResponseFormat
-            {
-                Type = ResponseFormatTypes.JsonObject
-            },
-            // Specify the model
-            Model = DeepSeekModels.ChatModel
+
         };
 
-        GameManager.Instance.StartCoroutine(clientDeepSeek.Chat(request, callback));
+        GameManager.Instance.StartCoroutine(clientDeepSeek.Chat(request, apiKey, callback));
 
       
 

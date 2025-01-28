@@ -48,6 +48,7 @@ public class SC_MainMenu : MonoBehaviour
             infotext.gameObject.SetActive(false);
             state = StateGame.ShowMenu;
             if (GameManager.Instance.debug)
+       
                 GameManager.Instance.InitialIA();
         }
         if (infotext != null)

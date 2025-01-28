@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using UnityEditor.PackageManager.Requests;
 using Newtonsoft.Json;
+using System.Security.Policy;
 
 public class DeepSeekClient
 {
@@ -43,9 +44,36 @@ public class DeepSeekClient
         Http.SetRequestHeader("Authorization", $"Bearer {apiKey}");
     }
 
+    public IEnumerator Chat(ChatRequest request, string apiKey, Action<string> callback)
+    {
+
+        string jsonData = JsonConvert.SerializeObject(request);
+        using (UnityWebRequest webRequest = UnityWebRequest.Post("https://api.deepseek.com/chat/completions", jsonData))
+        {
+            byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(jsonData);
+            webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
+            webRequest.downloadHandler = new DownloadHandlerBuffer();
+            webRequest.SetRequestHeader("Content-Type", "application/json");
+            webRequest.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+            // Enviar solicitud
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError($"Error en la solicitud POST: {webRequest.error}");
+                callback?.Invoke(null); // Enviar null si hay un error
+            }
+            else
+            {
+                Debug.Log($"Respuesta POST: {webRequest.downloadHandler.text}");
+                callback?.Invoke(webRequest.downloadHandler.text); // Enviar respuesta como JSON
+            }
+        }
+    }
     public IEnumerator Chat(ChatRequest request, Action<ChatResponse> callback)
     {
-        request.Stream = false;
+        request.stream = false;
              
         var content = JsonConvert.SerializeObject(request);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(content);
