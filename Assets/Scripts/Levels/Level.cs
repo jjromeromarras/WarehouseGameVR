@@ -12,7 +12,7 @@ public class Level : MonoBehaviour
     [SerializeField] public AudioClip scannerOK, scannerError;
     [SerializeField] public int numberlevel;
     [SerializeField] public bool tutorial;
-    public event Action<string, string, shelf, string, string, string, int> onSetPickingLocation;
+    public event Action<string, string, shelf, string, string, string, int, int> onSetPickingLocation;
     public event Action onSetReceptionLocation;
     public int bonificacion;
     public int penalizacion;
@@ -133,11 +133,11 @@ public class Level : MonoBehaviour
             onFinishTask(Convert.ToInt16(timer.TimeLeft), bonificacion, penalizacion);
         }
     }
-    public void setPickingLocation(string stock, string container, shelf location, string contclient1, string contclient2, string contclient3, int pedido)
+    public void setPickingLocation(string stock, string container, shelf location, string contclient1, string contclient2, string contclient3, int pedido, int quantitypick)
     {
         if (onSetPickingLocation != null)
         {
-            onSetPickingLocation(stock, container, location, contclient1, contclient2, contclient3, pedido);
+            onSetPickingLocation(stock, container, location, contclient1, contclient2, contclient3, pedido, quantitypick);
         }
 
     }

@@ -216,7 +216,7 @@ public class GameManagerLevels : MonoBehaviour
         _state = GameState.Reception;
     }
 
-    private void SetPickingLocation(string stock, string containersscc, shelf shelf, string contclient1, string contclient2, string contclient3, int pedido)
+    private void SetPickingLocation(string stock, string containersscc, shelf shelf, string contclient1, string contclient2, string contclient3, int pedido, int quantitypick)
     {
 
         pickingcamera.pedidopreparando = pedido;
@@ -266,17 +266,17 @@ public class GameManagerLevels : MonoBehaviour
                     if (item.transform.localPosition.x > 1)
                     {
                         // izquierda
-                        picking.setContainer(0, stockpallet, 12, item.ssc);
+                        picking.setContainer(0, stockpallet, quantitypick, item.ssc);
                     }
                     else if (item.transform.localPosition.x < 1 && item.transform.localPosition.x > -1)
                     {
                         // centrado
-                        picking.setContainer(1, stockpallet, 12, item.ssc);
+                        picking.setContainer(1, stockpallet, quantitypick, item.ssc);
                     }
                     else
                     {
                         // derecha
-                        picking.setContainer(2, stockpallet, 12, item.ssc);
+                        picking.setContainer(2, stockpallet, quantitypick, item.ssc);
                     }
                 }
                 else
@@ -285,17 +285,17 @@ public class GameManagerLevels : MonoBehaviour
                     if (item.transform.localPosition.x > 1)
                     {
                         // izquierda
-                        picking.setContainer(3, stockpallet, 12, item.ssc);
+                        picking.setContainer(3, stockpallet, quantitypick, item.ssc);
                     }
                     else if (item.transform.localPosition.x < 1 && item.transform.localPosition.x > -1)
                     {
                         // centrado
-                        picking.setContainer(4, stockpallet, 12, item.ssc);
+                        picking.setContainer(4, stockpallet, quantitypick, item.ssc);
                     }
                     else
                     {
                         // derecha
-                        picking.setContainer(5, stockpallet, 12, item.ssc);
+                        picking.setContainer(5, stockpallet, quantitypick, item.ssc);
                     }
                 }
             }

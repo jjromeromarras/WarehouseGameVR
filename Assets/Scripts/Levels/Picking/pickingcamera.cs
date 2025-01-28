@@ -47,7 +47,7 @@ public class pickingcamera : MonoBehaviour
     private float resetTime = 0.2f;
     public int selectclient = 1;
     private bool enableActions;
-
+    public float rotationSpeed = 100f; // Velocidad de rotación ajustable
     // Update is called once per frame
     private void Start()
     {
@@ -153,6 +153,19 @@ public class pickingcamera : MonoBehaviour
                     {
                         _selectedbox.isSelected = true;
                     }
+                }
+                var pallet = cajaSeleccionada.gameObject.GetComponentInParent<containerpicking>();
+                if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.Joystick1Button4))
+                {
+                    
+                    if(pallet!=null)
+                        pallet.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
+                }
+                else if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.Joystick1Button5))
+                {
+                  
+                    if (pallet != null)
+                        pallet.transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime, Space.World);
                 }
             }
             else

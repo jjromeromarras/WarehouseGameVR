@@ -16,4 +16,6 @@ public class Task
 
     public bool isLast { get; set; }
 
+    public bool isMulti { get; set; }
+
 }

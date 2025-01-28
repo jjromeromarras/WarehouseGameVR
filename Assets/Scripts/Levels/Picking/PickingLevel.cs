@@ -15,6 +15,7 @@ public class PickingLevel : Level
     private Task currentTask;
     private Queue<Task> tasks;
     private StateGame state;
+    private bool isFirtsAI = false;
 
     #region Public Methods  
 
@@ -27,13 +28,13 @@ public class PickingLevel : Level
             rfcontroller.SetTitle("TareasAutomaticas");
         }
 
-        if (!GameManager.Instance.UsedIA || numberlevel == 1)
+        if (!GameManager.Instance.UsedIA)
         {
             // El nivel 1 siempre es tutorial del juego
             switch (numberlevel)
             {
                 case 1:
-                    game = new GamePicking(warehousemanual, 1, 1, OrderType.Picking, "Tutorial Picking", 10);
+                    game = new GamePicking(warehousemanual, 1, 1, OrderType.Picking, "Tutorial Picking", 10, false);
                     state = StateGame.ShowBienVenido;
                     if (timer != null)
                     {
@@ -41,7 +42,7 @@ public class PickingLevel : Level
                     }
                     break;
                 case 2:
-                    game = new GamePicking(warehousemanual, 1, 10, OrderType.Picking, "Preparar un pedido", 6);
+                    game = new GamePicking(warehousemanual, 1, 10, OrderType.Picking, "Preparar un pedido", 6 , false);
                     showhelp = true;
                     state = StateGame.ShowTutorial2;
                     if (timer != null)
@@ -50,7 +51,7 @@ public class PickingLevel : Level
                     }
                     break;
                 case 3:
-                    game = new GamePicking(warehousemanual, 3, 8, OrderType.Picking, "Multi pedidos", 3);
+                    game = new GamePicking(warehousemanual, 3, 8, OrderType.Picking, "Multi pedidos", 3, true);
                     showhelp = true;
                     state = StateGame.ShowTutorial3;
                     if (timer != null)
@@ -78,14 +79,14 @@ public class PickingLevel : Level
     private void NextLevelIA()
     {
         // Le pedimos a la IA que nos de el siguiente reto a realizar
-        string prompt = $"El jugador se dispone a realizar los retos de preparación de pedidos. Su nivel general es {GameManager.Instance.player.playerClassification.GetLevel4Category("General")}." +
-            $"Y el nivel en la categoria de Preparación de Pedidos es {GameManager.Instance.player.playerClassification.GetLevel4Category("PreparacionPedidos")}." +
-            $"Sabiendo cual es su nivel necesito que me indiques cual seria el siguiente a realizar para alcanzar el siguiente nivel." +
+        string prompt = $"El jugador se dispone a realizar los retos de preparación de pedidos. Su nivel en la categoria de Preparación de Pedidos es {GameManager.Instance.player.playerClassification.GetLevel4Category("PreparacionPedidos")}." +
+            $"Necesito un reto para su nivel para poder avanzar y alcanzar el nivel experto." +
             $"La estructura de la respuesta es\r\n{{\r\n  \"Ordenes\": valor,     //Indica el Número de órdenes a realizar. Valor entre 1 a 3.   \t \r\n  \"Tareas\": valor,        //indica el Número de tareas. Valor puede ser entre 1 y 20. \t\r\n  \"Multireferencia\": valor, \t//es true (sí) o false (no), según incluyan contenedores multireferencia. Si es True mas dificil es el reto, solo adapto para el nivel experto.\r\n  \"Nivel\": valor, \t//es el Nivel de dificultad. Puede ser Principiante, Medio, Avanzado, Experto según dificultad del reto.\t\t\r\n  \"Tiempo\": valor, \t//es el Tiempo en minutos que debería el jugador de completar el reto en función del nivel, ordenes y número de tareas. Tiempo máximo para un reto de nivel experto 30 minutos.\r\n  \"Fallos\": valor, \t// es un entero que indica el Número máximo de fallos permitidos. Cuando mas fallos menor dificultad.\r\n  \"Explicacion\": valor // Cadena de texto con la explicación para mostrarsela al jugador del reto a realizar.\r\n   \"Ayuda\": valor // Indica en función del nivel de dificultad si se debe mostrar ayuda. Valor True o False. \"MiniMapa\": valor // Indica si en función del nivel de dificulta y nivel del jugador se debe mostrar o no un minimapa del almacén para que el jugador se pueda orientar. Valor True o False}}\r\nA mayor número de ordenes, tareas multireferencias y menor fallos mayor nivel de dificultad." +
             $" \r\nNecesito un reto para el siguiente nivel que el jugador necesite para llegar alcanzar el nivel experto (el cual seria el ultimo reto)," +
             $"\r\nRespondeme solamente con la estructura indicada para el primer reto. La explicación del reto debe estar el idioma: {GameManager.Instance.GetLanguage()}";
         GameManager.Instance.SendIAMsg(prompt);
         state = StateGame.WaitingIAReto;
+        
 
     }
 
@@ -197,7 +198,7 @@ public class PickingLevel : Level
                             {
                                 GameManager.Instance.WriteLog($"***************************");
                                 int numtareas = retoia.Tareas / retoia.Ordenes;
-                                game = new GamePicking(warehousemanual, retoia.Ordenes, numtareas, OrderType.Picking, $"Reto IA:{retoia.Nivel}", retoia.Fallos);
+                                game = new GamePicking(warehousemanual, retoia.Ordenes, numtareas, OrderType.Picking, $"Reto IA:{retoia.Nivel}", retoia.Fallos * retoia.Ordenes, retoia.Multireferencia);
                                 if (timer != null)
                                 {
                                     timer.SetTimeLeft(retoia.Tiempo * 60);
@@ -226,9 +227,10 @@ public class PickingLevel : Level
                         retoia = JsonConvert.DeserializeObject<IARetosPicking>(GameManager.Instance.IAResponse);
                         if (retoia != null)
                         {
+                            retoia.Multireferencia = true;
                             GameManager.Instance.WriteLog($"***************************");
                             int numtareas = retoia.Tareas / retoia.Ordenes;
-                            game = new GamePicking(warehousemanual, retoia.Ordenes, numtareas, OrderType.Picking, $"Reto IA:{retoia.Nivel}", retoia.Fallos);
+                            game = new GamePicking(warehousemanual, retoia.Ordenes, numtareas, OrderType.Picking, $"Reto IA:{retoia.Nivel}", retoia.Fallos * retoia.Ordenes, retoia.Multireferencia);
                             if (timer != null)
                             {
                                 timer.SetTimeLeft(retoia.Tiempo * 60);
@@ -245,6 +247,15 @@ public class PickingLevel : Level
                             GameManager.Instance.showminimap = retoia.MiniMapa;
                             tutorial = retoia.Ayuda;
                             state = StateGame.ShowMsgIA;
+                            if (isFirtsAI)
+                            {
+                                showhelp = true;
+                                isFirtsAI = false;
+                            }
+                            else
+                            {
+                                showhelp = false;
+                            }
                         }
                     }
                     break;
@@ -437,7 +448,7 @@ public class PickingLevel : Level
                         container2 = (game as GamePicking).Orders[1].ContainerClient != null ? (game as GamePicking).Orders[1].ContainerClient : string.Empty;
                     if ((game as GamePicking).Orders.Count >= 3)
                         container3 = (game as GamePicking).Orders[2].ContainerClient != null ? (game as GamePicking).Orders[2].ContainerClient : string.Empty;
-                    setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, container1, container2, container3, currentTask.parentOrder.Level);
+                    setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, container1, container2, container3, currentTask.parentOrder.Level, picking.isMulti?picking.Quantity:12);
                     AddBonificacion(5);
                 }
                 else
@@ -530,8 +541,7 @@ public class PickingLevel : Level
                 {
                     infotext.SetActiveInfo(true);
                     StartCoroutine(infotext.SetMessageKey("errorpickingproduct", 2f, new object[] { total, picking.Stock }));
-                    AddPenalty(5);
-
+                    onResetTask();
                     return false;
                 }
                 else
@@ -549,7 +559,7 @@ public class PickingLevel : Level
                 showerror = true;
                 infotext.SetActiveInfo(true);
                 StartCoroutine(infotext.SetMessageKey("errorpickingquantity", 2f, new object[] { total, picking.Quantity }));
-                AddPenalty(5);
+                onResetTask(); 
                 return false;
             }
         }
@@ -571,7 +581,7 @@ public class PickingLevel : Level
             if ((game as GamePicking).Orders.Count >= 3)
                 container3 = (game as GamePicking).Orders[2].ContainerClient != null ? (game as GamePicking).Orders[2].ContainerClient : string.Empty;
 
-            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, container1, container2, container3, currentTask.parentOrder.Level);
+            setPickingLocation(picking.Stock, picking.Container, picking.LocationRef, container1, container2, container3, currentTask.parentOrder.Level, picking.isMulti ? picking.Quantity : 12);
         }
     }
 
@@ -580,7 +590,7 @@ public class PickingLevel : Level
         showerror = true;
         infotext.SetActiveInfo(true);
         StartCoroutine(infotext.SetMessageKey("errorpickingotherclient", 2f, new object[] { }));
-        AddPenalty(5);
+        onResetTask();
 
     }
 

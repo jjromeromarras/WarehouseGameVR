@@ -54,98 +54,113 @@ public class containerpicking : MonoBehaviour
             case "piña":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(piña, cantidad, reception);
+                    SetStock(piña, peras, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(platano, cantidad-Random.Range(1, cantidad - 1), reception);
+                    SetStock(platano, null, cantidad-Random.Range(1, cantidad - 1), reception);
                 }
                 break;
             case "melocoton":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(melocoton, cantidad, reception);
+                    SetStock(melocoton, manzanas, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(uvas, cantidad - Random.Range(1, cantidad - 1), reception);
+                    SetStock(uvas, null, cantidad - Random.Range(1, cantidad - 1), reception);
                 }
                 break;
             case "platano":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(platano, cantidad, reception);
+                    SetStock(platano, uvas, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(melocoton, cantidad - Random.Range(1, cantidad - 1), reception);
+                    SetStock(melocoton, null, cantidad - Random.Range(1, cantidad - 1), reception);
                 }
                 break;
             case "peras":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(peras, cantidad, reception);
+                    SetStock(peras, platano, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(manzanas, cantidad - Random.Range(1, cantidad - 1), reception);
+                    SetStock(manzanas, null, cantidad - Random.Range(1, cantidad - 1), reception);
                 }
                 break;
             case "manzanas":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(manzanas, cantidad, reception);
+                    SetStock(manzanas, melocoton, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(fresa, cantidad - Random.Range(1, cantidad - 1), reception);
+                    SetStock(fresa, null,cantidad - Random.Range(1, cantidad - 1), reception);
                 }
                 break;
             case "uvas":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(uvas, cantidad, reception);
+                    SetStock(uvas, fresa, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(peras, cantidad - Random.Range(1, cantidad - 1), reception);
+                    SetStock(peras, null, cantidad - Random.Range(1, cantidad - 1), reception);
                 }
                 break;
             case "fresa":
                 if (!reception || (reception && !isfake))
                 {
-                    SetStock(fresa, cantidad, reception);
+                    SetStock(fresa, platano, cantidad, reception);
                 }
                 else
                 {
-                    SetStock(melocoton, cantidad - Random.Range(1, cantidad - 1), reception);
+                    SetStock(melocoton, null, cantidad - Random.Range(1, cantidad - 1), reception);
                 }
                 break;
         }
         
     }
 
-    private void SetStock(GameObject stocktype, int cantidad, bool reception)
+    private void SetStock(GameObject stocktype, GameObject stockmult, int cantidad, bool reception)
     {
         if(!reception)
-            StartCoroutine(ActivarDespuesDeEsperaPicking(stocktype));    
+            StartCoroutine(ActivarDespuesDeEsperaPicking(stocktype, stockmult, cantidad));    
         else
             StartCoroutine(ActivarDespuesDeEsperaReception(stocktype, cantidad));
     }
 
-    IEnumerator ActivarDespuesDeEsperaPicking(GameObject stocktype)
+
+    IEnumerator ActivarDespuesDeEsperaPicking(GameObject stocktype, GameObject stockmulti, int cantidad)
     {
      
         yield return new WaitForSeconds(0.5f);
         // Activar el objeto después de la espera
-        stocktype.SetActive(true);        
-        for (int i = 0; i < stocktype.transform.childCount; i++)
+        stocktype.SetActive(true);
+        stockmulti.SetActive(true);
+        var total = cantidad + 3 < 9 ? cantidad + 3 : cantidad;
+
+        // Parte de atrás        
+        for (int i = 11; i >= 0; i--)
         {
-            stocktype.transform.GetChild(i).gameObject.SetActive(true);
-            var pallet = stocktype.transform.GetChild(i).GetComponent<selectedBox>();
-            if( pallet != null )
+            if (total>0)
             {
-                pallet.isSelected = false;
+                stocktype.transform.GetChild(i).gameObject.SetActive(true);
+                stockmulti.transform.GetChild(i).gameObject.SetActive(false);
+                var pallet = stocktype.transform.GetChild(i).GetComponent<selectedBox>();
+                if (pallet != null)
+                {
+                    pallet.isSelected = false;
+                }
+                total--;
+            }
+            else
+            {
+                stocktype.transform.GetChild(i).gameObject.SetActive(false);
+                stockmulti.transform.GetChild(i).gameObject.SetActive(true);
             }
         }
 

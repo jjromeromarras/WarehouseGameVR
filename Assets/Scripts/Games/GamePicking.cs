@@ -14,7 +14,7 @@ public class GamePicking: Game
     public List<Order> Orders { get; set; }
     public List<Task> AllTask { get; set; }
 
-    public GamePicking(GameObject warehouse, int numorder, int numtareasmax, OrderType type, string name, int numerrors): base(name, string.Empty, numerrors)
+    public GamePicking(GameObject warehouse, int numorder, int numtareasmax, OrderType type, string name, int numerrors, bool multi): base(name, string.Empty, numerrors)
     {
         Orders = new List<Order>();
         AllTask = new List<Task>();
@@ -45,7 +45,7 @@ public class GamePicking: Game
                         task.parentOrder = order;
                         var numcontainer = Random.Range(1, 7);
                         task.LocationRef = shel;
-
+                        task.isMulti = multi;
                         var container = shel.transform.GetChild(numcontainer).GetComponent<pallet>();
                         if (container != null)
                         {
