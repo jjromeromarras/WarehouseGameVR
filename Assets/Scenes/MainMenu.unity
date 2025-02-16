@@ -9223,7 +9223,7 @@ MonoBehaviour:
   - Llama 3.2 3B Instruct
   - GPT4All Falcon
   - DeepSeek
-  IAmodelIndx: 0
+  IAmodelIndx: 5
   localize: 0
 --- !u!4 &1489883357
 Transform:
