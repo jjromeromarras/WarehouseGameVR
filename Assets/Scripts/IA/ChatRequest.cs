@@ -10,8 +10,7 @@ public partial class ChatRequest
 
 
     public ChatRequest()
-    {
-        model = DeepSeekModels.ChatModel;
+    {        
         stream = false;
     }
 }

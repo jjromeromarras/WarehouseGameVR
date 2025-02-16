@@ -443,6 +443,20 @@ public class SC_MainMenu : MonoBehaviour
         StartCoroutine(SetLocale(localeId));
     }
 
+    public void ChangeLLM(int LLMid)
+    {
+        SoundManager.SharedInstance.PlaySound(bottonClip);
+        if (LLMid == 0)
+        {
+            GameManager.Instance.enableIA = false;
+        }
+        else
+        {
+            GameManager.Instance.enableIA = true;
+            GameManager.Instance.IAmodelIndx = LLMid-1;
+        }
+    }
+
     IEnumerator SetLocale(int _locale)
     {
         changelanguage = true;

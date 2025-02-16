@@ -22,18 +22,21 @@ public class GameManager : MonoBehaviour
 
     public IA iagame;
     public Player player;
-    private UnityEngine.AsyncOperation asyncLoad;
+
     private Logger logger;
     public bool wait4IAResponse;
     public string IAResponse;
     public string[] IAmodels = { "ChatGPT-3.5 Turbo", 
-        "ChatGPT-4", 
-        "Nous Hermes 2 Mistral DPO", 
-        "Llama 3.2 3B Instruct", 
-        "GPT4All Falcon", 
-        "DeepSeek", };
-    public int IAmodelIndx = 5;
+        "ChatGPT-4",       
+        "DeepSeek",
+        "Grok"};
+    public int IAmodelIndx = 0;
     public int localize;
+
+    private string prompclasificacion =  $"Los jugadores se clasifican en cuatro niveles (de menor a mayor): Principiante, Medio, Avanzado, Experto, según su desempeño en las preguntas iniciales. Estas preguntas evalúan:  \r\n- Experiencia previa: Familiaridad con tareas logísticas.  \r\n- Conocimientos teóricos: Conceptos básicos de logística.  \r\n- Habilidades específicas: Fortalezas o debilidades en actividades concretas.  \r\n- Conocimiento técnico: Uso de herramientas como terminales RF o carretillas.  " +
+                           $"\r\n Ejemplo de Clasificación:  \r\n- Recepción de Materiales: 3 puntos → Medio.  \r\n- Preparación de Pedidos: 4 puntos → Avanzado.  \r\n- Ubicación de Materiales: 2 puntos → Medio.  \r\n- Manejo de Carretillas: 0 puntos → Principiante.  \r\n- Clasificación General: 8 puntos → Medio." +
+                           $"Este jugador recibiría un plan personalizado para reforzar habilidades de manejo de carretillas y ubicación de materiales, mientras que los retos avanzados estarían orientados a preparación de pedidos y recepción.Tu objetivo como IA será procesar esta información y proporcionar orientación adecuada en tiempo real, ajustando los retos y el plan de aprendizaje de acuerdo con el nivel y el progreso del jugador." +
+                           $"Por favor si entiendes el mensaje contesta solamente \"SI\".";
 
     private void Start()
     {
@@ -61,11 +64,7 @@ public class GameManager : MonoBehaviour
 
                     // result
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
-                    prompt = $"Los jugadores se clasifican en cuatro niveles (de menor a mayor): Principiante, Medio, Avanzado, Experto, según su desempeño en las preguntas iniciales. Estas preguntas evalúan:  \r\n- Experiencia previa: Familiaridad con tareas logísticas.  \r\n- Conocimientos teóricos: Conceptos básicos de logística.  \r\n- Habilidades específicas: Fortalezas o debilidades en actividades concretas.  \r\n- Conocimiento técnico: Uso de herramientas como terminales RF o carretillas.  " +
-                           $"\r\n Ejemplo de Clasificación:  \r\n- Recepción de Materiales: 3 puntos → Medio.  \r\n- Preparación de Pedidos: 4 puntos → Avanzado.  \r\n- Ubicación de Materiales: 2 puntos → Medio.  \r\n- Manejo de Carretillas: 0 puntos → Principiante.  \r\n- Clasificación General: 8 puntos → Medio." +
-                           $"Este jugador recibiría un plan personalizado para reforzar habilidades de manejo de carretillas y ubicación de materiales, mientras que los retos avanzados estarían orientados a preparación de pedidos y recepción.Tu objetivo como IA será procesar esta información y proporcionar orientación adecuada en tiempo real, ajustando los retos y el plan de aprendizaje de acuerdo con el nivel y el progreso del jugador." +
-                           $"Por favor si entiendes el mensaje contesta solamente \"SI\".";
-                    this.iagame.ChatDeepSeek(prompt, (response) =>
+                    this.iagame.ChatDeepSeek(prompclasificacion, (response) =>
                     {
 
                         if (!string.IsNullOrEmpty(response))
@@ -87,41 +86,133 @@ public class GameManager : MonoBehaviour
                 }
             });
         }
-        else
+        else if (IAmodels[IAmodelIndx] == "Grok")
         {
-            this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
+            this.iagame.ChatGrok(prompt, (chatResponse) =>
+            {
+                ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                if (responseMsg != null)
                 {
-                    if (!string.IsNullOrEmpty(response))
+
+                    // result
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    this.iagame.ChatGrok(prompclasificacion, (response) =>
                     {
-                        // Deserializar el JSON si es necesario
-                        ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
-                        Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
-                        if (responseMsg.choices[0].message.content == "SI")
+
+                        if (!string.IsNullOrEmpty(response))
                         {
-                            prompt = $"Los jugadores se clasifican en cuatro niveles (de menor a mayor): Principiante, Medio, Avanzado, Experto, según su desempeño en las preguntas iniciales. Estas preguntas evalúan:  \r\n- Experiencia previa: Familiaridad con tareas logísticas.  \r\n- Conocimientos teóricos: Conceptos básicos de logística.  \r\n- Habilidades específicas: Fortalezas o debilidades en actividades concretas.  \r\n- Conocimiento técnico: Uso de herramientas como terminales RF o carretillas.  " +
-                            $"\r\n Ejemplo de Clasificación:  \r\n- Recepción de Materiales: 3 puntos → Medio.  \r\n- Preparación de Pedidos: 4 puntos → Avanzado.  \r\n- Ubicación de Materiales: 2 puntos → Medio.  \r\n- Manejo de Carretillas: 0 puntos → Principiante.  \r\n- Clasificación General: 8 puntos → Medio." +
-                            $"Este jugador recibiría un plan personalizado para reforzar habilidades de manejo de carretillas y ubicación de materiales, mientras que los retos avanzados estarían orientados a preparación de pedidos y recepción.Tu objetivo como IA será procesar esta información y proporcionar orientación adecuada en tiempo real, ajustando los retos y el plan de aprendizaje de acuerdo con el nivel y el progreso del jugador." +
-                            $"Por favor si entiendes el mensaje contesta solamente \"SI\".";
-                            this.iagame.Chat("Llama 3.2 3B Instruct", prompt, (response) =>
-                            {
-
-                                if (!string.IsNullOrEmpty(response))
-                                {
-                                    // Deserializar el JSON si es necesario
-                                    ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
-                                    Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
-                                    wait4IAResponse = false;
-                                }
-
-                            });
+                            // Deserializar el JSON si es necesario
+                            ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                            Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            wait4IAResponse = false;
                         }
-                    }
-                    else
-                    {
-                        Debug.LogError("No se recibió ninguna respuesta del modelo.");
-                    }
-                });
+                        else
+                        {
+                            Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                        }
+                    });
+                }
+                else
+                {
+                    Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                }
+            });
         }
+        else if (IAmodels[IAmodelIndx] == "ChatGPT-3.5 Turbo")
+        {
+            this.iagame.ChatGPT(prompt, (chatResponse) =>
+            {
+                ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                if (responseMsg != null)
+                {
+
+                    // result
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    this.iagame.ChatGPT(prompclasificacion, (response) =>
+                    {
+
+                        if (!string.IsNullOrEmpty(response))
+                        {
+                            // Deserializar el JSON si es necesario
+                            ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                            Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            wait4IAResponse = false;
+                        }
+                        else
+                        {
+                            Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                        }
+                    }, LLMModels.gpt3turbo);
+                }
+                else
+                {
+                    Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                }
+            }, LLMModels.gpt3turbo);
+        }
+        else if (IAmodels[IAmodelIndx] == "ChatGPT-4")
+        {
+            this.iagame.ChatGPT(prompt, (chatResponse) =>
+            {
+                ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                if (responseMsg != null)
+                {
+
+                    // result
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    this.iagame.ChatGPT(prompclasificacion, (response) =>
+                    {
+
+                        if (!string.IsNullOrEmpty(response))
+                        {
+                            // Deserializar el JSON si es necesario
+                            ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                            Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            wait4IAResponse = false;
+                        }
+                        else
+                        {
+                            Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                        }
+                    }, LLMModels.gpt4turbo);
+                }
+                else
+                {
+                    Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                }
+            }, LLMModels.gpt4turbo);
+        }
+        //else
+        //{
+        //    this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
+        //        {
+        //            if (!string.IsNullOrEmpty(response))
+        //            {
+        //                // Deserializar el JSON si es necesario
+        //                ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
+        //                Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
+        //                if (responseMsg.choices[0].message.content == "SI")
+        //                {
+        //                    this.iagame.Chat(IAmodels[IAmodelIndx], prompclasificacion, (response) =>
+        //                    {
+
+        //                        if (!string.IsNullOrEmpty(response))
+        //                        {
+        //                            // Deserializar el JSON si es necesario
+        //                            ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
+        //                            Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
+        //                            wait4IAResponse = false;
+        //                        }
+
+        //                    });
+        //                }
+        //            }
+        //            else
+        //            {
+        //                Debug.LogError("No se recibió ninguna respuesta del modelo.");
+        //            }
+        //        });
+        //}
     }
     private void Awake()
     {
@@ -162,36 +253,89 @@ public class GameManager : MonoBehaviour
         {
             this.iagame.ChatDeepSeek(prompt, (response) =>
             {
-                
-                    if (!string.IsNullOrEmpty(response))
-                    {
-                        // Deserializar el JSON si es necesario
-                        ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
-                        Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    // Deserializar el JSON si es necesario
+                    ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
                     string patron = @"\{[\s\S]*?\}";
                     Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
                     IAResponse = match.Value;
-                        wait4IAResponse = false;
-                    }
+                    wait4IAResponse = false;
+                }
                 
             });
-        }
-        else
+        } else if (IAmodels[IAmodelIndx] == "Grok")
         {
-            this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
+            this.iagame.ChatGrok(prompt, (response) =>
             {
-               
-                    if (!string.IsNullOrEmpty(response))
-                    {
-                        // Deserializar el JSON si es necesario
-                        ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
-                        Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
-                        IAResponse = responseMsg.choices[0].message.content;
-                        wait4IAResponse = false;
-                    }
-                
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    // Deserializar el JSON si es necesario
+                    ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    string patron = @"\{[\s\S]*?\}";
+                    Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
+                    IAResponse = match.Value;
+                    wait4IAResponse = false;
+                }
+
             });
         }
+        else if (IAmodels[IAmodelIndx] == "ChatGPT-3.5 Turbo")
+        {
+            this.iagame.ChatGPT(prompt, (response) =>
+            {
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    // Deserializar el JSON si es necesario
+                    ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    string patron = @"\{[\s\S]*?\}";
+                    Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
+                    IAResponse = match.Value;
+                    wait4IAResponse = false;
+                }
+
+            }, LLMModels.gpt3turbo);
+        }
+        else if (IAmodels[IAmodelIndx] == "ChatGPT-4")
+        {
+            this.iagame.ChatGPT(prompt, (response) =>
+            {
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    // Deserializar el JSON si es necesario
+                    ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    string patron = @"\{[\s\S]*?\}";
+                    Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
+                    IAResponse = match.Value;
+                    wait4IAResponse = false;
+                }
+
+            }, LLMModels.gpt4turbo);
+        }
+        //else
+        //{
+        //    this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
+        //    {
+
+        //            if (!string.IsNullOrEmpty(response))
+        //            {
+        //                // Deserializar el JSON si es necesario
+        //                ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
+        //                Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
+        //                IAResponse = responseMsg.choices[0].message.content;
+        //                wait4IAResponse = false;
+        //            }
+
+        //    });
+        //}
     }
     public IEnumerator BackMenu()
     {

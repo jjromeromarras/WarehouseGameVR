@@ -1,12 +1,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.Net.Http;
-using System.Security.Policy;
-using System.Text;
-using System.Threading;
-using UnityEditor.PackageManager;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -14,16 +8,23 @@ public partial class IA
 {
 
     private const string SERVER = "http://localhost:4891/";
-    private const string SERVERDEEPSEEK = "https://api.deepseek.com";
-    private const string apiKey = "sk-840bb031b4b446df8b81a4ceea7fb6ab";
+            
     private class Endpoints
     {
         public const string MODELS = "v1/models";
         public const string TEXT = "v1/completions";
         public const string CHAT = "v1/chat/completions";
     }
-    private DeepSeekClient clientDeepSeek = new DeepSeekClient(apiKey);
 
+    private DeepSeekClient clientDeepSeek = new DeepSeekClient();
+    private GrokClient clientGrok = new GrokClient();
+    private OpenIAClient openIA = new OpenIAClient();
+    private string serverpromp = $"Eres un asistente en formación logística. Esta diseñado para " +
+            $"poder personalizar el entrenamiento de cualquier operario del almacén. Tus conocimientos" +
+            $"en lo logisticas son profundos. Entiendes los procesos de preparación de pedidos, recepción," +
+            $"ubicación de material o manejo de carretillas. Además eres un experto en gamificación a fin de poder" +
+            $"diseñar los entrenamiento mas atractivos y personalizados. Tu labor es ayudar a personalizar" +
+            $"el entranamiento de los operarios del almacén.";
     private IEnumerator PostRequest(string uri, string jsonData, Action<string> callback)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Post(uri, jsonData))
@@ -49,7 +50,7 @@ public partial class IA
             }
         }
     }
-
+    
 
     /// <summary>
     /// Generate a response from prompt with chat context/history
@@ -85,14 +86,25 @@ public partial class IA
 
     }
 
+  
     public void ChatDeepSeek(string prompttxt, Action<string> callback)
-    {
-        var serverpromp = $"Eres un asistente en formación logística. Esta diseñado para " +
-            $"poder personalizar el entrenamiento de cualquier operario del almacén. Tus conocimientos" +
-            $"en lo logisticas son profundos. Entiendes los procesos de preparación de pedidos, recepción," +
-            $"ubicación de material o manejo de carretillas. Además eres un experto en gamificación a fin de poder" +
-            $"diseñar los entrenamiento mas atractivos y personalizados. Tu labor es ayudar a personalizar" +
-            $"el entranamiento de los operarios del almacén.";
+    {       
+        var request = new ChatRequest
+        {
+            messages = new System.Collections.Generic.List<MessageDeep>() {
+                MessageDeep.NewSystemMessage(serverpromp),
+                MessageDeep.NewUserMessage(prompttxt)
+            },
+            model = LLMModels.DeepSeekChatModel,           
+
+        };
+
+        GameManager.Instance.StartCoroutine(clientDeepSeek.Chat(request, callback));      
+
+    }
+
+    public void ChatGrok(string prompttxt, Action<string> callback)
+    {       
 
         var request = new ChatRequest
         {
@@ -100,12 +112,28 @@ public partial class IA
                 MessageDeep.NewSystemMessage(serverpromp),
                 MessageDeep.NewUserMessage(prompttxt)
             },
+            model = LLMModels.Grok2,
 
         };
 
-        GameManager.Instance.StartCoroutine(clientDeepSeek.Chat(request, apiKey, callback));
+        GameManager.Instance.StartCoroutine(clientGrok.Chat(request, callback));
 
+    }
+
+    public void ChatGPT(string prompttxt, Action<string> callback, string model)
+    {
       
+        var request = new ChatRequest
+        {
+            messages = new System.Collections.Generic.List<MessageDeep>() {
+                MessageDeep.NewSystemMessage(serverpromp),
+                MessageDeep.NewUserMessage(prompttxt)
+            },
+            model = model
+
+        };
+
+        GameManager.Instance.StartCoroutine(openIA.Chat(request, callback));
 
     }
 }
