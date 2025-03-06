@@ -26,13 +26,14 @@ public class ReceptionLevel : Level
             case 1:
                 game = new GameReception(data, 1, 3, "Tutorial Reception", 10);                
                 state = StateGame.ShowReceptionInformada;
-
+                GameManager.Instance.showminimap = true;
                 if (timer != null)
                 {
                     timer.SetTimeLeft(300f);
                 }
                 break;
         }
+        setMiniMap();
         GameManager.Instance.WriteLog($"Iniciar game: {game.Name}");
         tasks = new Queue<ReceptionTask>();
         (game as GameReception).Orders.SelectMany(p => p.Tasks).ToList().ForEach(task => tasks.Enqueue(task as ReceptionTask));

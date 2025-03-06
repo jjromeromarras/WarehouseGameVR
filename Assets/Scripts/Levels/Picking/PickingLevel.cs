@@ -1,6 +1,7 @@
 using Assets.Scripts.Helper;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PickingLevel : Level
@@ -38,6 +39,9 @@ public class PickingLevel : Level
             {
                 case 1:
                     game = new GamePicking(warehousemanual, 1, 1, OrderType.Picking, "Tutorial Picking", 10, false);
+                    GameManager.Instance.showminimap = true;
+                    tutorial = true;
+
                     state = StateGame.ShowBienVenido;
                     if (timer != null)
                     {
@@ -46,7 +50,9 @@ public class PickingLevel : Level
                     break;
                 case 2:
                     game = new GamePicking(warehousemanual, 1, 10, OrderType.Picking, "Preparar un pedido", 6, false);
+                    GameManager.Instance.showminimap = true;
                     showhelp = true;
+                    tutorial = true;
                     state = StateGame.ShowTutorial2;
                     if (timer != null)
                     {
@@ -55,7 +61,9 @@ public class PickingLevel : Level
                     break;
                 case 3:
                     game = new GamePicking(warehousemanual, 3, 8, OrderType.Picking, "Multi pedidos", 3, true);
+                    GameManager.Instance.showminimap = false;
                     showhelp = true;
+                    tutorial = false;
                     state = StateGame.ShowTutorial3;
                     if (timer != null)
                     {
@@ -71,6 +79,7 @@ public class PickingLevel : Level
             {
                 txtNivel.SetPantallaTxt("level1", new object[] { });
             }
+            setMiniMap();
         }
         else
         {
@@ -177,6 +186,7 @@ public class PickingLevel : Level
             case StateGame.AdjustIAChallenge:
             case StateGame.AdjustIALevelInLocation:
             case StateGame.AdjustIALevelInContainerClient:
+            case StateGame.AdjustIALevelInContainer:
                 {
                     showMsg(retoayuda.Explicacion);
                     break;
@@ -213,7 +223,9 @@ public class PickingLevel : Level
                                 {
                                     timer.SetTimeLeft(retoia.Tiempo * 60);
                                 }
-                               
+                                currentTask.ContainerRef.SetSelected(false);
+                                currentTask.LocationRef.UnSelectionShelf();
+
                                 GameManager.Instance.WriteLog($"Iniciar game: {game.Name} - Nivel {retoia.Nivel}");
                                 tasks = new Queue<Task>();
                                 (game as GamePicking).AllTask.ForEach(task => tasks.Enqueue(task));
@@ -232,6 +244,7 @@ public class PickingLevel : Level
                     break;
                 }
             case StateGame.WaitingIAHelpLocation:
+            case StateGame.WaitingIAHelpContainer:
                 {
                     if (!GameManager.Instance.wait4IAResponse)
                     {
@@ -262,6 +275,8 @@ public class PickingLevel : Level
                                         }
                          
                                         GameManager.Instance.WriteLog($"Iniciar Reajustado game: {game.Name} - Nivel {retoayuda.Nivel}");
+                                        currentTask.ContainerRef.SetSelected(false);
+                                        currentTask.LocationRef.UnSelectionShelf();
                                         tasks = new Queue<Task>();
                                         (game as GamePicking).AllTask.ForEach(task => tasks.Enqueue(task));
                                         currentTask = tasks.Dequeue();
@@ -681,7 +696,7 @@ public class PickingLevel : Level
 
                             setLockPlayer(true);
                             GameManager.Instance.SendIAMsg(prompt);
-                            state = StateGame.WaitingIAHelpLocation;
+                            state = StateGame.WaitingIAHelpContainer;
                             stateHelp = StateGame.AdjustIALevelInContainer;
 
                         }
@@ -879,8 +894,15 @@ public class PickingLevel : Level
                     }
                 }
                 break;
+            case StateGame.AdjustIALevelInContainer:
+                {
+                    setLockPlayer(false);
+                    infotext.SetActiveInfo(false);
+                    state = StateGame.ScannerContainer;                   
+                }
+                break;
             case StateGame.ShowLocationPicking:
-            case StateGame.AdjustIALevelInLocation:
+            case StateGame.AdjustIALevelInLocation:            
                 {
                     setLockPlayer(false);
                     infotext.SetActiveInfo(false);

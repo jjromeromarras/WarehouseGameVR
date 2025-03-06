@@ -39,24 +39,17 @@ public class SC_MainMenu : MonoBehaviour
     {
         //SoundManager.SharedInstance.PlayMusic(menuMusic);
         //selected[0].SetActive(true);
-        if (GameManager.Instance != null && !GameManager.Instance.player.Survery && !GameManager.Instance.debug)
+        if (GameManager.Instance != null)
         {
             state = StateGame.ShowOptions;
             Options();
-        } else
-        {
-            infotext.gameObject.SetActive(false);
-            state = StateGame.ShowMenu;
-            if (GameManager.Instance.debug)
-       
-                GameManager.Instance.InitialIA();
         }
         if (infotext != null)
         {
             infotext.onFinishInfoText += FinishInfoText;
         }
 
-        
+
 
     }
 
@@ -155,43 +148,15 @@ public class SC_MainMenu : MonoBehaviour
                 }
             case StateGame.ShowEncuestaCarretilla2:
                 {
-                    //if (GameManager.Instance.UsedIA)
-                    //{
-                    //    GameManager.Instance.player.playerClassification.ClassifyPlayer();
-                    //    string prompt = $"A continuación te indico los resultados de las preguntas realizada al jugador y el nivel para cada categoría:";
-                    //    foreach (var categoria in GameManager.Instance.player.playerClassification.playerResponses)
-                    //    {
-                    //        prompt += $"{categoria.Key}={categoria.Value.level.ToString()},";
-                    //    }
-                    //    prompt += $"el nivel global del jugador {GameManager.Instance.player.playerClassification.overallLevel}. Con estos datos necesitos que recomiendes al jugador que categorías debería enfocarse primero." +
-                    //        $"La repuesta debe ser una frase de máximo 3 líneas. Escribe la respuesta como le estuvieras hablando al jugador. Si su nivel global bajo lo ideal sería recomendarle que siga el entrenamiento general. Y necesito que este en el idioma:{GameManager.Instance.GetLanguage()} ";
-                    //    GameManager.Instance.SendIAMsg(prompt);
-                    //}
+                    GameManager.Instance.player.playerClassification.CalculateClassifyPlayer();
                     showTextoKey("finalencuesta");
                     infotext.textcontinuar.gameObject.SetActive(true);
                     infotext.executeFinish = true;
                     GameManager.Instance.player.Survery = true;
-                    //if (GameManager.Instance.UsedIA)
-                    //{
-                    //    state = StateGame.ShowRecomendacion;
-                    //    infotext.executeFinish = false;
-                    //    enableactions = false;
-                    //}
-                    //else
-                    //{
-                        state = StateGame.ShowMenu;
-                        enableactions = true;
-                    //}
+                    state = StateGame.ShowMenu;
+                    enableactions = true;
                     break;
                 }
-            //case StateGame.ShowFinalEncuesta:
-            //    enableactions = false;
-            //    infotext.textcontinuar.gameObject.SetActive(true);
-            //    showTextoKey("procesarencuesta");
-            //    state = StateGame.ShowMenu;
-            //    infotext.executeFinish = false;
-                
-            //    break;
             case StateGame.ShowMenu:
                 {
                     infotext.SetActiveInfo(false);
@@ -205,16 +170,7 @@ public class SC_MainMenu : MonoBehaviour
 
 
     void Update()
-    {
-        // Respuesta A -> X (2) 2 Puntos
-        // Respuesta B -> A (0) 1 puntos
-        // Respuesta C -> B (1) 0 puntos
-        /*  { "General", new CategoryScore() },
-        { "RecepcionMateriales", new CategoryScore() },
-        { "PreparacionPedidos", new CategoryScore() },
-        { "UbicacionMateriales", new CategoryScore() },
-        { "ManejoCarretillas", new CategoryScore() }
-        */
+    {      
 
         if (state == StateGame.ShowInicio && !changelanguage)
         {
@@ -227,19 +183,7 @@ public class SC_MainMenu : MonoBehaviour
         {
             FinishInfoText();
         }
-
-        //if (state == StateGame.ShowRecomendacion)
-        //{
-        //    if (!GameManager.Instance.wait4IAResponse)
-        //    {
-        //        waitreading = false;
-        //        infotext.executeFinish = true;
-        //        infotext.textcontinuar.gameObject.SetActive(true);
-        //        showMsg(GameManager.Instance.IAResponse);
-        //        state = StateGame.ShowMenu;
-        //    }
-
-        //}
+       
         if (infotext.isFinish && state != StateGame.ShowBienVenido && state != StateGame.ShowEncuesta && enableactions)
         {
             var penalizacion = 0;
@@ -355,13 +299,20 @@ public class SC_MainMenu : MonoBehaviour
     public void PlayNowButton()
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
-        GameManager.Instance.minlevel = currentlevel;
+        
         if (currentlevel == 1)
         {
+            GameManager.Instance.minlevel = 0;
+            GameManager.Instance.maxlevel = 2;
+        }
+        else if (currentlevel == 2)
+        {
+            GameManager.Instance.minlevel = 3;
             GameManager.Instance.maxlevel = 3;
         }
         else if (currentlevel == 4)
         {
+            GameManager.Instance.minlevel = 4;
             GameManager.Instance.maxlevel = 5;
         }
         StartCoroutine(LoadAsyncScene()); //call to begin loading scene
@@ -448,12 +399,37 @@ public class SC_MainMenu : MonoBehaviour
         SoundManager.SharedInstance.PlaySound(bottonClip);
         if (LLMid == 0)
         {
-            GameManager.Instance.enableIA = false;
+            GameManager.Instance.UsedIA = false;
         }
         else
         {
-            GameManager.Instance.enableIA = true;
-            GameManager.Instance.IAmodelIndx = LLMid-1;
+            GameManager.Instance.UsedIA = true;
+            GameManager.Instance.IAmodelIndx = LLMid - 1;
+        }
+    }
+
+    public void ChangeLevel(int Levelid)
+    {
+        SoundManager.SharedInstance.PlaySound(bottonClip);
+        if (Levelid != 0)
+        {
+            GameManager.Instance.player.Survery = true;
+            switch (Levelid)
+            {
+                case 1:
+                    GameManager.Instance.player.playerClassification.SetClassifyPlayer(PlayerClassification.LevelCategory.Principiante);
+                        break;
+                case 2:
+                    GameManager.Instance.player.playerClassification.SetClassifyPlayer(PlayerClassification.LevelCategory.Medio);
+                    break;
+                case 3:
+                    GameManager.Instance.player.playerClassification.SetClassifyPlayer(PlayerClassification.LevelCategory.Avanzado);
+                    break;
+                case 4:
+                    GameManager.Instance.player.playerClassification.SetClassifyPlayer(PlayerClassification.LevelCategory.Experto);
+                    break;
+            }
+
         }
     }
 
@@ -492,6 +468,14 @@ public class SC_MainMenu : MonoBehaviour
             infotext.SetActiveInfo(true);
             NextStep();
         }
+        else
+        {
+            infotext.gameObject.SetActive(false);
+            state = StateGame.ShowMenu;
+            if (GameManager.Instance.UsedIA)
+                GameManager.Instance.InitialIA();
+        }
+
     }
 
     public void ChangePenalizacion(bool value)

@@ -68,7 +68,7 @@ public class GameManagerLevels : MonoBehaviour
             picking.gameObject.SetActive(false);
         }
 
-        currentGame = GameManager.Instance.minlevel - 1;
+        currentGame = GameManager.Instance.minlevel;
 
     }
     void Start()
@@ -91,18 +91,17 @@ public class GameManagerLevels : MonoBehaviour
         }
         for (int i = 0; i < levels.Length; i++)
         {
-            if (GameManager.Instance != null)
-            {
 
-                if (i != GameManager.Instance.minlevel - 1)
-                {
-                    levels[i].gameObject.SetActive(false);
-                }
-                else
-                {
-                    levels[i].gameObject.SetActive(true);
-                }
+
+            if (i == GameManager.Instance.minlevel)
+            {
+                levels[i].gameObject.SetActive(true);
             }
+            else
+            {
+                levels[i].gameObject.SetActive(false);
+            }
+
             levels[i].onSetLockPlayer += SetLockPlayer;
             levels[i].onSetPickingLocation += SetPickingLocation;
             levels[i].onSetReceptionLocation += SetReceptionLocation;
@@ -164,7 +163,7 @@ public class GameManagerLevels : MonoBehaviour
             {
                 inforesult.SetActiveInfo(false);
                 levels[currentGame].gameObject.SetActive(false);
-                if (currentGame < GameManager.Instance.maxlevel)
+                if (currentGame <= GameManager.Instance.maxlevel)
                 {
                     currentGame++;
                     onResetMiniMap();

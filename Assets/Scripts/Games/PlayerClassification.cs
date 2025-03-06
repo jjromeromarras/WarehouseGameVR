@@ -26,19 +26,15 @@ public class PlayerClassification
         { "UbicacionMateriales", new CategoryScore() },
         { "ManejoCarretillas", new CategoryScore() }
     };
-
-    // Puntuaciones máximas por categoría y total
-    private const int maxPointsPerCategory = 4;
-    private const int maxTotalPoints = 16;
+    
 
     // Clasificación general y por categoría
     public LevelCategory overallLevel;
    
 
     // Método para calcular la puntuación
-    public void ClassifyPlayer()
+    public void CalculateClassifyPlayer()
     {
-
         // Suma total de puntos
         int totalPoints = 0;
 
@@ -53,6 +49,20 @@ public class PlayerClassification
 
         // Clasificar el nivel general
         overallLevel = GetOverallLevel(totalPoints);
+    }
+
+    public void SetClassifyPlayer(LevelCategory level)
+    {       
+        // Evaluar cada categoría
+        foreach (var response in playerResponses)
+        {
+            int score = (2 - response.Value.pregunta1) + (2 - response.Value.pregunta1);
+            // Clasificar categoría
+            response.Value.level = level;
+        }
+
+        // Clasificar el nivel general
+        overallLevel = level;
     }
     public LevelCategory GetLevel4Category(string categoryName)
     {

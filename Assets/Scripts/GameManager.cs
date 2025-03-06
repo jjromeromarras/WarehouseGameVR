@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] public bool mandoxbox;
     [SerializeField] public int minlevel;
     [SerializeField] public int maxlevel;
-    [SerializeField] public bool enableIA;
     [SerializeField] public bool debug;
 
     public IA iagame;
@@ -43,9 +42,7 @@ public class GameManager : MonoBehaviour
         localize = 0;
         logger = FindObjectOfType<Logger>();
         wait4IAResponse = false;
-        enableIA = true;
-    
-
+        UsedIA = false;    
     }
 
     public void InitialIA()
@@ -181,38 +178,7 @@ public class GameManager : MonoBehaviour
                     Debug.LogError("No se recibió ninguna respuesta del modelo.");
                 }
             }, LLMModels.gpt4turbo);
-        }
-        //else
-        //{
-        //    this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
-        //        {
-        //            if (!string.IsNullOrEmpty(response))
-        //            {
-        //                // Deserializar el JSON si es necesario
-        //                ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
-        //                Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
-        //                if (responseMsg.choices[0].message.content == "SI")
-        //                {
-        //                    this.iagame.Chat(IAmodels[IAmodelIndx], prompclasificacion, (response) =>
-        //                    {
-
-        //                        if (!string.IsNullOrEmpty(response))
-        //                        {
-        //                            // Deserializar el JSON si es necesario
-        //                            ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
-        //                            Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
-        //                            wait4IAResponse = false;
-        //                        }
-
-        //                    });
-        //                }
-        //            }
-        //            else
-        //            {
-        //                Debug.LogError("No se recibió ninguna respuesta del modelo.");
-        //            }
-        //        });
-        //}
+        }       
     }
     private void Awake()
     {
@@ -319,23 +285,7 @@ public class GameManager : MonoBehaviour
                 }
 
             }, LLMModels.gpt4turbo);
-        }
-        //else
-        //{
-        //    this.iagame.Chat(IAmodels[IAmodelIndx], prompt, (response) =>
-        //    {
-
-        //            if (!string.IsNullOrEmpty(response))
-        //            {
-        //                // Deserializar el JSON si es necesario
-        //                ResponseMsg responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(response);
-        //                Debug.Log($"Respuesta: {responseMsg.choices[0].message.content}");
-        //                IAResponse = responseMsg.choices[0].message.content;
-        //                wait4IAResponse = false;
-        //            }
-
-        //    });
-        //}
+        }       
     }
     public IEnumerator BackMenu()
     {
