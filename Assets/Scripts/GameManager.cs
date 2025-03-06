@@ -220,8 +220,8 @@ public class GameManager : MonoBehaviour
         {
             player = new Player();
             GameManager.Instance = this;
-            this.UsedIA = true;
-            this.showminimap = true;
+            //this.UsedIA = true;
+            this.showminimap = false;
             this.penalización = true;
             this.mandoxbox = true;
             iagame = new IA();

@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using UnityEngine;
-
 public class MessageDeep 
 {
     public string content { get; set; }

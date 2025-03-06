@@ -14,6 +14,7 @@ public class Level : MonoBehaviour
     [SerializeField] public bool tutorial;
     public event Action<string, string, shelf, string, string, string, int, int> onSetPickingLocation;
     public event Action onSetReceptionLocation;
+    public event Action onResetMiniMap;
     public int bonificacion;
     public int penalizacion;
     public bool showhelp;
@@ -150,6 +151,15 @@ public class Level : MonoBehaviour
         }
 
     }
+
+    public void setMiniMap()
+    {
+        if (onResetMiniMap != null)
+        {
+            onResetMiniMap();
+        }
+
+    }
     public virtual void NextStep() { }
 
     public void FinishInfoText()
@@ -184,6 +194,10 @@ public class Level : MonoBehaviour
         settxtErrors(GameManager.Instance.player.Data[currentData].Errors);
     }
 
+    public void ResetErrors()
+    {
+        GameManager.Instance.player.Data[currentData].Errors = 0;
+    }
     public void AddBonificacion(int bonus)
     {
         bonificacion += bonus;

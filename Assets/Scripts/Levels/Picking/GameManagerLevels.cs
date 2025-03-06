@@ -51,7 +51,7 @@ public class GameManagerLevels : MonoBehaviour
 
         if (minimap != null)
         {
-            minimap.SetActive(GameManager.Instance.showminimap);
+            onResetMiniMap();
         }
 
         if (cross != null)
@@ -107,6 +107,7 @@ public class GameManagerLevels : MonoBehaviour
             levels[i].onSetPickingLocation += SetPickingLocation;
             levels[i].onSetReceptionLocation += SetReceptionLocation;
             levels[i].onFinishTask += FinishTask;
+            levels[i].onResetMiniMap += onResetMiniMap;
 
         }
 
@@ -166,7 +167,7 @@ public class GameManagerLevels : MonoBehaviour
                 if (currentGame < GameManager.Instance.maxlevel)
                 {
                     currentGame++;
-                    minimap.SetActive(GameManager.Instance.showminimap);
+                    onResetMiniMap();
                     cross.SetActive(true);
                     rfmenu.SetActive(true);
                     infotext.SetActiveInfo(false);
@@ -345,7 +346,7 @@ public class GameManagerLevels : MonoBehaviour
 
             playerbody.gameObject.SetActive(true);
             cross.SetActive(true);
-            minimap.SetActive(GameManager.Instance.showminimap);
+            onResetMiniMap();
             infopicking.SetActive(false);
             SetLockPlayer(false);
             _state = GameState.Traveller;
@@ -408,7 +409,7 @@ public class GameManagerLevels : MonoBehaviour
 
             playerbody.gameObject.SetActive(true);
             cross.SetActive(true);
-            minimap.SetActive(GameManager.Instance.showminimap);
+            onResetMiniMap();
             infopicking.SetActive(false);
             SetLockPlayer(false);
 
@@ -437,6 +438,11 @@ public class GameManagerLevels : MonoBehaviour
         levels[currentGame].onResetTask();
         receptioncamera.ResetScene();
 
+    }
+
+    private void onResetMiniMap()
+    {
+        minimap.SetActive(GameManager.Instance.showminimap);
     }
 
     private void onErrorPicking()

@@ -532,7 +532,7 @@ public class SC_MainMenu : MonoBehaviour
     public void NextLevel()
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
-        if (currentlevel < 6) currentlevel++;
+        if (currentlevel < 5) currentlevel++;
         SetLevel();
     }
     public void BackLevel()
@@ -552,8 +552,8 @@ public class SC_MainMenu : MonoBehaviour
 
         localizedstring = GenerateLocalizedStringInEditor("level" + currentlevel.ToString());
         txttitulolevel.StringReference = localizedstring;
-        imagelock.SetActive(currentlevel != 1 && currentlevel != 4);
-        bottoncomenzar.SetActive(currentlevel == 1 || currentlevel == 4);
+        imagelock.SetActive(false);
+        bottoncomenzar.SetActive(true);
     }
 
     private LocalizedString GenerateLocalizedStringInEditor(string key)
