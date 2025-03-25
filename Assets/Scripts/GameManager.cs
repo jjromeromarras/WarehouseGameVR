@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
 
                     // result
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
                     this.iagame.ChatDeepSeek(prompclasificacion, (response) =>
                     {
 
@@ -69,16 +70,19 @@ public class GameManager : MonoBehaviour
                             // Deserializar el JSON si es necesario
                             ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
                             Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
                             wait4IAResponse = false;
                         }
                         else
                         {
                             Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                            GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
                         }
                     });
                 }
                 else
                 {
+                    GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
                     Debug.LogError("No se recibió ninguna respuesta del modelo.");
                 }
             });
@@ -93,6 +97,8 @@ public class GameManager : MonoBehaviour
 
                     // result
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     this.iagame.ChatGrok(prompclasificacion, (response) =>
                     {
 
@@ -101,17 +107,23 @@ public class GameManager : MonoBehaviour
                             // Deserializar el JSON si es necesario
                             ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
                             Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                             wait4IAResponse = false;
                         }
                         else
                         {
                             Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                            GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
                         }
                     });
                 }
                 else
                 {
                     Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                    GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
                 }
             });
         }
@@ -125,6 +137,8 @@ public class GameManager : MonoBehaviour
 
                     // result
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     this.iagame.ChatGPT(prompclasificacion, (response) =>
                     {
 
@@ -133,17 +147,23 @@ public class GameManager : MonoBehaviour
                             // Deserializar el JSON si es necesario
                             ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
                             Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                             wait4IAResponse = false;
                         }
                         else
                         {
                             Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                            GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
                         }
                     }, LLMModels.gpt3turbo);
                 }
                 else
                 {
                     Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                    GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
                 }
             }, LLMModels.gpt3turbo);
         }
@@ -157,6 +177,8 @@ public class GameManager : MonoBehaviour
 
                     // result
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     this.iagame.ChatGPT(prompclasificacion, (response) =>
                     {
 
@@ -165,20 +187,66 @@ public class GameManager : MonoBehaviour
                             // Deserializar el JSON si es necesario
                             ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
                             Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                             wait4IAResponse = false;
                         }
                         else
                         {
                             Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                            GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
                         }
                     }, LLMModels.gpt4turbo);
                 }
                 else
                 {
                     Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                    GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
                 }
             }, LLMModels.gpt4turbo);
-        }       
+        }
+        else if (IAmodels[IAmodelIndx] == "Llama")
+        {
+            this.iagame.ChatLlama(prompt, (chatResponse) =>
+            {
+                ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                if (responseMsg != null)
+                {
+
+                    // result
+                    Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
+                    this.iagame.ChatLlama(prompclasificacion, (response) =>
+                    {
+
+                        if (!string.IsNullOrEmpty(response))
+                        {
+                            // Deserializar el JSON si es necesario
+                            ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(chatResponse);
+                            Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                            GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
+                            wait4IAResponse = false;
+                        }
+                        else
+                        {
+                            Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                            GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
+                        }
+                    });
+                }
+                else
+                {
+                    Debug.LogError("No se recibió ninguna respuesta del modelo.");
+                    GameManager.Instance.WriteLog("No se recibió ninguna respuesta del modelo.");
+
+                }
+            });
+        }
     }
     private void Awake()
     {
@@ -215,6 +283,8 @@ public class GameManager : MonoBehaviour
     public void SendIAMsg(string prompt)
     {
         wait4IAResponse = true;
+        Debug.Log($"Pregunta IA {IAmodels[IAmodelIndx]}: {prompt}");
+        GameManager.Instance.WriteLog($"Pregunta IA {IAmodels[IAmodelIndx]}: {prompt}");
         if (IAmodels[IAmodelIndx] == "DeepSeek")
         {
             this.iagame.ChatDeepSeek(prompt, (response) =>
@@ -225,12 +295,15 @@ public class GameManager : MonoBehaviour
                     // Deserializar el JSON si es necesario
                     ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     string patron = @"\{[\s\S]*?\}";
                     Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
                     IAResponse = match.Value;
                     wait4IAResponse = false;
                 }
-                
+
+
             });
         } else if (IAmodels[IAmodelIndx] == "Grok")
         {
@@ -242,6 +315,8 @@ public class GameManager : MonoBehaviour
                     // Deserializar el JSON si es necesario
                     ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     string patron = @"\{[\s\S]*?\}";
                     Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
                     IAResponse = match.Value;
@@ -260,6 +335,8 @@ public class GameManager : MonoBehaviour
                     // Deserializar el JSON si es necesario
                     ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     string patron = @"\{[\s\S]*?\}";
                     Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
                     IAResponse = match.Value;
@@ -278,6 +355,8 @@ public class GameManager : MonoBehaviour
                     // Deserializar el JSON si es necesario
                     ChatResponse responseMsg = JsonConvert.DeserializeObject<ChatResponse>(response);
                     Debug.Log($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+                    GameManager.Instance.WriteLog($"Respuesta: {responseMsg?.choices.FirstOrDefault()?.message?.content}");
+
                     string patron = @"\{[\s\S]*?\}";
                     Match match = Regex.Match(responseMsg?.choices.FirstOrDefault()?.message?.content, patron);
                     IAResponse = match.Value;

@@ -211,6 +211,7 @@ public class pnjwalker : MonoBehaviour
     public void ResumePNJ()
     {
         state = PNJRFState.eMove;
+        //agente.gameObject.SetActive(false);
         //agente.gameObject.SetActive(true);
     }
 }

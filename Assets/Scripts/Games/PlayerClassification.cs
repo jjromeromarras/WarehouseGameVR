@@ -106,7 +106,8 @@ public class PlayerClassification
         Principiante,
         Medio,
         Avanzado,
-        Experto
+        Experto,
+        Master
     }
     
 }

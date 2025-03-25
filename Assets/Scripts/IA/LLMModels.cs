@@ -8,4 +8,5 @@ public class LLMModels
     public const string gpt4o = "gpt-4o";
     public const string gpt4turbo = "gpt-4-turbo";
     public const string gpt3turbo = "gpt-3.5-turbo";
+    public const string Llamameta = "llama3.3-70b";
 }

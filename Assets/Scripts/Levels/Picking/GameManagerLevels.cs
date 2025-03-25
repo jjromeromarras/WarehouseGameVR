@@ -210,9 +210,9 @@ public class GameManagerLevels : MonoBehaviour
         cross.SetActive(false);
         for (int i = 0; i < pnjs.Length; i++)
         {
-            pnjs[i].StopPNJ();
+           pnjs[i].StopPNJ();
         }
-        warehouse.SetActive(false);
+        //warehouse.SetActive(false);
         _state = GameState.Reception;
     }
 
@@ -234,7 +234,7 @@ public class GameManagerLevels : MonoBehaviour
         {
             pnjs[i].StopPNJ();
         }
-        warehouse.SetActive(false);
+       // warehouse.SetActive(false);
 
         _state = GameState.Picking;
         List<pallet> containers = new List<pallet>();
@@ -312,7 +312,6 @@ public class GameManagerLevels : MonoBehaviour
         if (!result)
         {
             GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container} Fail");
-            SoundManager.SharedInstance.PlaySound(pickingFail);
         }
         GameManager.Instance.WriteLog($"[onCheckContainerPicking] - container: {container} OK");
         return result;
@@ -337,7 +336,7 @@ public class GameManagerLevels : MonoBehaviour
             GameManager.Instance.WriteLog($"[onCheckPicking] - Picking OK");
             SoundManager.SharedInstance.PlaySound(pickingOK);
             picking.gameObject.SetActive(false);
-            warehouse.SetActive(true);
+            //warehouse.SetActive(true);
             for (int i = 0; i < pnjs.Length; i++)
             {
                 pnjs[i].ResumePNJ();
@@ -368,7 +367,7 @@ public class GameManagerLevels : MonoBehaviour
             receptioncamera.ResetScene();
             SoundManager.SharedInstance.PlaySound(pickingOK);
             reception.gameObject.SetActive(false);
-            warehouse.SetActive(true);
+            //warehouse.SetActive(true);
             for (int i = 0; i < pnjs.Length; i++)
             {
                 pnjs[i].ResumePNJ();
@@ -400,7 +399,7 @@ public class GameManagerLevels : MonoBehaviour
             receptioncamera.ResetScene();
             SoundManager.SharedInstance.PlaySound(pickingOK);
             reception.gameObject.SetActive(false);
-            warehouse.SetActive(true);
+            //warehouse.SetActive(true);
             for (int i = 0; i < pnjs.Length; i++)
             {
                 pnjs[i].ResumePNJ();

@@ -510,6 +510,7 @@ public class SC_MainMenu : MonoBehaviour
     {
         SoundManager.SharedInstance.PlaySound(bottonClip);
         panelconsentimiento.SetActive(false);
+        panellevels.SetActive(false);
         mainmenu.SetActive(true);
     }
 

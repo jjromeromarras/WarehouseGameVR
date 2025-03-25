@@ -19,6 +19,7 @@ public partial class IA
     private DeepSeekClient clientDeepSeek = new DeepSeekClient();
     private GrokClient clientGrok = new GrokClient();
     private OpenIAClient openIA = new OpenIAClient();
+    private LLamaClient llamaIA = new LLamaClient();
     private string serverpromp = $"Eres un asistente en formación logística. Esta diseñado para " +
             $"poder personalizar el entrenamiento de cualquier operario del almacén. Tus conocimientos" +
             $"en lo logisticas son profundos. Entiendes los procesos de preparación de pedidos, recepción," +
@@ -134,6 +135,23 @@ public partial class IA
         };
 
         GameManager.Instance.StartCoroutine(openIA.Chat(request, callback));
+
+    }
+
+    public void ChatLlama(string prompttxt, Action<string> callback)
+    {
+
+        var request = new ChatRequest
+        {
+            messages = new System.Collections.Generic.List<MessageDeep>() {
+                MessageDeep.NewSystemMessage(serverpromp),
+                MessageDeep.NewUserMessage(prompttxt)
+            },
+            model = LLMModels.Llamameta,
+
+        };
+
+        GameManager.Instance.StartCoroutine(llamaIA.Chat(request, callback));
 
     }
 }
